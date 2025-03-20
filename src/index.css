@@ -5,35 +5,65 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 220 20% 98%;
+    --foreground: 220 20% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 20% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 20% 10%;
 
-    --primary: 209 100% 60%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 220 20% 10%;
+    --primary-foreground: 220 20% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 20% 96%;
+    --secondary-foreground: 220 20% 12%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 20% 96%;
+    --muted-foreground: 220 20% 40%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 20% 96%;
+    --accent-foreground: 220 20% 10%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 50% 40%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 209 100% 60%;
+    --border: 220 20% 90%;
+    --input: 220 20% 90%;
+    --ring: 220 20% 40%;
 
-    --radius: 1rem;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 220 20% 8%;
+    --foreground: 220 20% 98%;
+
+    --card: 220 20% 10%;
+    --card-foreground: 220 20% 98%;
+
+    --popover: 220 20% 10%;
+    --popover-foreground: 220 20% 98%;
+
+    --primary: 220 20% 90%;
+    --primary-foreground: 220 20% 8%;
+
+    --secondary: 220 20% 16%;
+    --secondary-foreground: 220 20% 98%;
+
+    --muted: 220 20% 16%;
+    --muted-foreground: 220 20% 60%;
+
+    --accent: 220 20% 16%;
+    --accent-foreground: 220 20% 98%;
+
+    --destructive: 0 50% 40%;
+    --destructive-foreground: 220 20% 98%;
+
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 220 20% 60%;
   }
 
   * {
@@ -47,7 +77,7 @@
   
   /* Custom classes for our app */
   .glass-card {
-    @apply bg-white bg-opacity-70 backdrop-blur-md border border-white border-opacity-20 shadow-sm;
+    @apply bg-card/80 backdrop-blur-md border border-border shadow-sm;
   }
   
   .text-balance {
@@ -60,8 +90,8 @@
   
   /* Mobile optimized scrollbar */
   ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 3px;
+    height: 3px;
   }
   
   ::-webkit-scrollbar-track {
@@ -70,5 +100,23 @@
   
   ::-webkit-scrollbar-thumb {
     @apply bg-primary/30 rounded-full;
+  }
+
+  /* Compact UI elements */
+  .compact-card {
+    @apply p-2 space-y-1;
+  }
+  
+  .compact-input {
+    @apply py-1 px-2 h-8 text-sm;
+  }
+  
+  .compact-button {
+    @apply py-1 px-2 h-8 text-sm;
+  }
+  
+  .compact-table td, 
+  .compact-table th {
+    @apply py-1 px-2 text-sm;
   }
 }

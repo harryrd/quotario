@@ -14,16 +14,16 @@ const SettingsItem: React.FC<{
   onClick?: () => void;
 }> = ({ icon: Icon, title, description, onClick }) => (
   <motion.button
-    className="w-full flex items-center p-4 rounded-lg text-left hover:bg-secondary/50 smooth-transition"
+    className="w-full flex items-center p-3 rounded-md text-left hover:bg-secondary/50 smooth-transition"
     onClick={onClick}
     whileTap={{ scale: 0.98 }}
   >
-    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-      <Icon className="h-5 w-5 text-primary" />
+    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+      <Icon className="h-4 w-4 text-primary" />
     </div>
     <div className="flex-1">
-      <h3 className="font-medium">{title}</h3>
-      {description && <p className="text-sm text-muted-foreground">{description}</p>}
+      <h3 className="font-medium text-sm">{title}</h3>
+      {description && <p className="text-xs text-muted-foreground">{description}</p>}
     </div>
   </motion.button>
 );
@@ -33,12 +33,12 @@ const Settings: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-background">
       <Header title="Settings" showBack />
       
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-3">
         <AnimatedTransition>
-          <div className="grid gap-6">
+          <div className="grid gap-4">
             <section>
-              <h2 className="text-lg font-medium mb-2">Account</h2>
-              <div className="space-y-1 rounded-lg border overflow-hidden">
+              <h2 className="text-base font-medium mb-2">Account</h2>
+              <div className="space-y-1 rounded-md border overflow-hidden">
                 <SettingsItem 
                   icon={User} 
                   title="Profile"
@@ -54,8 +54,8 @@ const Settings: React.FC = () => {
             </section>
             
             <section>
-              <h2 className="text-lg font-medium mb-2">Billing</h2>
-              <div className="space-y-1 rounded-lg border overflow-hidden">
+              <h2 className="text-base font-medium mb-2">Billing</h2>
+              <div className="space-y-1 rounded-md border overflow-hidden">
                 <SettingsItem 
                   icon={CreditCard} 
                   title="Payment Methods"
@@ -65,8 +65,8 @@ const Settings: React.FC = () => {
             </section>
             
             <section>
-              <h2 className="text-lg font-medium mb-2">App Settings</h2>
-              <div className="space-y-1 rounded-lg border overflow-hidden">
+              <h2 className="text-base font-medium mb-2">App Settings</h2>
+              <div className="space-y-1 rounded-md border overflow-hidden">
                 <SettingsItem 
                   icon={Bell} 
                   title="Notifications"
@@ -82,8 +82,8 @@ const Settings: React.FC = () => {
             </section>
             
             <section>
-              <h2 className="text-lg font-medium mb-2">Support</h2>
-              <div className="space-y-1 rounded-lg border overflow-hidden">
+              <h2 className="text-base font-medium mb-2">Support</h2>
+              <div className="space-y-1 rounded-md border overflow-hidden">
                 <SettingsItem 
                   icon={HelpCircle} 
                   title="Help & Support"
@@ -94,9 +94,9 @@ const Settings: React.FC = () => {
             
             <Button 
               variant="outline"
-              className="w-full flex items-center justify-center gap-2 mt-4"
+              className="w-full flex items-center justify-center gap-2 mt-3 text-xs h-8"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-3 w-3" />
               <span>Log Out</span>
             </Button>
           </div>

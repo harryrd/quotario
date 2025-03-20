@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FileText, ArrowRight, Calendar } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { 
@@ -29,10 +29,10 @@ export interface DocumentCardProps {
 
 const statusColors: Record<DocumentStatus, string> = {
   draft: 'bg-muted text-muted-foreground',
-  sent: 'bg-blue-100 text-blue-800',
-  accepted: 'bg-green-100 text-green-800',
-  declined: 'bg-red-100 text-red-800',
-  paid: 'bg-emerald-100 text-emerald-800',
+  sent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+  accepted: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+  declined: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+  paid: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
 };
 
 const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -48,7 +48,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 }) => {
   return (
     <motion.div
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      whileHover={{ y: -2, transition: { duration: 0.2 } }}
       whileTap={{ scale: 0.98 }}
       className={cn("w-full", className)}
     >
@@ -56,33 +56,33 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         className="w-full overflow-hidden shadow-sm border-border/50 hover:shadow-md smooth-transition"
         onClick={onClick}
       >
-        <CardHeader className="p-4 pb-0 flex flex-row items-start justify-between">
+        <CardHeader className="p-3 pb-0 flex flex-row items-start justify-between">
           <div>
             <Badge 
               variant="outline" 
-              className="mb-2 uppercase text-xs tracking-wider font-medium"
+              className="mb-1 uppercase text-xs tracking-wider font-medium"
             >
               {type}
             </Badge>
-            <h3 className="text-lg font-medium line-clamp-1">{title}</h3>
-            <p className="text-sm text-muted-foreground">{clientName}</p>
+            <h3 className="text-base font-medium line-clamp-1">{title}</h3>
+            <p className="text-xs text-muted-foreground">{clientName}</p>
           </div>
           <Badge className={cn("rounded-full text-xs font-medium", statusColors[status])}>
             {status}
           </Badge>
         </CardHeader>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="h-4 w-4" />
+        <CardContent className="p-3 pt-2">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3" />
             <span>{date}</span>
           </div>
         </CardContent>
-        <CardFooter className="p-4 pt-0 flex justify-between items-center">
-          <p className="font-medium text-lg">
+        <CardFooter className="p-3 pt-0 flex justify-between items-center">
+          <p className="font-medium text-base">
             ${amount.toFixed(2)}
           </p>
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <ArrowRight className="h-4 w-4" />
+          <Button variant="ghost" size="icon" className="rounded-full h-7 w-7">
+            <ArrowRight className="h-3 w-3" />
           </Button>
         </CardFooter>
       </Card>

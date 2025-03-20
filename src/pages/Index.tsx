@@ -72,8 +72,7 @@ const Index: React.FC = () => {
   });
   
   const handleOpenDocument = (id: string) => {
-    // In a real app, you'd navigate to the document detail page
-    console.log(`Opening document ${id}`);
+    navigate(`/document/${id}`);
   };
   
   const handleCreateDocument = (type: 'quotation' | 'invoice') => {
@@ -88,43 +87,43 @@ const Index: React.FC = () => {
           <Button 
             variant="default" 
             size="sm" 
-            className="gap-1"
+            className="h-8 px-2 py-1 text-xs"
             onClick={() => navigate('/create')}
           >
-            <FilePlus className="h-4 w-4" />
+            <FilePlus className="h-3 w-3 mr-1" />
             New
           </Button>
         }
       />
       
-      <div className="flex items-center gap-2 p-4">
+      <div className="flex items-center gap-2 p-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
           <Input 
             placeholder="Search documents..." 
-            className="pl-9"
+            className="pl-7 h-8 text-xs"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button variant="outline" size="icon">
-          <Filter className="h-4 w-4" />
+        <Button variant="outline" size="icon" className="h-8 w-8">
+          <Filter className="h-3 w-3" />
         </Button>
       </div>
       
-      <div className="flex-1 px-4">
+      <div className="flex-1 px-3">
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="quotation">Quotations</TabsTrigger>
-            <TabsTrigger value="invoice">Invoices</TabsTrigger>
+          <TabsList className="grid grid-cols-3 mb-3">
+            <TabsTrigger value="all" className="text-xs py-1">All</TabsTrigger>
+            <TabsTrigger value="quotation" className="text-xs py-1">Quotations</TabsTrigger>
+            <TabsTrigger value="invoice" className="text-xs py-1">Invoices</TabsTrigger>
           </TabsList>
           
           <TabsContent value={activeTab} className="mt-0">
             <AnimatedTransition>
-              <div className="grid gap-4 pb-20">
+              <div className="grid gap-3 pb-16">
                 {filteredDocuments.length > 0 ? (
-                  filteredDocuments.map((doc, index) => (
+                  filteredDocuments.map((doc) => (
                     <DocumentCard 
                       key={doc.id} 
                       {...doc} 
@@ -132,14 +131,20 @@ const Index: React.FC = () => {
                     />
                   ))
                 ) : (
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <p className="text-muted-foreground mb-4">No documents found</p>
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <p className="text-muted-foreground mb-3 text-sm">No documents found</p>
                     {activeTab === 'all' ? (
-                      <Button onClick={() => navigate('/create')}>
+                      <Button 
+                        onClick={() => navigate('/create')}
+                        className="text-xs py-1 h-8"
+                      >
                         Create Your First Document
                       </Button>
                     ) : (
-                      <Button onClick={() => handleCreateDocument(activeTab as 'quotation' | 'invoice')}>
+                      <Button 
+                        onClick={() => handleCreateDocument(activeTab as 'quotation' | 'invoice')}
+                        className="text-xs py-1 h-8"
+                      >
                         Create Your First {activeTab === 'quotation' ? 'Quotation' : 'Invoice'}
                       </Button>
                     )}
@@ -152,19 +157,19 @@ const Index: React.FC = () => {
       </div>
       
       <motion.div 
-        className="fixed bottom-6 left-0 right-0 flex justify-center gap-4 px-4"
+        className="fixed bottom-4 left-0 right-0 flex justify-center gap-3 px-3"
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
       >
         <Button 
-          className="flex-1 glass-card shadow-lg"
+          className="flex-1 glass-card shadow-sm text-xs py-1 h-8"
           onClick={() => handleCreateDocument('quotation')}
         >
           New Quotation
         </Button>
         <Button 
-          className="flex-1 glass-card shadow-lg"
+          className="flex-1 glass-card shadow-sm text-xs py-1 h-8"
           onClick={() => handleCreateDocument('invoice')}
         >
           New Invoice

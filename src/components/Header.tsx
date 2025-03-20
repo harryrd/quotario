@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 interface HeaderProps {
   title: string;
@@ -42,25 +43,26 @@ const Header: React.FC<HeaderProps> = ({
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "sticky top-0 z-10 w-full px-4 py-4 flex items-center justify-between bg-background/80 backdrop-blur-md border-b border-border",
+        "sticky top-0 z-10 w-full px-3 py-2 flex items-center justify-between bg-background/80 backdrop-blur-md border-b border-border",
         className
       )}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {showBack && (
-          <Button variant="ghost" size="icon" onClick={goBack} className="rounded-full">
-            <ChevronLeft className="h-5 w-5" />
+          <Button variant="ghost" size="icon" onClick={goBack} className="rounded-full h-8 w-8">
+            <ChevronLeft className="h-4 w-4" />
           </Button>
         )}
-        <h1 className="text-xl font-medium">{title}</h1>
+        <h1 className="text-base font-medium">{title}</h1>
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
+        <ThemeSwitcher />
         {actions}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <MoreVertical className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+              <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
