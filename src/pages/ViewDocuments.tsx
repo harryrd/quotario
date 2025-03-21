@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const ViewDocuments: React.FC = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const handlePreviewPDF = () => {
     toast.success('Preparing PDF preview...');
@@ -117,42 +119,62 @@ const ViewDocuments: React.FC = () => {
       </div>
       
       <motion.div 
-        className="fixed bottom-6 left-0 right-0 flex justify-center gap-3 px-4"
+        className="fixed bottom-6 left-0 right-0 flex justify-center px-4"
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
       >
-        <Button 
-          variant="outline"
-          className="flex-1 glass-card h-11"
-          onClick={() => console.log('Download PDF')}
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Download
-        </Button>
-        <Button 
-          variant="outline"
-          className="flex-1 glass-card h-11"
-          onClick={handlePreviewPDF}
-        >
-          <FileText className="h-4 w-4 mr-2" />
-          Preview PDF
-        </Button>
-        <Button 
-          variant="outline"
-          className="flex-1 glass-card h-11"
-          onClick={() => console.log('Print document')}
-        >
-          <Printer className="h-4 w-4 mr-2" />
-          Print
-        </Button>
-        <Button 
-          className="flex-1 glass-card h-11"
-          onClick={() => console.log('Share document')}
-        >
-          <Share className="h-4 w-4 mr-2" />
-          Share
-        </Button>
+        <div className={`grid ${isMobile ? 'grid-cols-2 gap-3' : 'grid-cols-4 gap-3'} w-full`}>
+          {!isMobile && (
+            <Button 
+              variant="outline"
+              className="glass-card"
+              onClick={() => console.log('Download PDF')}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download
+            </Button>
+          )}
+          
+          <Button 
+            variant="outline"
+            className="glass-card"
+            onClick={handlePreviewPDF}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Preview PDF
+          </Button>
+          
+          {!isMobile && (
+            <Button 
+              variant="outline"
+              className="glass-card"
+              onClick={() => console.log('Print document')}
+            >
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </Button>
+          )}
+          
+          <Button 
+            className="glass-card"
+            onClick={() => console.log('Share document')}
+          >
+            <Share className="h-4 w-4 mr-2" />
+            Share
+          </Button>
+          
+          {isMobile && (
+            <Button 
+              variant="outline"
+              className="glass-card"
+              onClick={() => console.log('Download PDF')}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download
+            </Button>
+          )}
+        </div>
       </motion.div>
     </div>
   );

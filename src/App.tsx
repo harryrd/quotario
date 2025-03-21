@@ -10,6 +10,9 @@ import CreateDocument from "./pages/CreateDocument";
 import ViewDocuments from "./pages/ViewDocuments";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import ProfileSettings from "./pages/ProfileSettings";
+import BusinessDetails from "./pages/BusinessDetailsPage";
+import PaymentMethods from "./pages/PaymentMethodsPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +28,9 @@ const App = () => (
             <Route path="/create" element={<CreateDocument />} />
             <Route path="/document/:id" element={<ViewDocuments />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/settings/profile" element={<ProfileSettings />} />
+            <Route path="/settings/business" element={<BusinessDetails />} />
+            <Route path="/settings/payment" element={<PaymentMethods />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -86,11 +86,10 @@ const Index: React.FC = () => {
         actions={
           <Button 
             variant="default" 
-            size="sm" 
-            className="h-8 px-2 py-1 text-xs"
+            size="sm"
             onClick={() => navigate('/create')}
           >
-            <FilePlus className="h-3 w-3 mr-1" />
+            <FilePlus className="h-4 w-4 mr-1" />
             New
           </Button>
         }
@@ -98,25 +97,25 @@ const Index: React.FC = () => {
       
       <div className="flex items-center gap-2 p-3">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
             placeholder="Search documents..." 
-            className="pl-7 h-8 text-xs"
+            className="pl-9"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button variant="outline" size="icon" className="h-8 w-8">
-          <Filter className="h-3 w-3" />
+        <Button variant="outline" size="icon">
+          <Filter className="h-4 w-4" />
         </Button>
       </div>
       
       <div className="flex-1 px-3">
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-3 mb-3">
-            <TabsTrigger value="all" className="text-xs py-1">All</TabsTrigger>
-            <TabsTrigger value="quotation" className="text-xs py-1">Quotations</TabsTrigger>
-            <TabsTrigger value="invoice" className="text-xs py-1">Invoices</TabsTrigger>
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="quotation">Quotations</TabsTrigger>
+            <TabsTrigger value="invoice">Invoices</TabsTrigger>
           </TabsList>
           
           <TabsContent value={activeTab} className="mt-0">
@@ -132,18 +131,16 @@ const Index: React.FC = () => {
                   ))
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <p className="text-muted-foreground mb-3 text-sm">No documents found</p>
+                    <p className="text-muted-foreground mb-3">No documents found</p>
                     {activeTab === 'all' ? (
                       <Button 
                         onClick={() => navigate('/create')}
-                        className="text-xs py-1 h-8"
                       >
                         Create Your First Document
                       </Button>
                     ) : (
                       <Button 
                         onClick={() => handleCreateDocument(activeTab as 'quotation' | 'invoice')}
-                        className="text-xs py-1 h-8"
                       >
                         Create Your First {activeTab === 'quotation' ? 'Quotation' : 'Invoice'}
                       </Button>
@@ -163,13 +160,13 @@ const Index: React.FC = () => {
         transition={{ delay: 0.3, duration: 0.5 }}
       >
         <Button 
-          className="flex-1 glass-card shadow-sm text-xs py-1 h-8"
+          className="flex-1 glass-card shadow-sm"
           onClick={() => handleCreateDocument('quotation')}
         >
           New Quotation
         </Button>
         <Button 
-          className="flex-1 glass-card shadow-sm text-xs py-1 h-8"
+          className="flex-1 glass-card shadow-sm"
           onClick={() => handleCreateDocument('invoice')}
         >
           New Invoice
