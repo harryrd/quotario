@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Building, CreditCard, Bell, Lock, HelpCircle, LogOut, ChevronRight } from 'lucide-react';
+import { User, Building, CreditCard, Bell, Lock, HelpCircle, LogOut, ChevronRight, Settings as SettingsIcon, Users, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import { Separator } from '@/components/ui/separator';
@@ -72,8 +72,27 @@ const Settings: React.FC = () => {
             </section>
             
             <section>
+              <h2 className="text-base font-medium mb-2">Data Management</h2>
+              <div className="space-y-1 rounded-md border overflow-hidden">
+                <SettingsItem 
+                  icon={Users} 
+                  title="Clients"
+                  description="Manage your client database"
+                  onClick={() => navigate('/settings/clients')}
+                />
+              </div>
+            </section>
+            
+            <section>
               <h2 className="text-base font-medium mb-2">App Settings</h2>
               <div className="space-y-1 rounded-md border overflow-hidden">
+                <SettingsItem 
+                  icon={SettingsIcon} 
+                  title="General"
+                  description="Configure currency, numbering and formats"
+                  onClick={() => navigate('/settings/general')}
+                />
+                <Separator />
                 <SettingsItem 
                   icon={Bell} 
                   title="Notifications"

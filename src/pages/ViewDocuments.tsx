@@ -1,21 +1,34 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download, Share, Printer, Edit, FileText } from 'lucide-react';
+import { Download, Share, Printer, Edit, FileText, Menu, FilePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 
 const ViewDocuments: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [documentType, setDocumentType] = useState<'quotation' | 'invoice'>('quotation');
   
   const handlePreviewPDF = () => {
     toast.success('Preparing PDF preview...');
     // In a real app, this would generate and display a PDF
+  };
+  
+  const handleConvertToInvoice = () => {
+    toast.success('Converting quotation to invoice...');
+    // In a real app, this would actually convert the document and redirect
+    setDocumentType('invoice');
   };
   
   return (
@@ -124,56 +137,55 @@ const ViewDocuments: React.FC = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
       >
-        <div className={`grid ${isMobile ? 'grid-cols-2 gap-3' : 'grid-cols-4 gap-3'} w-full`}>
-          {!isMobile && (
+        <div className="w-full flex justify-center">
+          <div className="flex flex-row gap-3 w-full">
             <Button 
               variant="outline"
-              className="glass-card"
-              onClick={() => console.log('Download PDF')}
+              className="flex-1 glass-card"
+              onClick={handlePreviewPDF}
             >
-              <Download className="h-4 w-4 mr-2" />
-              Download
+              <FileText className="h-4 w-4 mr-2" />
+              Preview PDF
             </Button>
-          )}
-          
-          <Button 
-            variant="outline"
-            className="glass-card"
-            onClick={handlePreviewPDF}
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Preview PDF
-          </Button>
-          
-          {!isMobile && (
+            
             <Button 
-              variant="outline"
-              className="glass-card"
-              onClick={() => console.log('Print document')}
+              className="flex-1 glass-card"
+              onClick={() => toast.success('Document shared successfully')}
             >
-              <Printer className="h-4 w-4 mr-2" />
-              Print
+              <Share className="h-4 w-4 mr-2" />
+              Share
             </Button>
-          )}
-          
-          <Button 
-            className="glass-card"
-            onClick={() => console.log('Share document')}
-          >
-            <Share className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-          
-          {isMobile && (
-            <Button 
-              variant="outline"
-              className="glass-card"
-              onClick={() => console.log('Download PDF')}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Download
-            </Button>
-          )}
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline"
+                  size="icon"
+                  className="glass-card"
+                >
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => toast.success('Downloading document...')}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem onClick={() => toast.success('Printing document...')}>
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print
+                </DropdownMenuItem>
+                
+                {documentType === 'quotation' && (
+                  <DropdownMenuItem onClick={handleConvertToInvoice}>
+                    <FilePlus className="h-4 w-4 mr-2" />
+                    Convert to Invoice
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </motion.div>
     </div>

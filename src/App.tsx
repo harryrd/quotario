@@ -13,6 +13,8 @@ import NotFound from "./pages/NotFound";
 import ProfileSettings from "./pages/ProfileSettings";
 import BusinessDetails from "./pages/BusinessDetailsPage";
 import PaymentMethods from "./pages/PaymentMethodsPage";
+import GeneralSettingsPage from "./pages/GeneralSettingsPage";
+import ClientsPage from "./pages/ClientsPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +33,8 @@ const App = () => (
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/business" element={<BusinessDetails />} />
             <Route path="/settings/payment" element={<PaymentMethods />} />
+            <Route path="/settings/general" element={<GeneralSettingsPage />} />
+            <Route path="/settings/clients" element={<ClientsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
