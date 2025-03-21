@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import { Separator } from '@/components/ui/separator';
 import AnimatedTransition from '@/components/AnimatedTransition';
+import { useAuth } from '@/components/AuthContext';
 
 const SettingsItem: React.FC<{
   icon: React.ElementType;
@@ -32,6 +33,7 @@ const SettingsItem: React.FC<{
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -124,6 +126,7 @@ const Settings: React.FC = () => {
             <Button 
               variant="outline"
               className="w-full flex items-center justify-center gap-2 mt-3"
+              onClick={logout}
             >
               <LogOut className="h-4 w-4" />
               <span>Log Out</span>
