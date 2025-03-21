@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 interface HeaderProps {
   title: string;
@@ -57,7 +56,6 @@ const Header: React.FC<HeaderProps> = ({
       </div>
       
       <div className="flex items-center gap-1">
-        <ThemeSwitcher />
         {actions}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -6,6 +6,7 @@ import { useTheme } from "@/components/ThemeProvider";
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
 
+  // Toggle between light and dark mode
   return (
     <Button
       variant="ghost"

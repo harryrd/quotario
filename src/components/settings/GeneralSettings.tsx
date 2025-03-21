@@ -1,18 +1,24 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { useTheme } from '@/components/ThemeProvider';
 import { 
   Tabs, 
   TabsContent, 
   TabsList, 
   TabsTrigger 
 } from '@/components/ui/tabs';
+import {
+  ToggleGroup,
+  ToggleGroupItem
+} from '@/components/ui/toggle-group';
+import { Moon, Sun, Monitor } from 'lucide-react';
 
 const GeneralSettings = () => {
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState({
     currency: 'USD',
     quotationPrefix: 'QUO-',
@@ -50,6 +56,11 @@ const GeneralSettings = () => {
     }
   };
 
+  // Apply font size on initial render
+  useEffect(() => {
+    document.documentElement.style.fontSize = getFontSizeValue(settings.fontSize);
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>
@@ -60,10 +71,11 @@ const GeneralSettings = () => {
       </div>
 
       <Tabs defaultValue="document" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-4">
+        <TabsList className="grid grid-cols-4 mb-4">
           <TabsTrigger value="document">Document</TabsTrigger>
           <TabsTrigger value="format">Format</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="theme">Theme</TabsTrigger>
         </TabsList>
         
         <TabsContent value="document" className="space-y-5">
@@ -186,6 +198,26 @@ const GeneralSettings = () => {
                 <SelectItem value="XL">Extra Large</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="theme" className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="themeSelector">Theme Mode</Label>
+            <ToggleGroup type="single" value={theme} onValueChange={(value) => value && setTheme(value as "light" | "dark" | "system")} className="justify-start">
+              <ToggleGroupItem value="light" aria-label="Light Mode">
+                <Sun className="h-4 w-4 mr-2" />
+                Light
+              </ToggleGroupItem>
+              <ToggleGroupItem value="dark" aria-label="Dark Mode">
+                <Moon className="h-4 w-4 mr-2" />
+                Dark
+              </ToggleGroupItem>
+              <ToggleGroupItem value="system" aria-label="System Theme">
+                <Monitor className="h-4 w-4 mr-2" />
+                System
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
         </TabsContent>
       </Tabs>
