@@ -11,7 +11,7 @@ const GeneralSettingsPage: React.FC = () => {
       
       <div className="flex-1 p-4">
         <AnimatedTransition>
-          <div className="border rounded-md p-4">
+          <div className="border rounded-md p-6 bg-card">
             <GeneralSettings />
           </div>
         </AnimatedTransition>

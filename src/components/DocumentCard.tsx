@@ -56,7 +56,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         className="w-full overflow-hidden shadow-sm border-border/50 hover:shadow-md smooth-transition"
         onClick={onClick}
       >
-        <CardHeader className="p-3 pb-0 flex flex-row items-start justify-between">
+        <CardHeader className="p-2 pb-0 flex flex-row items-start justify-between">
           <div>
             <Badge 
               variant="outline" 
@@ -64,24 +64,24 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
             >
               {type}
             </Badge>
-            <h3 className="text-base font-medium line-clamp-1">{title}</h3>
+            <h3 className="text-sm font-medium line-clamp-1">{title}</h3>
             <p className="text-xs text-muted-foreground">{clientName}</p>
           </div>
-          <Badge className={cn("rounded-full text-xs font-medium", statusColors[status])}>
+          <Badge className={cn("rounded-full text-xs font-medium py-0 h-5", statusColors[status])}>
             {status}
           </Badge>
         </CardHeader>
-        <CardContent className="p-3 pt-2">
+        <CardContent className="p-2 pt-1">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Calendar className="h-3 w-3" />
             <span>{date}</span>
           </div>
         </CardContent>
-        <CardFooter className="p-3 pt-0 flex justify-between items-center">
-          <p className="font-medium text-base">
+        <CardFooter className="p-2 pt-0 flex justify-between items-center">
+          <p className="font-medium text-sm">
             ${amount.toFixed(2)}
           </p>
-          <Button variant="ghost" size="icon" className="rounded-full h-7 w-7">
+          <Button variant="ghost" size="icon" className="rounded-full h-6 w-6">
             <ArrowRight className="h-3 w-3" />
           </Button>
         </CardFooter>

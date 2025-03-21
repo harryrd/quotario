@@ -37,8 +37,9 @@ const ViewDocuments: React.FC = () => {
         title="Document Details" 
         showBack
         actions={
-          <Button variant="outline" size="icon">
-            <Edit className="h-4 w-4" />
+          <Button variant="outline">
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
           </Button>
         }
       />
@@ -64,7 +65,7 @@ const ViewDocuments: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex justify-between mb-4">
+            <div className="flex flex-col md:flex-row md:justify-between mb-4 gap-4">
               <div>
                 <h3 className="font-medium mb-1">Document Number:</h3>
                 <p>QUO-2023-001</p>
@@ -79,39 +80,41 @@ const ViewDocuments: React.FC = () => {
               </div>
             </div>
             
-            <table className="w-full border-collapse mb-8">
-              <thead>
-                <tr className="border-b">
-                  <th className="py-2 px-2 text-left">Description</th>
-                  <th className="py-2 px-2 text-right">Quantity</th>
-                  <th className="py-2 px-2 text-right">Unit Price</th>
-                  <th className="py-2 px-2 text-right">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="py-2 px-2">Website Design & Mockups</td>
-                  <td className="py-2 px-2 text-right">1</td>
-                  <td className="py-2 px-2 text-right">$800.00</td>
-                  <td className="py-2 px-2 text-right">$800.00</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="py-2 px-2">Frontend Development</td>
-                  <td className="py-2 px-2 text-right">1</td>
-                  <td className="py-2 px-2 text-right">$1,200.00</td>
-                  <td className="py-2 px-2 text-right">$1,200.00</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="py-2 px-2">CMS Integration</td>
-                  <td className="py-2 px-2 text-right">1</td>
-                  <td className="py-2 px-2 text-right">$500.00</td>
-                  <td className="py-2 px-2 text-right">$500.00</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="overflow-x-auto mb-8">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="py-2 px-4 text-left">Description</th>
+                    <th className="py-2 px-4 text-right">Quantity</th>
+                    <th className="py-2 px-4 text-right">Unit Price</th>
+                    <th className="py-2 px-4 text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b">
+                    <td className="py-2 px-4">Website Design & Mockups</td>
+                    <td className="py-2 px-4 text-right">1</td>
+                    <td className="py-2 px-4 text-right">$800.00</td>
+                    <td className="py-2 px-4 text-right">$800.00</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2 px-4">Frontend Development</td>
+                    <td className="py-2 px-4 text-right">1</td>
+                    <td className="py-2 px-4 text-right">$1,200.00</td>
+                    <td className="py-2 px-4 text-right">$1,200.00</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2 px-4">CMS Integration</td>
+                    <td className="py-2 px-4 text-right">1</td>
+                    <td className="py-2 px-4 text-right">$500.00</td>
+                    <td className="py-2 px-4 text-right">$500.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             
             <div className="flex justify-end mb-8">
-              <div className="w-1/3">
+              <div className="w-full md:w-1/3">
                 <div className="flex justify-between py-2">
                   <span>Subtotal:</span>
                   <span>$2,500.00</span>
@@ -138,10 +141,9 @@ const ViewDocuments: React.FC = () => {
         transition={{ delay: 0.3, duration: 0.5 }}
       >
         <div className="w-full flex justify-center">
-          <div className="flex flex-row gap-3 w-full">
+          <div className="flex flex-row gap-3 w-full max-w-md">
             <Button 
-              variant="outline"
-              className="flex-1 glass-card"
+              className="flex-1"
               onClick={handlePreviewPDF}
             >
               <FileText className="h-4 w-4 mr-2" />
@@ -149,7 +151,7 @@ const ViewDocuments: React.FC = () => {
             </Button>
             
             <Button 
-              className="flex-1 glass-card"
+              className="flex-1"
               onClick={() => toast.success('Document shared successfully')}
             >
               <Share className="h-4 w-4 mr-2" />
@@ -160,8 +162,7 @@ const ViewDocuments: React.FC = () => {
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="outline"
-                  size="icon"
-                  className="glass-card"
+                  className="h-13 w-13 p-2 aspect-square"
                 >
                   <Menu className="h-4 w-4" />
                 </Button>
