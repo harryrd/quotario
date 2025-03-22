@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Building, CreditCard, Bell, Lock, HelpCircle, LogOut, ChevronRight, Settings as SettingsIcon, Users, FileText, Coffee } from 'lucide-react';
+import { User, Building, CreditCard, Bell, Lock, HelpCircle, LogOut, ChevronRight, Settings as SettingsIcon, Users, FileText, Coffee, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import { Separator } from '@/components/ui/separator';
@@ -93,6 +93,13 @@ const Settings: React.FC = () => {
                   title="General"
                   description="Configure currency, numbering and formats"
                   onClick={() => navigate('/settings/general')}
+                />
+                <Separator />
+                <SettingsItem 
+                  icon={FileSpreadsheet} 
+                  title="Templates"
+                  description="Configure document templates and fields"
+                  onClick={() => navigate('/settings/templates')}
                 />
                 <Separator />
                 <SettingsItem 
