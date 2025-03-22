@@ -22,6 +22,12 @@ export const useDocumentSave = (userId: string | undefined) => {
 
     try {
       // Find the highest document number in the database
+      // We need to check if this column exists before implementing increment functionality
+      // Since document_number doesn't exist, let's use the startNumber for now
+      // Implementation of auto-incrementing numbers will require a database update
+      return startNumber;
+      
+      /* This would be the correct implementation once we have the document_number column
       const { data, error } = await supabase
         .from('documents')
         .select('document_number')
@@ -46,6 +52,7 @@ export const useDocumentSave = (userId: string | undefined) => {
           return (numericPart + 1).toString();
         }
       }
+      */
       
       // If no previous document or couldn't parse number, use start number
       return startNumber;
@@ -102,7 +109,7 @@ export const useDocumentSave = (userId: string | undefined) => {
           .insert({
             user_id: userId,
             type: documentType,
-            document_number: documentNumber,
+            // document_number field doesn't exist yet, so we don't include it
             title: details.title,
             client_name: details.client?.name || '',
             date: details.date || new Date().toISOString().split('T')[0],
