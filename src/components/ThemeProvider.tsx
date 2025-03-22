@@ -12,11 +12,13 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  resolvedTheme: "dark" | "light"; // Tracks actual applied theme (light/dark)
 };
 
 const initialState: ThemeProviderState = {
   theme: "system",
   setTheme: () => null,
+  resolvedTheme: "light"
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
@@ -30,67 +32,48 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
+  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("light");
 
+  // Effect to apply theme class and track resolved theme
   useEffect(() => {
     const root = window.document.documentElement;
     
-    // First, remove all theme classes
-    root.classList.remove("light", "dark");
+    // Function to apply theme to DOM
+    const applyTheme = (newTheme: "dark" | "light") => {
+      root.classList.remove("light", "dark");
+      root.classList.add(newTheme);
+      setResolvedTheme(newTheme);
+    };
 
+    // Determine and apply the effective theme
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-      
-      root.classList.add(systemTheme);
-      return;
+        .matches ? "dark" : "light";
+      applyTheme(systemTheme);
+    } else {
+      applyTheme(theme);
     }
 
-    root.classList.add(theme);
-    console.log("Theme class added:", theme); // Debug log
-  }, [theme]);
-
-  // Handle system theme changes
-  useEffect(() => {
-    if (theme !== "system") return;
-
+    // Set up listener for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     
-    // Initial setup
-    const root = window.document.documentElement;
-    if (mediaQuery.matches) {
-      root.classList.remove("light");
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-      root.classList.add("light");
-    }
-    
-    // Listen for changes
-    const handleChange = () => {
-      const root = window.document.documentElement;
-      if (theme !== "system") return;
-      
-      if (mediaQuery.matches) {
-        root.classList.remove("light");
-        root.classList.add("dark");
-      } else {
-        root.classList.remove("dark");
-        root.classList.add("light");
+    const handleSystemThemeChange = () => {
+      if (theme === "system") {
+        const newSystemTheme = mediaQuery.matches ? "dark" : "light";
+        applyTheme(newSystemTheme);
       }
     };
     
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    mediaQuery.addEventListener("change", handleSystemThemeChange);
+    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
   }, [theme]);
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-      console.log("Theme set to:", theme); // Debug log
+    resolvedTheme,
+    setTheme: (newTheme: Theme) => {
+      localStorage.setItem(storageKey, newTheme);
+      setTheme(newTheme);
     },
   };
 

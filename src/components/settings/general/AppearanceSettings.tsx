@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Moon, Sun, Monitor } from 'lucide-react';
 import { UserSettings } from './index';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface AppearanceSettingsProps {
   settings: UserSettings;
@@ -15,6 +16,8 @@ export const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
   settings, 
   onSettingChange 
 }) => {
+  const { resolvedTheme } = useTheme();
+  
   return (
     <>
       <div className="space-y-2">
@@ -38,13 +41,22 @@ export const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
       
       <div className="space-y-2 mt-4">
         <Label htmlFor="themeSelector">Theme Mode</Label>
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-1 mb-3">
+          <span>Currently using: </span>
+          <span className="flex items-center font-medium text-foreground">
+            {resolvedTheme === "dark" ? (
+              <><Moon className="h-3.5 w-3.5 mr-1" /> Dark</>
+            ) : (
+              <><Sun className="h-3.5 w-3.5 mr-1" /> Light</>
+            )}
+          </span>
+        </div>
         <ToggleGroup 
           type="single" 
           value={settings.theme} 
           onValueChange={(value) => {
             if (value) {
               onSettingChange('theme', value);
-              console.log('Theme changed to:', value); // Debug log
             }
           }} 
           className="justify-start"

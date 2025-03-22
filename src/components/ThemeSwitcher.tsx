@@ -10,18 +10,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function ThemeSwitcher() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full" aria-label="Toggle theme">
-          {theme === "dark" ? (
-            <Moon className="h-4 w-4" />
-          ) : theme === "light" ? (
-            <Sun className="h-4 w-4" />
-          ) : (
+          {theme === "system" ? (
             <Monitor className="h-4 w-4" />
+          ) : resolvedTheme === "dark" ? (
+            <Moon className="h-4 w-4" />
+          ) : (
+            <Sun className="h-4 w-4" />
           )}
           <span className="sr-only">Toggle theme</span>
         </Button>
