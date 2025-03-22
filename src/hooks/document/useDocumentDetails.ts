@@ -38,9 +38,17 @@ export const useDocumentDetails = (documentId: string | undefined, userId: strin
   const convertToInvoice = async () => {
     const updatedDocument = await handleConvertToInvoice();
     if (updatedDocument) {
-      setDocument(updatedDocument);
+      // Ensure the type is correctly cast as 'quotation' | 'invoice'
+      setDocument({
+        ...updatedDocument,
+        type: 'invoice' as const // Use const assertion to narrow the type
+      });
+      
       if (editableDocument) {
-        setEditableDocument({ ...editableDocument, type: 'invoice' as const });
+        setEditableDocument({
+          ...editableDocument,
+          type: 'invoice' as const
+        });
       }
     }
   };
