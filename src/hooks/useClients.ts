@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Client, emptyClient } from '@/types/client';
 
 export const useClients = (userId?: string) => {
+  // Initialize with empty array explicitly to prevent undefined issues
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -12,7 +13,8 @@ export const useClients = (userId?: string) => {
     try {
       setLoading(true);
       if (!userId) {
-        // If no userId is provided, return early
+        // If no userId is provided, return early but ensure clients is an empty array
+        setClients([]);
         setLoading(false);
         return;
       }
@@ -25,6 +27,12 @@ export const useClients = (userId?: string) => {
       if (error) {
         toast.error('Failed to fetch clients');
         console.error('Error fetching clients:', error);
+        setClients([]);
+        return;
+      }
+
+      // If data is null or undefined, ensure we set an empty array
+      if (!data) {
         setClients([]);
         return;
       }
@@ -43,6 +51,7 @@ export const useClients = (userId?: string) => {
     } catch (error) {
       console.error('Error:', error);
       toast.error('Something went wrong');
+      // Ensure clients is set to empty array in case of error
       setClients([]);
     } finally {
       setLoading(false);
@@ -162,7 +171,7 @@ export const useClients = (userId?: string) => {
     if (userId) {
       fetchClients();
     } else {
-      // If no userId is available, set clients to empty array
+      // If no userId is available, ensure clients is an empty array
       setClients([]);
     }
   }, [userId]);

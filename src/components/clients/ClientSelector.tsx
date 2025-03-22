@@ -33,7 +33,8 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
   const { clients, loading } = useClients(user?.id);
   const [value, setValue] = useState(selectedClientName);
   
-  // Make sure clients is always an array
+  // Make sure clients is always an array and initialize with empty array
+  // This is crucial to avoid the "undefined is not iterable" error
   const clientsList = Array.isArray(clients) ? clients : [];
 
   useEffect(() => {
@@ -62,34 +63,42 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
           <CommandEmpty>
             {loading ? 'Loading clients...' : 'No client found.'}
           </CommandEmpty>
+          {/* Ensure CommandGroup always has at least an empty div as child to prevent issues */}
           <CommandGroup>
-            {clientsList.map((client) => (
-              <CommandItem
-                key={client.id}
-                value={client.name}
-                onSelect={(currentValue) => {
-                  const selectedClient = clientsList.find(c => c.name.toLowerCase() === currentValue.toLowerCase());
-                  if (selectedClient) {
-                    setValue(selectedClient.name);
-                    onClientSelect(selectedClient);
-                  }
-                  setOpen(false);
-                }}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === client.name ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                <div className="flex flex-col">
-                  <span className="text-sm">{client.name}</span>
-                  {client.company && (
-                    <span className="text-xs text-muted-foreground">{client.company}</span>
-                  )}
-                </div>
-              </CommandItem>
-            ))}
+            {clientsList.length > 0 ? (
+              clientsList.map((client) => (
+                <CommandItem
+                  key={client.id}
+                  value={client.name}
+                  onSelect={(currentValue) => {
+                    const selectedClient = clientsList.find(c => c.name.toLowerCase() === currentValue.toLowerCase());
+                    if (selectedClient) {
+                      setValue(selectedClient.name);
+                      onClientSelect(selectedClient);
+                    }
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === client.name ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-sm">{client.name}</span>
+                    {client.company && (
+                      <span className="text-xs text-muted-foreground">{client.company}</span>
+                    )}
+                  </div>
+                </CommandItem>
+              ))
+            ) : (
+              // Add a fallback item to ensure CommandGroup always has children
+              <div className="py-6 text-center text-xs text-muted-foreground">
+                {loading ? 'Loading clients...' : 'No clients available'}
+              </div>
+            )}
           </CommandGroup>
         </Command>
       </PopoverContent>
