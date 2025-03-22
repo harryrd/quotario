@@ -76,13 +76,13 @@ const BusinessDetails: React.FC = () => {
   }, [user]);
 
   const uploadLogo = async (file: File) => {
-    if (!user) return;
+    if (!user) return null;
     
     try {
       // Create a unique file path
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-logo-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `logos/${fileName}`;
+      const filePath = `${fileName}`;
       
       // Upload the file to Supabase Storage
       const { error: uploadError } = await supabase.storage
@@ -279,7 +279,7 @@ const BusinessDetails: React.FC = () => {
               value={businessDetails.website}
               onChange={(e) => setBusinessDetails({...businessDetails, website: e.target.value})}
               className="pl-9"
-              placeholder="Enter your website URL"
+              placeholder="Enter your website URL (e.g. https://example.com)"
               disabled={saving}
             />
             <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />

@@ -56,15 +56,13 @@ const ProfileSettings: React.FC = () => {
   }, [user]);
 
   const uploadAvatar = async (file: File) => {
-    if (!user) return;
+    if (!user) return null;
     
     try {
-      setLoading(true);
-      
       // Create a unique file path
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const filePath = `${fileName}`;
       
       // Upload the file to Supabase Storage
       const { error: uploadError } = await supabase.storage
@@ -80,23 +78,11 @@ const ProfileSettings: React.FC = () => {
         .from('avatars')
         .getPublicUrl(filePath);
       
-      // Update profile with new avatar URL
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id);
-      
-      if (updateError) {
-        throw updateError;
-      }
-      
-      setAvatarUrl(publicUrl);
-      toast.success('Avatar updated successfully');
+      return publicUrl;
     } catch (error) {
       console.error('Error uploading avatar:', error);
       toast.error('Failed to upload avatar');
-    } finally {
-      setLoading(false);
+      return null;
     }
   };
 
@@ -118,8 +104,12 @@ const ProfileSettings: React.FC = () => {
       setLoading(true);
       
       // Upload avatar if we have a new one
+      let finalAvatarUrl = avatarUrl;
       if (avatarFile) {
-        await uploadAvatar(avatarFile);
+        const uploadedUrl = await uploadAvatar(avatarFile);
+        if (uploadedUrl) {
+          finalAvatarUrl = uploadedUrl;
+        }
       }
       
       // Update profile
@@ -127,6 +117,7 @@ const ProfileSettings: React.FC = () => {
         .from('profiles')
         .update({
           full_name: fullName,
+          avatar_url: finalAvatarUrl,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -134,6 +125,10 @@ const ProfileSettings: React.FC = () => {
       if (error) {
         throw error;
       }
+      
+      // Update state with the new avatar URL
+      setAvatarUrl(finalAvatarUrl);
+      setAvatarFile(null);
       
       toast.success('Profile updated successfully');
     } catch (error) {
