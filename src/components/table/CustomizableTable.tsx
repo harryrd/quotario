@@ -18,7 +18,6 @@ import { cn } from '@/lib/utils';
 import { TableField, TableRow } from './types';
 import TableHeaderComponent from './TableHeader';
 import TableRowComponent from './TableRowComponent';
-import AddFieldDialog from './AddFieldDialog';
 import EmptyTableState from './EmptyTableState';
 
 export interface CustomizableTableProps {
@@ -38,55 +37,6 @@ const CustomizableTable: React.FC<CustomizableTableProps> = ({
   onRowsChange,
   className
 }) => {
-  const [fieldDialogOpen, setFieldDialogOpen] = useState(false);
-  const [newField, setNewField] = useState<Partial<TableField>>({
-    name: '',
-    type: 'text',
-    required: false
-  });
-  
-  const addField = () => {
-    if (!newField.name) return;
-    
-    const fieldId = Date.now().toString();
-    onFieldsChange([
-      ...fields,
-      {
-        id: fieldId,
-        name: newField.name,
-        type: newField.type || 'text',
-        required: newField.required || false
-      }
-    ]);
-    
-    // Add empty value for this field to all rows
-    const updatedRows = rows.map(row => ({
-      ...row,
-      [fieldId]: ''
-    }));
-    onRowsChange(updatedRows);
-    
-    // Reset form
-    setNewField({
-      name: '',
-      type: 'text',
-      required: false
-    });
-    setFieldDialogOpen(false);
-  };
-  
-  const removeField = (fieldId: string) => {
-    onFieldsChange(fields.filter(f => f.id !== fieldId));
-    
-    // Remove this field from all rows
-    const updatedRows = rows.map(row => {
-      const newRow = {...row};
-      delete newRow[fieldId];
-      return newRow;
-    });
-    onRowsChange(updatedRows);
-  };
-  
   const addRow = () => {
     const rowData: TableRow = { id: Date.now().toString() };
     fields.forEach(field => {
@@ -114,15 +64,6 @@ const CustomizableTable: React.FC<CustomizableTableProps> = ({
       <CardHeader className="pb-0">
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg font-medium">{title}</CardTitle>
-          <div className="flex gap-2">
-            <AddFieldDialog
-              open={fieldDialogOpen}
-              onOpenChange={setFieldDialogOpen}
-              newField={newField}
-              onNewFieldChange={setNewField}
-              onAddField={addField}
-            />
-          </div>
         </div>
       </CardHeader>
       <CardContent className="p-0 overflow-x-auto">
@@ -131,7 +72,7 @@ const CustomizableTable: React.FC<CustomizableTableProps> = ({
             <TableHeader>
               <TableHeaderComponent 
                 fields={fields} 
-                onRemoveField={removeField} 
+                onRemoveField={() => {}} // Disabled field removal
               />
             </TableHeader>
             <TableBody>
@@ -147,7 +88,7 @@ const CustomizableTable: React.FC<CustomizableTableProps> = ({
             </TableBody>
           </Table>
         ) : (
-          <EmptyTableState onAddField={() => setFieldDialogOpen(true)} />
+          <EmptyTableState onAddField={() => {}} />
         )}
       </CardContent>
       {fields.length > 0 && (

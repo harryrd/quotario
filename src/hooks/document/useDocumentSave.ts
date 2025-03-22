@@ -15,19 +15,17 @@ export const useDocumentSave = (userId: string | undefined) => {
     rows: TableRow[],
     status: 'draft' | 'sent'
   ) => {
-    // Validate required fields
-    if (!details.title || !details.client || !details.date) {
-      toast.error('Please fill in all required fields');
+    // Validate required fields - less strict validation
+    if (!details.title) {
+      toast.error('Please provide a document title');
       return null;
     }
     
-    // Check if table has at least one valid row
-    const hasValidRow = rows.some(row => {
-      return row.desc && row.qty && row.price;
-    });
+    // Check if there's at least one row with some data (not requiring complete rows)
+    const hasAnyRow = rows.length > 0;
     
-    if (!hasValidRow) {
-      toast.error('Please add at least one complete item to your document');
+    if (!hasAnyRow) {
+      toast.error('Please add at least one item to your document');
       return null;
     }
 
@@ -43,7 +41,7 @@ export const useDocumentSave = (userId: string | undefined) => {
             type: documentType,
             title: details.title,
             client_name: details.client?.name || '',
-            date: details.date,
+            date: details.date || new Date().toISOString().split('T')[0],
             due_date: details.dueDate || null,
             notes: details.notes || null,
             status: status
@@ -58,16 +56,14 @@ export const useDocumentSave = (userId: string | undefined) => {
         // Set document ID for redirection
         setDocumentId(documentData.id);
         
-        // Insert document items
-        const documentItems = rows
-          .filter(row => row.desc && row.qty && row.price) // Only save valid rows
-          .map(row => ({
-            document_id: documentData.id,
-            description: row.desc,
-            quantity: Number(row.qty),
-            unit_price: Number(row.price),
-            tax: row.tax ? Number(row.tax) : null
-          }));
+        // Insert document items - save all rows, including incomplete ones
+        const documentItems = rows.map(row => ({
+          document_id: documentData.id,
+          description: row.desc || '',
+          quantity: Number(row.qty) || 0,
+          unit_price: Number(row.price) || 0,
+          tax: row.tax ? Number(row.tax) : null
+        }));
         
         if (documentItems.length > 0) {
           const { error: itemsError } = await supabase

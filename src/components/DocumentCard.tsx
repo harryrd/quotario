@@ -22,6 +22,7 @@ export interface DocumentCardProps {
   status: DocumentStatus;
   onClick?: () => void;
   className?: string;
+  currency?: string;
 }
 
 const statusColors: Record<DocumentStatus, string> = {
@@ -30,6 +31,19 @@ const statusColors: Record<DocumentStatus, string> = {
   accepted: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
   declined: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
   paid: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+};
+
+// Function to get currency symbol based on currency code
+const getCurrencySymbol = (currencyCode: string = 'USD') => {
+  switch (currencyCode) {
+    case 'USD': return '$';
+    case 'EUR': return '€';
+    case 'GBP': return '£';
+    case 'JPY': return '¥';
+    case 'CAD': return 'C$';
+    case 'IDR': return 'Rp';
+    default: return currencyCode;
+  }
 };
 
 const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -42,10 +56,13 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   status,
   onClick,
   className,
+  currency = 'USD',
 }) => {
   const typeIcon = type === 'invoice' ? 
     <FileText className="h-3 w-3 mr-1" /> : 
     <FileText className="h-3 w-3 mr-1" />;
+
+  const currencySymbol = getCurrencySymbol(currency);
 
   return (
     <motion.div
@@ -76,7 +93,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
           </div>
           <div className="text-right">
             <p className="font-medium text-xs">
-              ${amount.toFixed(2)}
+              {currencySymbol}{amount.toFixed(2)}
             </p>
             <div className="flex items-center justify-end text-[10px] text-muted-foreground mt-1">
               <Calendar className="h-2.5 w-2.5 mr-1" />
