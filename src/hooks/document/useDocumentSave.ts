@@ -36,7 +36,7 @@ export const useDocumentSave = (userId: string | undefined) => {
         return startNumber;
       }
 
-      if (data && data.length > 0 && data[0].document_number) {
+      if (data && data.length > 0 && data[0]?.document_number) {
         // Extract the numeric part (assuming format is PREFIX-NUMBER)
         const latestNumber = data[0].document_number;
         const matches = latestNumber.match(/(\d+)$/);
