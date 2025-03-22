@@ -1,23 +1,31 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { User, Upload, Mail, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/AuthContext';
+import AvatarUploader from './AvatarUploader';
+import ProfileForm from './ProfileForm';
+import { useAvatarUpload } from '@/hooks/useAvatarUpload';
 
 const ProfileSettings: React.FC = () => {
   const { user } = useAuth();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  
+  const {
+    avatarUrl,
+    setAvatarUrl,
+    avatarFile,
+    setAvatarFile,
+    uploadAvatar,
+    handleAvatarChange,
+    resetAvatarState,
+    loading,
+    setLoading
+  } = useAvatarUpload(user?.id);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -53,54 +61,7 @@ const ProfileSettings: React.FC = () => {
     };
     
     fetchProfile();
-  }, [user]);
-
-  const uploadAvatar = async (file: File) => {
-    if (!user) return null;
-    
-    try {
-      console.log('Starting avatar upload');
-      
-      // Create a unique file path - now following the folder structure required by RLS
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${user.id}/${fileName}`;
-      
-      // Upload the file to Supabase Storage
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
-      
-      if (uploadError) {
-        console.error('Error during avatar upload:', uploadError);
-        throw uploadError;
-      }
-      
-      console.log('Upload successful:', uploadData);
-      
-      // Get the public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-      
-      console.log('Avatar public URL:', publicUrl);
-      return publicUrl;
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast.error('Failed to upload avatar');
-      return null;
-    }
-  };
-
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Create a local preview
-      const objectUrl = URL.createObjectURL(file);
-      setAvatarUrl(objectUrl);
-      setAvatarFile(file);
-    }
-  };
+  }, [user, setAvatarUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,16 +80,7 @@ const ProfileSettings: React.FC = () => {
           // If upload failed but we're using a local preview, don't update the avatar URL
           if (avatarUrl.startsWith('blob:')) {
             toast.error('Avatar upload failed, keeping previous avatar');
-            // Fetch the current avatar URL from the database to reset the UI
-            const { data } = await supabase
-              .from('profiles')
-              .select('avatar_url')
-              .eq('id', user.id)
-              .single();
-            
-            if (data && data.avatar_url) {
-              finalAvatarUrl = data.avatar_url;
-            }
+            finalAvatarUrl = await resetAvatarState();
           }
         }
       }
@@ -174,75 +126,20 @@ const ProfileSettings: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4"
     >
-      <div className="flex items-center gap-4">
-        <Avatar className="h-16 w-16">
-          <AvatarImage src={avatarUrl} alt={fullName} />
-          <AvatarFallback className="bg-primary/10 text-primary">
-            {fullName ? fullName.split(' ').map(name => name[0]).join('') : '?'}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div>
-          <Label htmlFor="avatar-upload" className="cursor-pointer">
-            <div className="flex items-center gap-2 text-sm text-primary hover:underline">
-              <Upload className="h-4 w-4" />
-              <span>Change avatar</span>
-            </div>
-          </Label>
-          <Input 
-            id="avatar-upload" 
-            type="file" 
-            accept="image/*"
-            className="hidden" 
-            onChange={handleAvatarChange}
-            disabled={loading}
-          />
-        </div>
-      </div>
+      <AvatarUploader 
+        avatarUrl={avatarUrl}
+        fullName={fullName}
+        handleAvatarChange={handleAvatarChange}
+        disabled={loading}
+      />
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="full-name">Full Name</Label>
-          <div className="relative">
-            <Input
-              id="full-name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="pl-9"
-              placeholder="Enter your full name"
-              disabled={loading}
-            />
-            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              className="pl-9"
-              disabled={true} // Email can't be changed directly
-              readOnly
-            />
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          </div>
-          <p className="text-xs text-muted-foreground">Email cannot be changed</p>
-        </div>
-        
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            'Save Changes'
-          )}
-        </Button>
-      </form>
+      <ProfileForm
+        fullName={fullName}
+        setFullName={setFullName}
+        email={email}
+        loading={loading}
+        onSubmit={handleSubmit}
+      />
     </motion.div>
   );
 };
