@@ -1,11 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Building, Plus, Search, Edit, Trash, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { useAuth } from '@/components/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 type Client = {
   id: string;
@@ -18,26 +20,11 @@ type Client = {
 
 const ClientsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [clients, setClients] = useState<Client[]>([
-    {
-      id: '1',
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '(123) 456-7890',
-      address: '123 Main St, City, State 12345',
-      company: 'Acme Corp',
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '(098) 765-4321',
-      address: '456 Oak Ave, Town, State 54321',
-      company: 'XYZ Inc',
-    },
-  ]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [currentClient, setCurrentClient] = useState<Client | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const emptyClient: Client = {
     id: '',
@@ -48,8 +35,47 @@ const ClientsManagement = () => {
     company: '',
   };
 
+  useEffect(() => {
+    if (user) {
+      fetchClients();
+    }
+  }, [user]);
+
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) {
+        toast.error('Failed to fetch clients');
+        console.error('Error fetching clients:', error);
+        return;
+      }
+
+      // Map database fields to our Client type
+      const mappedClients = data.map(client => ({
+        id: client.id,
+        name: client.name,
+        email: client.email || '',
+        phone: client.phone || '',
+        address: client.address || '',
+        company: client.company
+      }));
+
+      setClients(mappedClients);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddClient = () => {
-    setCurrentClient({ ...emptyClient, id: Date.now().toString() });
+    setCurrentClient({ ...emptyClient, id: '' });
     setIsDialogOpen(true);
   };
 
@@ -58,9 +84,25 @@ const ClientsManagement = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDeleteClient = (id: string) => {
-    setClients(clients.filter(client => client.id !== id));
-    toast.success('Client deleted successfully');
+  const handleDeleteClient = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('clients')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        toast.error('Failed to delete client');
+        console.error('Error deleting client:', error);
+        return;
+      }
+
+      setClients(clients.filter(client => client.id !== id));
+      toast.success('Client deleted successfully');
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Something went wrong');
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,27 +115,81 @@ const ClientsManagement = () => {
     });
   };
 
-  const handleSaveClient = () => {
-    if (!currentClient) return;
+  const handleSaveClient = async () => {
+    if (!currentClient || !user) return;
     
     if (!currentClient.name || !currentClient.email) {
       toast.error('Name and email are required');
       return;
     }
 
-    if (clients.some(client => client.id === currentClient.id)) {
-      // Update existing client
-      setClients(clients.map(client => 
-        client.id === currentClient.id ? currentClient : client
-      ));
-      toast.success('Client updated successfully');
-    } else {
-      // Add new client
-      setClients([...clients, currentClient]);
-      toast.success('Client added successfully');
+    try {
+      // Prepare client data for Supabase
+      const clientData = {
+        name: currentClient.name,
+        email: currentClient.email,
+        phone: currentClient.phone,
+        address: currentClient.address,
+        company: currentClient.company,
+        user_id: user.id
+      };
+
+      if (currentClient.id) {
+        // Update existing client
+        const { data, error } = await supabase
+          .from('clients')
+          .update(clientData)
+          .eq('id', currentClient.id)
+          .select()
+          .single();
+
+        if (error) {
+          toast.error('Failed to update client');
+          console.error('Error updating client:', error);
+          return;
+        }
+
+        setClients(clients.map(client => 
+          client.id === data.id ? {
+            ...client,
+            name: data.name,
+            email: data.email || '',
+            phone: data.phone || '',
+            address: data.address || '',
+            company: data.company
+          } : client
+        ));
+        toast.success('Client updated successfully');
+      } else {
+        // Add new client
+        const { data, error } = await supabase
+          .from('clients')
+          .insert(clientData)
+          .select()
+          .single();
+
+        if (error) {
+          toast.error('Failed to add client');
+          console.error('Error adding client:', error);
+          return;
+        }
+
+        setClients([...clients, {
+          id: data.id,
+          name: data.name,
+          email: data.email || '',
+          phone: data.phone || '',
+          address: data.address || '',
+          company: data.company
+        }]);
+        toast.success('Client added successfully');
+      }
+      
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Something went wrong');
     }
-    
-    setIsDialogOpen(false);
   };
 
   const filteredClients = clients.filter(client => 
@@ -127,65 +223,71 @@ const ClientsManagement = () => {
         </Button>
       </div>
 
-      <div className="border rounded-md divide-y">
-        {filteredClients.length > 0 ? (
-          filteredClients.map((client) => (
-            <div 
-              key={client.id} 
-              className="p-2 flex items-center justify-between gap-2"
-            >
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  {client.company ? (
-                    <Building className="h-4 w-4 text-primary" />
-                  ) : (
-                    <User className="h-4 w-4 text-primary" />
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">{client.name}</h3>
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-muted-foreground">{client.email}</p>
-                    {client.company && (
-                      <span className="text-xs bg-secondary px-1.5 py-0.5 rounded-full">
-                        {client.company}
-                      </span>
+      {loading ? (
+        <div className="border rounded-md p-8 text-center">
+          <p className="text-muted-foreground">Loading clients...</p>
+        </div>
+      ) : (
+        <div className="border rounded-md divide-y">
+          {filteredClients.length > 0 ? (
+            filteredClients.map((client) => (
+              <div 
+                key={client.id} 
+                className="p-2 flex items-center justify-between gap-2"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    {client.company ? (
+                      <Building className="h-4 w-4 text-primary" />
+                    ) : (
+                      <User className="h-4 w-4 text-primary" />
                     )}
                   </div>
+                  <div>
+                    <h3 className="font-medium text-sm">{client.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-muted-foreground">{client.email}</p>
+                      {client.company && (
+                        <span className="text-xs bg-secondary px-1.5 py-0.5 rounded-full">
+                          {client.company}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => handleEditClient(client)}
+                  >
+                    <Edit className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => handleDeleteClient(client.id)}
+                  >
+                    <Trash className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => handleEditClient(client)}
-                >
-                  <Edit className="h-3.5 w-3.5" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => handleDeleteClient(client.id)}
-                >
-                  <Trash className="h-3.5 w-3.5" />
-                </Button>
-              </div>
+            ))
+          ) : (
+            <div className="p-4 text-center">
+              <p className="text-muted-foreground text-sm">No clients found</p>
             </div>
-          ))
-        ) : (
-          <div className="p-4 text-center">
-            <p className="text-muted-foreground text-sm">No clients found</p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {currentClient && clients.some(client => client.id === currentClient.id) 
+              {currentClient && currentClient.id
                 ? 'Edit Client' 
                 : 'Add New Client'}
             </DialogTitle>
