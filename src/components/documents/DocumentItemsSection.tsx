@@ -1,3 +1,4 @@
+
 import React from 'react';
 import CustomizableTable, { TableRow, TableField } from '@/components/CustomizableTable';
 import { DocumentType } from '@/types/document';
@@ -22,6 +23,7 @@ const DocumentItemsSection: React.FC<DocumentItemsSectionProps> = ({
   return (
     <div>
       <CustomizableTable
+        title={`${documentType === 'quotation' ? 'Quotation' : 'Invoice'} Items`}
         fields={fields}
         rows={rows}
         onFieldsChange={onFieldsChange}
