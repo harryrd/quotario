@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { CalendarIcon, Save, FileCheck } from 'lucide-react';
+import { CalendarIcon, FileCheck, ChevronLeft } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import Header from '@/components/Header';
 import { Input } from '@/components/ui/input';
@@ -29,7 +29,7 @@ import { FieldTemplate } from '@/components/settings/template/types';
 const CreateQuotation: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { settings, loading: settingsLoading } = useUserSettings(user?.id);
+  const userSettings = useUserSettings(userId);
 
   // Document save hook
   const { handleSave, isLoading, documentId, navigateToDetails } = useDocumentSave(user?.id);
@@ -63,9 +63,9 @@ const CreateQuotation: React.FC = () => {
 
   // Effect to load template fields from settings
   useEffect(() => {
-    if (settings?.documentTemplates?.quotation) {
+    if (userSettings && userSettings.documentTemplates?.quotation) {
       try {
-        const templateFields = settings.documentTemplates.quotation.fields;
+        const templateFields = userSettings.documentTemplates.quotation.fields;
         if (Array.isArray(templateFields)) {
           // Convert template fields to table fields
           const enabledFields = templateFields
@@ -97,7 +97,7 @@ const CreateQuotation: React.FC = () => {
         console.error('Error setting template fields:', error);
       }
     }
-  }, [settings]);
+  }, [userSettings]);
 
   // Handle client selection
   const handleClientSelect = (client: Client) => {
@@ -105,22 +105,22 @@ const CreateQuotation: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmitQuotation = async (status: 'draft' | 'sent') => {
+  const handleSubmitQuotation = async () => {
     // Validate required fields
     if (!details.title) {
       toast.error('Please provide a document title');
       return;
     }
 
-    const prefix = settings?.quotationPrefix || 'QUO-';
-    const startNumber = settings?.quotationStartNumber || '1001';
+    const prefix = userSettings?.quotationPrefix || 'QUO-';
+    const startNumber = userSettings?.quotationStartNumber || '1001';
     
-    // Save the document
+    // Save the document as sent (not draft)
     await handleSave(
       'quotation',
       details,
       rows,
-      status,
+      'sent',
       prefix,
       startNumber
     );
@@ -128,7 +128,10 @@ const CreateQuotation: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header title="Create New Quotation" />
+      <Header 
+        title="Create New Quotation" 
+        showBack={true}
+      />
       
       <div className="flex-1 container max-w-5xl py-6 space-y-8">
         {/* Document details section */}
@@ -207,28 +210,19 @@ const CreateQuotation: React.FC = () => {
             rows={rows}
             onFieldsChange={setFields}
             onRowsChange={setRows}
-            currency={settings?.currency || 'USD'}
+            currency={userSettings?.currency || 'USD'}
           />
         </div>
         
-        {/* Action buttons */}
-        <div className="flex justify-end gap-4 pt-4">
-          <Button
-            variant="outline"
-            className="font-medium"
-            onClick={() => handleSubmitQuotation('draft')}
-            disabled={isLoading}
-          >
-            <Save className="mr-2 h-4 w-4" />
-            Save as Draft
-          </Button>
+        {/* Action button - single Save Quotation button */}
+        <div className="flex justify-end pt-4">
           <Button
             className="font-medium"
-            onClick={() => handleSubmitQuotation('sent')}
+            onClick={handleSubmitQuotation}
             disabled={isLoading}
           >
             <FileCheck className="mr-2 h-4 w-4" />
-            Save as Document
+            Save Quotation
           </Button>
         </div>
       </div>
