@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { BusinessDetails, Document } from '@/pages/ViewDocuments';
+import DocumentItemsTable from '@/components/documents/DocumentItemsTable';
 import QuotationHeader from '@/components/quotation/QuotationHeader';
 import QuotationNotes from '@/components/quotation/QuotationNotes';
 
