@@ -13,20 +13,20 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface DeleteDocumentDialogProps {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
+  open: boolean;
+  onOpenChange: (isOpen: boolean) => void;
   onDelete: () => void;
   isDeleting: boolean;
 }
 
 const DeleteDocumentDialog: React.FC<DeleteDocumentDialogProps> = ({
-  isOpen,
-  setIsOpen,
+  open,
+  onOpenChange,
   onDelete,
   isDeleting,
 }) => {
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
