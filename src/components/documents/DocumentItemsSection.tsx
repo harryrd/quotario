@@ -29,6 +29,7 @@ const DocumentItemsSection: React.FC<DocumentItemsSectionProps> = ({
         rows={rows}
         onFieldsChange={onFieldsChange}
         onRowsChange={onRowsChange}
+        currency={currency}
       />
     </div>
   );

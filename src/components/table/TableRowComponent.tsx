@@ -11,25 +11,73 @@ interface TableRowComponentProps {
   fields: TableField[];
   onUpdateCell: (rowId: string, fieldId: string, value: any) => void;
   onRemoveRow: (rowId: string) => void;
+  currency?: string;
 }
 
 const TableRowComponent: React.FC<TableRowComponentProps> = ({ 
   row, 
   fields, 
   onUpdateCell, 
-  onRemoveRow 
+  onRemoveRow,
+  currency = 'USD'
 }) => {
+  // Format currency input
+  const formatCurrencyInput = (value: string) => {
+    if (!value) return '';
+    
+    // Remove non-numeric characters
+    const numericValue = value.replace(/[^\d.]/g, '');
+    
+    // Allow only one decimal point
+    const parts = numericValue.split('.');
+    if (parts.length > 2) {
+      return parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    return numericValue;
+  };
+
+  const getCurrencySymbol = (currencyCode: string) => {
+    switch (currencyCode) {
+      case 'USD': return '$';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      case 'JPY': return '¥';
+      case 'CAD': return 'C$';
+      case 'IDR': return 'Rp';
+      default: return currencyCode + ' ';
+    }
+  };
+
   return (
     <UITableRow>
       {fields.map((field) => (
         <TableCell key={`${row.id}-${field.id}`} className="p-0 h-[52px]">
           {field.type === 'number' ? (
-            <Input
-              type="number"
-              value={row[field.id] || ''}
-              onChange={(e) => onUpdateCell(row.id, field.id, e.target.value)}
-              className="border-0 focus-visible:ring-0 rounded-none h-full"
-            />
+            field.id === 'price' ? (
+              <div className="relative flex items-center">
+                <span className="absolute left-2 text-muted-foreground">
+                  {getCurrencySymbol(currency)}
+                </span>
+                <Input
+                  type="text"
+                  value={row[field.id] || ''}
+                  onChange={(e) => onUpdateCell(
+                    row.id, 
+                    field.id, 
+                    formatCurrencyInput(e.target.value)
+                  )}
+                  className="border-0 focus-visible:ring-0 rounded-none h-full pl-8"
+                />
+              </div>
+            ) : (
+              <Input
+                type="number"
+                value={row[field.id] || ''}
+                onChange={(e) => onUpdateCell(row.id, field.id, e.target.value)}
+                className="border-0 focus-visible:ring-0 rounded-none h-full"
+              />
+            )
           ) : field.type === 'date' ? (
             <Input
               type="date"

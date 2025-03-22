@@ -1,13 +1,13 @@
 
 import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import DocumentTypeSelector from '@/components/documents/DocumentTypeSelector';
 import DocumentActions from '@/components/documents/DocumentActions';
 import DocumentDetailsTab from '@/components/documents/DocumentDetailsTab';
 import DocumentItemsTab from '@/components/documents/DocumentItemsTab';
 import { useDocumentCreation } from '@/hooks/useDocumentCreation';
-import { useNavigate } from 'react-router-dom';
 
 const CreateDocument: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +28,8 @@ const CreateDocument: React.FC = () => {
     setRows,
     handleClientSelect,
     fetchTemplateFields,
-    documentId
+    documentId,
+    navigateToDetails
   } = useDocumentCreation();
   
   // Fetch template fields when document type changes
@@ -38,11 +39,19 @@ const CreateDocument: React.FC = () => {
   
   // Handle document save with redirection
   const handleDocumentSave = async (status: 'draft' | 'sent') => {
-    const savedId = await handleSave(status);
+    const savedId = await handleSave(
+      status, 
+      documentType === 'quotation' ? userSettings.quotationPrefix : userSettings.invoicePrefix,
+      documentType === 'quotation' ? userSettings.quotationStartNumber : userSettings.invoiceStartNumber
+    );
     
     if (savedId) {
-      // Always navigate to document details
-      navigate(`/document/${savedId}`);
+      // Navigate based on status
+      if (status === 'draft' || !navigateToDetails) {
+        navigate('/documents');
+      } else {
+        navigate(`/document/${savedId}`);
+      }
     }
   };
   

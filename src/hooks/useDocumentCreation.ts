@@ -35,6 +35,7 @@ export const useDocumentCreation = () => {
   const {
     isLoading,
     documentId,
+    navigateToDetails,
     handleSave: saveDocument
   } = useDocumentSave(user?.id);
   
@@ -54,8 +55,12 @@ export const useDocumentCreation = () => {
   }, [fields]);
   
   // Adapter function to maintain the same API
-  const handleSave = async (status: 'draft' | 'sent') => {
-    return await saveDocument(documentType, details, rows, status);
+  const handleSave = async (
+    status: 'draft' | 'sent',
+    prefix?: string,
+    startNumber?: string
+  ) => {
+    return await saveDocument(documentType, details, rows, status, prefix, startNumber);
   };
 
   return {
@@ -74,6 +79,7 @@ export const useDocumentCreation = () => {
     setRows,
     handleClientSelect,
     fetchTemplateFields,
-    documentId
+    documentId,
+    navigateToDetails
   };
 };
