@@ -11,10 +11,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import CustomizableTable, { TableField, TableRow } from '@/components/CustomizableTable';
 import AnimatedTransition from '@/components/AnimatedTransition';
+import ClientSelector from '@/components/clients/ClientSelector';
+import { Client } from '@/types/client';
 
 interface DocumentDetails {
   title: string;
-  client: string;
+  client: Client | null;
   date: string;
   dueDate?: string;
   notes?: string;
@@ -29,7 +31,7 @@ const CreateDocument: React.FC = () => {
   const [documentType, setDocumentType] = useState<'quotation' | 'invoice'>(initialType);
   const [details, setDetails] = useState<DocumentDetails>({
     title: '',
-    client: '',
+    client: null,
     date: new Date().toISOString().split('T')[0],
     dueDate: '',
     notes: ''
@@ -61,6 +63,10 @@ const CreateDocument: React.FC = () => {
   useEffect(() => {
     setFields(documentType === 'quotation' ? defaultQuotationFields : defaultInvoiceFields);
   }, [documentType]);
+  
+  const handleClientSelect = (client: Client) => {
+    setDetails(prev => ({ ...prev, client }));
+  };
   
   const handleSave = (status: 'draft' | 'sent') => {
     // Validate required fields
@@ -144,13 +150,9 @@ const CreateDocument: React.FC = () => {
                 
                 <div className="grid gap-1">
                   <Label htmlFor="client" className="text-xs">Client<span className="text-red-500">*</span></Label>
-                  <Input
-                    id="client"
-                    placeholder="Client name or company"
-                    value={details.client}
-                    onChange={(e) => setDetails({...details, client: e.target.value})}
-                    required
-                    className="compact-input"
+                  <ClientSelector 
+                    onClientSelect={handleClientSelect}
+                    selectedClientName={details.client?.name || ''}
                   />
                 </div>
                 

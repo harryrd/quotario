@@ -15,7 +15,15 @@ const AdsFreePage: React.FC = () => {
   const handlePaymentOption = (option: 'coffee' | 'meal') => {
     setIsProcessing(true);
     
-    // Simulate payment processing
+    // Redirect to PayPal
+    const paypalUrl = option === 'coffee' 
+      ? 'https://www.paypal.com/paypalme/harryrd/5'
+      : 'https://www.paypal.com/paypalme/harryrd/10';
+    
+    // Open PayPal in a new tab
+    window.open(paypalUrl, '_blank');
+    
+    // Reset processing state after a brief delay
     setTimeout(() => {
       setIsProcessing(false);
       toast.success(`Thank you for your ${option === 'coffee' ? 'coffee' : 'meal'} support!`);
