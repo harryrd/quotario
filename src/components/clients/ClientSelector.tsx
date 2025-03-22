@@ -8,6 +8,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from '@/components/ui/command';
 import {
   Popover,
@@ -60,46 +61,46 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
       <PopoverContent className="w-full p-0">
         <Command>
           <CommandInput placeholder="Search client..." className="h-9" />
-          <CommandEmpty>
-            {loading ? 'Loading clients...' : 'No client found.'}
-          </CommandEmpty>
-          {/* Ensure CommandGroup always has at least an empty div as child to prevent issues */}
-          <CommandGroup>
-            {clientsList.length > 0 ? (
-              clientsList.map((client) => (
-                <CommandItem
-                  key={client.id}
-                  value={client.name}
-                  onSelect={(currentValue) => {
-                    const selectedClient = clientsList.find(c => c.name.toLowerCase() === currentValue.toLowerCase());
-                    if (selectedClient) {
-                      setValue(selectedClient.name);
-                      onClientSelect(selectedClient);
-                    }
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === client.name ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-sm">{client.name}</span>
-                    {client.company && (
-                      <span className="text-xs text-muted-foreground">{client.company}</span>
-                    )}
-                  </div>
-                </CommandItem>
-              ))
-            ) : (
-              // Add a fallback item to ensure CommandGroup always has children
-              <div className="py-6 text-center text-xs text-muted-foreground">
-                {loading ? 'Loading clients...' : 'No clients available'}
-              </div>
-            )}
-          </CommandGroup>
+          <CommandList>
+            <CommandEmpty>
+              {loading ? 'Loading clients...' : 'No client found.'}
+            </CommandEmpty>
+            <CommandGroup>
+              {clientsList.length > 0 ? (
+                clientsList.map((client) => (
+                  <CommandItem
+                    key={client.id}
+                    value={client.name}
+                    onSelect={(currentValue) => {
+                      const selectedClient = clientsList.find(c => c.name.toLowerCase() === currentValue.toLowerCase());
+                      if (selectedClient) {
+                        setValue(selectedClient.name);
+                        onClientSelect(selectedClient);
+                      }
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === client.name ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm">{client.name}</span>
+                      {client.company && (
+                        <span className="text-xs text-muted-foreground">{client.company}</span>
+                      )}
+                    </div>
+                  </CommandItem>
+                ))
+              ) : (
+                <div className="py-6 text-center text-xs text-muted-foreground">
+                  {loading ? 'Loading clients...' : 'No clients available'}
+                </div>
+              )}
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>
