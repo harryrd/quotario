@@ -1,35 +1,10 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import Header from '@/components/Header';
 import { useAuth } from '@/components/AuthContext';
-import SearchBar from '@/components/documents/SearchBar';
-import DocumentList from '@/components/documents/DocumentList';
-import DeleteDocumentDialog from '@/components/documents/DeleteDocumentDialog';
-import { useDocuments } from '@/hooks/useDocuments';
 
 const Index: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  const {
-    documents,
-    loading,
-    isDeleteDialogOpen,
-    setIsDeleteDialogOpen,
-    documentToDelete,
-    setDocumentToDelete,
-    isDeleting,
-    deleteDocument
-  } = useDocuments(user?.id);
-  
-  const handleDeleteClick = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent opening the document
-    setDocumentToDelete(id);
-    setIsDeleteDialogOpen(true);
-  };
   
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -37,28 +12,14 @@ const Index: React.FC = () => {
         title="Documents" 
       />
       
-      <SearchBar 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
-      
-      <div className="flex-1 px-3">
-        <DocumentList 
-          documents={documents}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          searchQuery={searchQuery}
-          loading={loading}
-          handleDeleteClick={handleDeleteClick}
-        />
+      <div className="flex-1 px-3 py-8 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-2">Document Management</h2>
+          <p className="text-muted-foreground mb-6">
+            Welcome to your document management dashboard
+          </p>
+        </div>
       </div>
-      
-      <DeleteDocumentDialog 
-        isOpen={isDeleteDialogOpen}
-        setIsOpen={setIsDeleteDialogOpen}
-        onDelete={deleteDocument}
-        isDeleting={isDeleting}
-      />
     </div>
   );
 };
