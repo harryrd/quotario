@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { DocumentItem } from '@/pages/ViewDocuments';
 
@@ -16,6 +16,18 @@ const DocumentItemsTable: React.FC<DocumentItemsTableProps> = ({
   isEditing,
   onItemsChange
 }) => {
+  const [totals, setTotals] = useState<{[key: string]: number}>({});
+  
+  // Recalculate totals whenever items change
+  useEffect(() => {
+    const newTotals: {[key: string]: number} = {};
+    items.forEach((item, index) => {
+      const itemTotal = Number(item.quantity) * Number(item.unit_price);
+      newTotals[item.id] = itemTotal;
+    });
+    setTotals(newTotals);
+  }, [items]);
+
   const handleItemChange = (index: number, field: keyof DocumentItem, value: any) => {
     if (!onItemsChange) return;
     
@@ -24,6 +36,12 @@ const DocumentItemsTable: React.FC<DocumentItemsTableProps> = ({
       ...updatedItems[index],
       [field]: field === 'description' ? value : parseFloat(value) || 0
     };
+    
+    // Recalculate the total for this item immediately
+    const itemId = updatedItems[index].id;
+    const itemTotal = Number(updatedItems[index].quantity) * Number(updatedItems[index].unit_price);
+    setTotals(prev => ({...prev, [itemId]: itemTotal}));
+    
     onItemsChange(updatedItems);
   };
 
@@ -43,7 +61,8 @@ const DocumentItemsTable: React.FC<DocumentItemsTableProps> = ({
         </thead>
         <tbody>
           {items.map((item, index) => {
-            const itemTotal = Number(item.quantity) * Number(item.unit_price);
+            const itemTotal = totals[item.id] || (Number(item.quantity) * Number(item.unit_price));
+            
             return (
               <tr key={item.id} className="border-b">
                 <td className="py-2 px-4">

@@ -16,6 +16,15 @@ export const useDocuments = (userId: string | undefined) => {
     if (userId) {
       try {
         setLoading(true);
+        // Get user settings for currency
+        const { data: settingsData } = await supabase
+          .from('user_settings')
+          .select('currency')
+          .eq('user_id', userId)
+          .single();
+        
+        const currency = settingsData?.currency || 'USD';
+        
         const { data, error } = await supabase
           .from('documents')
           .select(`
@@ -27,7 +36,8 @@ export const useDocuments = (userId: string | undefined) => {
             status,
             document_items(unit_price, quantity)
           `)
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false }); // Sort by newest first
           
         if (error) {
           console.error('Error fetching documents:', error);
@@ -43,14 +53,26 @@ export const useDocuments = (userId: string | undefined) => {
               return sum + (Number(item.quantity) * Number(item.unit_price));
             }, 0) || 0;
             
+            // Extract client company from client name if available (format: "Name - Company")
+            let clientName = doc.client_name;
+            let clientCompany = undefined;
+            
+            if (doc.client_name.includes(' - ')) {
+              const parts = doc.client_name.split(' - ');
+              clientName = parts[0];
+              clientCompany = parts[1];
+            }
+            
             return {
               id: doc.id,
               type: doc.type as 'quotation' | 'invoice',
               title: doc.title,
-              clientName: doc.client_name,
+              clientName: clientName,
+              clientCompany: clientCompany,
               date: doc.date,
               amount: totalAmount,
-              status: doc.status as 'draft' | 'sent' | 'accepted' | 'declined' | 'paid'
+              status: doc.status as 'draft' | 'sent' | 'accepted' | 'declined' | 'paid',
+              currency: currency
             };
           });
           

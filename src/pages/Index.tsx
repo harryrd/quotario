@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { useAuth } from '@/components/AuthContext';
 import { Button } from '@/components/ui/button';
-import { FilePlus, FileText, Plus } from 'lucide-react';
+import { FilePlus, FileText } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import SearchBar from '@/components/documents/SearchBar';
@@ -36,44 +36,43 @@ const Index: React.FC = () => {
   
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header 
-        title="Documents" 
-      />
+      <Header title="Documents" />
       
-      <AnimatedTransition>
-        <SearchBar 
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
-        
-        <DocumentList 
-          documents={documents}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          searchQuery={searchQuery}
-          loading={loading}
-          handleDeleteClick={handleDeleteClick}
-        />
-      </AnimatedTransition>
+      <div className="flex-1 container max-w-5xl py-4 space-y-4">
+        <AnimatedTransition>
+          <SearchBar 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+          
+          <DocumentList 
+            documents={documents}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            searchQuery={searchQuery}
+            loading={loading}
+            handleDeleteClick={handleDeleteClick}
+          />
+        </AnimatedTransition>
+      </div>
       
       {/* Floating action buttons */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-2 sm:flex-row">
+      <div className="fixed bottom-4 right-4 flex gap-2">
         <Button 
-          className="rounded-full shadow-lg" 
-          size="sm"
-          onClick={() => navigate('/create/quotation')}
-        >
-          <FilePlus className="mr-2 h-4 w-4" />
-          New Quotation
-        </Button>
-        <Button 
-          className="rounded-full shadow-lg" 
-          size="sm"
-          variant="secondary" 
+          className="shadow-lg" 
           onClick={() => navigate('/create/invoice')}
+          size="default"
         >
           <FileText className="mr-2 h-4 w-4" />
           New Invoice
+        </Button>
+        <Button 
+          className="shadow-lg" 
+          onClick={() => navigate('/create/quotation')}
+          variant="default"
+        >
+          <FilePlus className="mr-2 h-4 w-4" />
+          New Quotation
         </Button>
       </div>
       

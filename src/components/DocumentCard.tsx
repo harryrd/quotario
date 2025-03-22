@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, FileText } from 'lucide-react';
+import { Calendar, FileText, Building } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Card, 
@@ -17,6 +17,7 @@ export interface DocumentCardProps {
   type: DocumentType;
   title: string;
   clientName: string;
+  clientCompany?: string;
   date: string;
   amount: number;
   status: DocumentStatus;
@@ -51,6 +52,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   type,
   title,
   clientName,
+  clientCompany,
   date,
   amount,
   status,
@@ -71,12 +73,12 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       className={cn("w-full", className)}
     >
       <Card 
-        className="w-full overflow-hidden border-border/50 hover:shadow-sm smooth-transition p-3"
+        className="w-full overflow-hidden border-border/50 hover:shadow-sm smooth-transition p-4"
         onClick={onClick}
       >
-        <div className="flex justify-between items-start mb-1">
+        <div className="flex justify-between items-start mb-2">
           <div className="flex-1">
-            <div className="flex items-center mb-1">
+            <div className="flex items-center mb-2">
               <Badge 
                 variant="outline" 
                 className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-medium mr-2 flex items-center"
@@ -89,10 +91,20 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
               </Badge>
             </div>
             <h3 className="text-sm font-medium line-clamp-1">{title}</h3>
-            <p className="text-xs text-muted-foreground line-clamp-1">{clientName}</p>
+            <div className="flex flex-col mt-1">
+              <p className="text-xs text-muted-foreground line-clamp-1">
+                {clientName}
+              </p>
+              {clientCompany && (
+                <div className="flex items-center text-xs text-muted-foreground mt-1">
+                  <Building className="h-2.5 w-2.5 mr-1" />
+                  <span className="line-clamp-1">{clientCompany}</span>
+                </div>
+              )}
+            </div>
           </div>
           <div className="text-right">
-            <p className="font-medium text-xs">
+            <p className="font-medium text-sm">
               {currencySymbol}{amount.toFixed(2)}
             </p>
             <div className="flex items-center justify-end text-[10px] text-muted-foreground mt-1">
