@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -23,7 +22,8 @@ export const useInvoiceForm = (userId: string | undefined) => {
     client: null,
     date: format(new Date(), 'yyyy-MM-dd'),
     dueDate: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'), // Default due date: 30 days from now
-    notes: ''
+    notes: '',
+    documentNumber: ''
   });
 
   // State for table fields and rows
@@ -126,6 +126,10 @@ export const useInvoiceForm = (userId: string | undefined) => {
     setDetails(prev => ({ ...prev, notes }));
   };
 
+  const updateDocumentNumber = (documentNumber: string) => {
+    setDetails(prev => ({ ...prev, documentNumber }));
+  };
+
   return {
     details,
     fields,
@@ -136,6 +140,7 @@ export const useInvoiceForm = (userId: string | undefined) => {
     updateDate,
     updateDueDate,
     updateNotes,
+    updateDocumentNumber,
     handleClientSelect,
     handleSubmitInvoice,
     setFields,

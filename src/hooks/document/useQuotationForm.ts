@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -22,7 +21,8 @@ export const useQuotationForm = (userId: string | undefined) => {
     title: '',
     client: null,
     date: format(new Date(), 'yyyy-MM-dd'),
-    notes: ''
+    notes: '',
+    documentNumber: ''
   });
 
   // State for table fields and rows
@@ -121,10 +121,8 @@ export const useQuotationForm = (userId: string | undefined) => {
     setDetails(prev => ({ ...prev, notes }));
   };
 
-  // Stub for updateDocumentNumber - this functionality will be handled internally by handleSave
-  const updateDocumentNumber = () => {
-    // Document number is generated automatically during save
-    console.log('Document number will be generated automatically');
+  const updateDocumentNumber = (documentNumber: string) => {
+    setDetails(prev => ({ ...prev, documentNumber }));
   };
 
   return {

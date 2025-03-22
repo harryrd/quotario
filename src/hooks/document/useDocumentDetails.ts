@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useFetchDocument } from './useFetchDocument';
 import { useDocumentEdit } from './useDocumentEdit';
 import { useDocumentActions } from './useDocumentActions';
-import { Document } from '@/types/document-details';
+import { Document, DocumentItem } from '@/types/document-details';
 
 export type { Document, BusinessDetails } from '@/types/document-details';
 
@@ -40,7 +40,7 @@ export const useDocumentDetails = (documentId: string | undefined, userId: strin
     if (updatedDocument) {
       setDocument(updatedDocument);
       if (editableDocument) {
-        setEditableDocument({ ...editableDocument, type: 'invoice' });
+        setEditableDocument({ ...editableDocument, type: 'invoice' as const });
       }
     }
   };

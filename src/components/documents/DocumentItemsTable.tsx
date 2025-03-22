@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { DocumentItem } from '@/pages/ViewDocuments';
+import { DocumentItem } from '@/types/document-details';
 
 interface DocumentItemsTableProps {
   items: DocumentItem[];

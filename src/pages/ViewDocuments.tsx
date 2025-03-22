@@ -8,14 +8,15 @@ import { useAuth } from '@/components/AuthContext';
 import DocumentDetails from '@/components/documents/DocumentDetails';
 import DocumentActions from '@/components/documents/DocumentActions';
 import DocumentEditActions from '@/components/documents/DocumentEditActions';
-import { useDocumentDetails, Document, BusinessDetails } from '@/hooks/document/useDocumentDetails';
+import { useDocumentDetails } from '@/hooks/document/useDocumentDetails';
+import { Document, BusinessDetails, DocumentItem } from '@/types/document-details';
 import DeleteDocumentDialog from '@/components/documents/DeleteDocumentDialog';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 // Re-export the types for other components to use
-export type { Document, BusinessDetails };
+export type { Document, BusinessDetails, DocumentItem };
 
 const ViewDocuments: React.FC = () => {
   const { id } = useParams<{ id: string }>();
