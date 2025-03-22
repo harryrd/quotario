@@ -1,26 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Save, Send, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
-import CustomizableTable, { TableField, TableRow } from '@/components/CustomizableTable';
-import AnimatedTransition from '@/components/AnimatedTransition';
-import ClientSelector from '@/components/clients/ClientSelector';
+import DocumentTypeSelector from '@/components/documents/DocumentTypeSelector';
+import DocumentDetailsForm from '@/components/documents/DocumentDetailsForm';
+import DocumentItemsSection from '@/components/documents/DocumentItemsSection';
+import DocumentActions from '@/components/documents/DocumentActions';
+import { DocumentType, DocumentDetails } from '@/types/document';
+import { TableField, TableRow } from '@/components/CustomizableTable';
 import { Client } from '@/types/client';
-
-interface DocumentDetails {
-  title: string;
-  client: Client | null;
-  date: string;
-  dueDate?: string;
-  notes?: string;
-}
 
 const CreateDocument: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +18,7 @@ const CreateDocument: React.FC = () => {
   const initialType = location.state?.type || 'quotation';
   
   const [activeTab, setActiveTab] = useState('details');
-  const [documentType, setDocumentType] = useState<'quotation' | 'invoice'>(initialType);
+  const [documentType, setDocumentType] = useState<DocumentType>(initialType);
   const [details, setDetails] = useState<DocumentDetails>({
     title: '',
     client: null,
@@ -67,6 +57,14 @@ const CreateDocument: React.FC = () => {
   const handleClientSelect = (client: Client) => {
     setDetails(prev => ({ ...prev, client }));
   };
+
+  const handleTypeChange = (type: DocumentType) => {
+    setDocumentType(type);
+  };
+  
+  const handleDetailsChange = (updatedDetails: DocumentDetails) => {
+    setDetails(updatedDetails);
+  };
   
   const handleSave = (status: 'draft' | 'sent') => {
     // Validate required fields
@@ -101,30 +99,10 @@ const CreateDocument: React.FC = () => {
         showBack
       />
       
-      <div className="flex justify-center p-3">
-        <div className="flex items-center bg-secondary rounded-md">
-          <button
-            className={`px-3 py-1 text-xs font-medium rounded-md ${
-              documentType === 'quotation' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'text-muted-foreground'
-            }`}
-            onClick={() => setDocumentType('quotation')}
-          >
-            Quotation
-          </button>
-          <button
-            className={`px-3 py-1 text-xs font-medium rounded-md ${
-              documentType === 'invoice' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'text-muted-foreground'
-            }`}
-            onClick={() => setDocumentType('invoice')}
-          >
-            Invoice
-          </button>
-        </div>
-      </div>
+      <DocumentTypeSelector 
+        documentType={documentType}
+        onTypeChange={handleTypeChange}
+      />
       
       <div className="flex-1 px-3">
         <Tabs defaultValue="details" value={activeTab} onValueChange={setActiveTab}>
@@ -134,154 +112,27 @@ const CreateDocument: React.FC = () => {
           </TabsList>
           
           <TabsContent value="details" className="mt-0">
-            <AnimatedTransition>
-              <div className="grid gap-3">
-                <div className="grid gap-1">
-                  <Label htmlFor="title" className="text-xs">Title<span className="text-red-500">*</span></Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g. Website Development Project"
-                    value={details.title}
-                    onChange={(e) => setDetails({...details, title: e.target.value})}
-                    required
-                    className="compact-input"
-                  />
-                </div>
-                
-                <div className="grid gap-1">
-                  <Label htmlFor="client" className="text-xs">Client<span className="text-red-500">*</span></Label>
-                  <ClientSelector 
-                    onClientSelect={handleClientSelect}
-                    selectedClientName={details.client?.name || ''}
-                  />
-                </div>
-                
-                <div className="grid gap-1">
-                  <Label htmlFor="date" className="text-xs">Date<span className="text-red-500">*</span></Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={details.date}
-                    onChange={(e) => setDetails({...details, date: e.target.value})}
-                    required
-                    className="compact-input"
-                  />
-                </div>
-                
-                {documentType === 'invoice' && (
-                  <div className="grid gap-1">
-                    <Label htmlFor="dueDate" className="text-xs">Due Date</Label>
-                    <Input
-                      id="dueDate"
-                      type="date"
-                      value={details.dueDate}
-                      onChange={(e) => setDetails({...details, dueDate: e.target.value})}
-                      className="compact-input"
-                    />
-                  </div>
-                )}
-                
-                <div className="grid gap-1">
-                  <Label htmlFor="notes" className="text-xs">Notes</Label>
-                  <textarea
-                    id="notes"
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="Additional notes or terms..."
-                    value={details.notes}
-                    onChange={(e) => setDetails({...details, notes: e.target.value})}
-                  />
-                </div>
-                
-                <Button 
-                  className="mt-2 text-xs py-1 h-8" 
-                  size="sm" 
-                  onClick={() => setActiveTab('items')}
-                >
-                  Continue to Items
-                  <ChevronDown className="ml-1 h-3 w-3" />
-                </Button>
-              </div>
-            </AnimatedTransition>
+            <DocumentDetailsForm
+              documentType={documentType}
+              details={details}
+              onDetailsChange={handleDetailsChange}
+              onContinue={() => setActiveTab('items')}
+            />
           </TabsContent>
           
           <TabsContent value="items" className="mt-0">
-            <AnimatedTransition>
-              <CustomizableTable
-                title="Document Items"
-                fields={fields}
-                rows={rows}
-                onFieldsChange={setFields}
-                onRowsChange={setRows}
-              />
-              
-              <div className="mt-4 flex justify-end">
-                <div className="w-1/2 space-y-1">
-                  <div className="flex justify-between py-1 border-b text-sm">
-                    <span className="font-medium">Subtotal:</span>
-                    <span>
-                      ${rows.reduce((sum, row) => {
-                        const qty = parseFloat(row.qty) || 0;
-                        const price = parseFloat(row.price) || 0;
-                        return sum + (qty * price);
-                      }, 0).toFixed(2)}
-                    </span>
-                  </div>
-                  
-                  {documentType === 'invoice' && rows.some(row => row.tax) && (
-                    <div className="flex justify-between py-1 border-b text-sm">
-                      <span className="font-medium">Tax:</span>
-                      <span>
-                        ${rows.reduce((sum, row) => {
-                          const qty = parseFloat(row.qty) || 0;
-                          const price = parseFloat(row.price) || 0;
-                          const tax = parseFloat(row.tax) || 0;
-                          return sum + (qty * price * tax / 100);
-                        }, 0).toFixed(2)}
-                      </span>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-between py-1 font-bold text-sm">
-                    <span>Total:</span>
-                    <span>
-                      ${rows.reduce((sum, row) => {
-                        const qty = parseFloat(row.qty) || 0;
-                        const price = parseFloat(row.price) || 0;
-                        const tax = documentType === 'invoice' ? (parseFloat(row.tax) || 0) : 0;
-                        const lineTotal = qty * price;
-                        return sum + lineTotal + (lineTotal * tax / 100);
-                      }, 0).toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </AnimatedTransition>
+            <DocumentItemsSection
+              documentType={documentType}
+              fields={fields}
+              rows={rows}
+              onFieldsChange={setFields}
+              onRowsChange={setRows}
+            />
           </TabsContent>
         </Tabs>
       </div>
       
-      <motion.div 
-        className="fixed bottom-4 left-0 right-0 flex justify-center gap-3 px-3"
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-      >
-        <Button 
-          variant="outline"
-          className="flex-1 py-1 text-xs h-8"
-          onClick={() => handleSave('draft')}
-        >
-          <Save className="h-3 w-3 mr-1" />
-          Save as Draft
-        </Button>
-        <Button 
-          className="flex-1 py-1 text-xs h-8"
-          onClick={() => handleSave('sent')}
-        >
-          <Send className="h-3 w-3 mr-1" />
-          Send Document
-        </Button>
-      </motion.div>
+      <DocumentActions onSave={handleSave} />
     </div>
   );
 };
