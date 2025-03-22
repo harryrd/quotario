@@ -157,6 +157,7 @@ export type Database = {
           client_name: string
           created_at: string
           date: string
+          document_number: string | null
           due_date: string | null
           id: string
           notes: string | null
@@ -170,6 +171,7 @@ export type Database = {
           client_name: string
           created_at?: string
           date: string
+          document_number?: string | null
           due_date?: string | null
           id?: string
           notes?: string | null
@@ -183,6 +185,7 @@ export type Database = {
           client_name?: string
           created_at?: string
           date?: string
+          document_number?: string | null
           due_date?: string | null
           id?: string
           notes?: string | null
