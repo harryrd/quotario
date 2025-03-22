@@ -198,8 +198,8 @@ export const useDocuments = (userId: string | undefined) => {
         throw docError;
       }
       
-      // Update the UI
-      setDocuments(prev => prev.filter(doc => doc.id !== documentToDelete));
+      // Update the UI immediately by removing the deleted document from state
+      setDocuments(prevDocs => prevDocs.filter(doc => doc.id !== documentToDelete));
       toast.success('Document deleted successfully');
     } catch (error) {
       console.error('Error deleting document:', error);
