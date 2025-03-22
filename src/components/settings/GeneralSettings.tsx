@@ -16,58 +16,175 @@ import {
   ToggleGroup,
   ToggleGroupItem
 } from '@/components/ui/toggle-group';
-import { Moon, Sun, Monitor, Check } from 'lucide-react';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Moon, Sun, Monitor, Check, ChevronDown } from 'lucide-react';
+import { useAuth } from '@/components/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
-const ColorPalette = ({ color, isSelected, onClick }: { color: string, isSelected: boolean, onClick: () => void }) => (
+type UserSettings = {
+  currency: string;
+  quotationPrefix: string;
+  quotationStartNumber: string;
+  invoicePrefix: string;
+  invoiceStartNumber: string;
+  dateFormat: string;
+  language: string;
+  fontSize: string;
+  colorPalette: string;
+  theme: "light" | "dark" | "system";
+}
+
+const defaultSettings: UserSettings = {
+  currency: 'USD',
+  quotationPrefix: 'QUO-',
+  quotationStartNumber: '1001',
+  invoicePrefix: 'INV-',
+  invoiceStartNumber: '1001',
+  dateFormat: 'MM/DD/YYYY',
+  language: 'English',
+  fontSize: 'M',
+  colorPalette: 'default',
+  theme: 'system'
+};
+
+const ColorPalette = ({ color, name, isSelected, onClick }: { color: string, name: string, isSelected: boolean, onClick: () => void }) => (
   <div 
-    className={`relative h-12 w-12 rounded-md cursor-pointer overflow-hidden border-2 ${isSelected ? 'border-primary' : 'border-transparent'}`}
+    className="flex items-center gap-2 p-2 hover:bg-accent cursor-pointer rounded-sm"
     onClick={onClick}
   >
-    <div className={`h-full w-full ${color}`} />
-    {isSelected && (
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Check className="h-5 w-5 text-white drop-shadow-md" />
-      </div>
-    )}
+    <div className={`relative h-5 w-5 rounded-full ${color}`}></div>
+    <span>{name}</span>
+    {isSelected && <Check className="h-4 w-4 ml-auto" />}
   </div>
 );
 
 const GeneralSettings = () => {
   const { theme, setTheme } = useTheme();
-  const [settings, setSettings] = useState({
-    currency: 'USD',
-    quotationPrefix: 'QUO-',
-    quotationStartNumber: '1001',
-    invoicePrefix: 'INV-',
-    invoiceStartNumber: '1001',
-    dateFormat: 'MM/DD/YYYY',
-    language: 'English',
-    fontSize: 'M',
-    colorPalette: 'default',
-  });
+  const { user } = useAuth();
+  const [settings, setSettings] = useState<UserSettings>({...defaultSettings, theme});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleChange = (field: string, value: string) => {
+  // Fetch user settings on component mount
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching settings:', error);
+          toast.error('Failed to load settings');
+          return;
+        }
+
+        if (data) {
+          // Transform database column names to camelCase
+          const userSettings = {
+            currency: data.currency,
+            quotationPrefix: data.quotation_prefix,
+            quotationStartNumber: data.quotation_start_number,
+            invoicePrefix: data.invoice_prefix,
+            invoiceStartNumber: data.invoice_start_number,
+            dateFormat: data.date_format,
+            language: data.language,
+            fontSize: data.font_size,
+            colorPalette: data.color_palette,
+            theme: data.theme as "light" | "dark" | "system"
+          };
+          
+          setSettings(userSettings);
+          
+          // Apply settings to the UI
+          document.documentElement.style.fontSize = getFontSizeValue(userSettings.fontSize);
+          applyColorPalette(userSettings.colorPalette);
+          setTheme(userSettings.theme);
+        }
+      } catch (error) {
+        console.error('Error in fetchUserSettings:', error);
+        toast.error('Failed to load settings');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserSettings();
+  }, [user, setTheme]);
+
+  const handleChange = (field: keyof UserSettings, value: string) => {
     setSettings({
       ...settings,
       [field]: value,
     });
 
-    // Apply color palette immediately
+    // Apply color palette and theme changes immediately for preview
     if (field === 'colorPalette') {
       applyColorPalette(value);
     }
+    
+    if (field === 'theme') {
+      setTheme(value as "light" | "dark" | "system");
+    }
   };
 
-  const handleSave = () => {
-    // In a real app, this would save to a database
-    toast.success('Settings saved successfully');
-    
-    // Apply font size globally
-    document.documentElement.style.fontSize = getFontSizeValue(settings.fontSize);
-    
-    // Apply color palette
-    applyColorPalette(settings.colorPalette);
+  const handleSave = async () => {
+    if (!user) {
+      toast.error('You must be logged in to save settings');
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      // Transform settings to database column format
+      const dbSettings = {
+        user_id: user.id,
+        currency: settings.currency,
+        quotation_prefix: settings.quotationPrefix,
+        quotation_start_number: settings.quotationStartNumber,
+        invoice_prefix: settings.invoicePrefix,
+        invoice_start_number: settings.invoiceStartNumber,
+        date_format: settings.dateFormat,
+        language: settings.language,
+        font_size: settings.fontSize,
+        color_palette: settings.colorPalette,
+        theme: settings.theme
+      };
+
+      const { data, error } = await supabase
+        .from('user_settings')
+        .upsert(dbSettings, { onConflict: 'user_id' })
+        .select();
+
+      if (error) {
+        console.error('Error saving settings:', error);
+        toast.error('Failed to save settings');
+        return;
+      }
+
+      // Apply font size and color palette globally
+      document.documentElement.style.fontSize = getFontSizeValue(settings.fontSize);
+      applyColorPalette(settings.colorPalette);
+      setTheme(settings.theme);
+      
+      toast.success('Settings saved successfully');
+    } catch (error) {
+      console.error('Error in handleSave:', error);
+      toast.error('Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
   };
   
   const getFontSizeValue = (size: string) => {
@@ -115,10 +232,9 @@ const GeneralSettings = () => {
     }
   };
 
-  // Apply font size on initial render
-  useEffect(() => {
-    document.documentElement.style.fontSize = getFontSizeValue(settings.fontSize);
-  }, []);
+  if (loading) {
+    return <div className="flex items-center justify-center h-40">Loading settings...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -260,7 +376,12 @@ const GeneralSettings = () => {
           
           <div className="space-y-2 mt-4">
             <Label htmlFor="themeSelector">Theme Mode</Label>
-            <ToggleGroup type="single" value={theme} onValueChange={(value) => value && setTheme(value as "light" | "dark" | "system")} className="justify-start">
+            <ToggleGroup 
+              type="single" 
+              value={settings.theme} 
+              onValueChange={(value) => value && handleChange('theme', value)} 
+              className="justify-start"
+            >
               <ToggleGroupItem value="light" aria-label="Light Mode">
                 <Sun className="h-4 w-4 mr-2" />
                 Light
@@ -278,65 +399,60 @@ const GeneralSettings = () => {
           
           <div className="space-y-2 mt-4">
             <Label>Color Palette</Label>
-            <RadioGroup 
-              value={settings.colorPalette}
-              onValueChange={(value) => handleChange('colorPalette', value)}
-              className="flex flex-wrap gap-3 mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="default" id="default" className="sr-only" />
-                <Label htmlFor="default" className="flex items-center space-x-2 cursor-pointer">
-                  <ColorPalette 
-                    color="bg-gradient-to-br from-gray-700 to-gray-900" 
-                    isSelected={settings.colorPalette === 'default'} 
-                    onClick={() => handleChange('colorPalette', 'default')} 
-                  />
-                  <div>Monochrome</div>
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="blue" id="blue" className="sr-only" />
-                <Label htmlFor="blue" className="flex items-center space-x-2 cursor-pointer">
-                  <ColorPalette 
-                    color="bg-gradient-to-br from-blue-500 to-blue-700" 
-                    isSelected={settings.colorPalette === 'blue'} 
-                    onClick={() => handleChange('colorPalette', 'blue')} 
-                  />
-                  <div>Blue</div>
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="purple" id="purple" className="sr-only" />
-                <Label htmlFor="purple" className="flex items-center space-x-2 cursor-pointer">
-                  <ColorPalette 
-                    color="bg-gradient-to-br from-purple-500 to-purple-700" 
-                    isSelected={settings.colorPalette === 'purple'} 
-                    onClick={() => handleChange('colorPalette', 'purple')} 
-                  />
-                  <div>Purple</div>
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="green" id="green" className="sr-only" />
-                <Label htmlFor="green" className="flex items-center space-x-2 cursor-pointer">
-                  <ColorPalette 
-                    color="bg-gradient-to-br from-emerald-500 to-emerald-700" 
-                    isSelected={settings.colorPalette === 'green'} 
-                    onClick={() => handleChange('colorPalette', 'green')} 
-                  />
-                  <div>Green</div>
-                </Label>
-              </div>
-            </RadioGroup>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  <div className="flex items-center">
+                    <div className={`h-4 w-4 rounded-full mr-2 ${
+                      settings.colorPalette === 'default' ? 'bg-gradient-to-br from-gray-700 to-gray-900' :
+                      settings.colorPalette === 'blue' ? 'bg-gradient-to-br from-blue-500 to-blue-700' :
+                      settings.colorPalette === 'purple' ? 'bg-gradient-to-br from-purple-500 to-purple-700' : 
+                      'bg-gradient-to-br from-emerald-500 to-emerald-700'
+                    }`}></div>
+                    {settings.colorPalette === 'default' ? 'Monochrome' : 
+                     settings.colorPalette === 'blue' ? 'Blue' :
+                     settings.colorPalette === 'purple' ? 'Purple' : 'Green'}
+                  </div>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px]">
+                <ColorPalette 
+                  color="bg-gradient-to-br from-gray-700 to-gray-900" 
+                  name="Monochrome"
+                  isSelected={settings.colorPalette === 'default'} 
+                  onClick={() => handleChange('colorPalette', 'default')} 
+                />
+                <ColorPalette 
+                  color="bg-gradient-to-br from-blue-500 to-blue-700" 
+                  name="Blue"
+                  isSelected={settings.colorPalette === 'blue'} 
+                  onClick={() => handleChange('colorPalette', 'blue')} 
+                />
+                <ColorPalette 
+                  color="bg-gradient-to-br from-purple-500 to-purple-700" 
+                  name="Purple"
+                  isSelected={settings.colorPalette === 'purple'} 
+                  onClick={() => handleChange('colorPalette', 'purple')} 
+                />
+                <ColorPalette 
+                  color="bg-gradient-to-br from-emerald-500 to-emerald-700" 
+                  name="Green"
+                  isSelected={settings.colorPalette === 'green'} 
+                  onClick={() => handleChange('colorPalette', 'green')} 
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </TabsContent>
       </Tabs>
 
-      <Button onClick={handleSave} className="mt-4">
-        Save Changes
+      <Button 
+        onClick={handleSave} 
+        className="mt-4" 
+        disabled={saving}
+      >
+        {saving ? 'Saving...' : 'Save Changes'}
       </Button>
     </div>
   );

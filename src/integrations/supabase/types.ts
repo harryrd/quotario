@@ -152,6 +152,57 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          color_palette: string
+          created_at: string | null
+          currency: string
+          date_format: string
+          font_size: string
+          id: string
+          invoice_prefix: string
+          invoice_start_number: string
+          language: string
+          quotation_prefix: string
+          quotation_start_number: string
+          theme: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          color_palette?: string
+          created_at?: string | null
+          currency?: string
+          date_format?: string
+          font_size?: string
+          id?: string
+          invoice_prefix?: string
+          invoice_start_number?: string
+          language?: string
+          quotation_prefix?: string
+          quotation_start_number?: string
+          theme?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          color_palette?: string
+          created_at?: string | null
+          currency?: string
+          date_format?: string
+          font_size?: string
+          id?: string
+          invoice_prefix?: string
+          invoice_start_number?: string
+          language?: string
+          quotation_prefix?: string
+          quotation_start_number?: string
+          theme?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
