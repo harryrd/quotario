@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DocumentCard, { DocumentCardProps } from '@/components/DocumentCard';
 import AnimatedTransition from '@/components/AnimatedTransition';
-import { Button } from '@/components/ui/button';
 
 interface DocumentListProps {
   documents: DocumentCardProps[];
@@ -13,7 +12,6 @@ interface DocumentListProps {
   searchQuery: string;
   loading: boolean;
   handleDeleteClick: (id: string, e: React.MouseEvent) => void;
-  onCreateDocument: (type: 'quotation' | 'invoice') => void;
 }
 
 const DocumentList: React.FC<DocumentListProps> = ({
@@ -23,7 +21,6 @@ const DocumentList: React.FC<DocumentListProps> = ({
   searchQuery,
   loading,
   handleDeleteClick,
-  onCreateDocument,
 }) => {
   const navigate = useNavigate();
 
@@ -72,19 +69,6 @@ const DocumentList: React.FC<DocumentListProps> = ({
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <p className="text-muted-foreground mb-3">No documents found</p>
-                {activeTab === 'all' ? (
-                  <Button 
-                    onClick={() => navigate('/create')}
-                  >
-                    Create Your First Document
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={() => onCreateDocument(activeTab as 'quotation' | 'invoice')}
-                  >
-                    Create Your First {activeTab === 'quotation' ? 'Quotation' : 'Invoice'}
-                  </Button>
-                )}
               </div>
             )}
           </div>

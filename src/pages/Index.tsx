@@ -1,14 +1,10 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FilePlus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import { useAuth } from '@/components/AuthContext';
-import { toast } from 'sonner';
 import SearchBar from '@/components/documents/SearchBar';
 import DocumentList from '@/components/documents/DocumentList';
-import CreateDocumentButtons from '@/components/documents/CreateDocumentButtons';
 import DeleteDocumentDialog from '@/components/documents/DeleteDocumentDialog';
 import { useDocuments } from '@/hooks/useDocuments';
 
@@ -29,15 +25,6 @@ const Index: React.FC = () => {
     deleteDocument
   } = useDocuments(user?.id);
   
-  const handleCreateDocument = (type: 'quotation' | 'invoice') => {
-    if (!user) {
-      toast.error("Please sign in to create documents");
-      navigate('/sign-in');
-      return;
-    }
-    navigate('/create', { state: { type } });
-  };
-
   const handleDeleteClick = (id: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent opening the document
     setDocumentToDelete(id);
@@ -48,16 +35,6 @@ const Index: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-background">
       <Header 
         title="Documents" 
-        actions={
-          <Button 
-            variant="default" 
-            size="sm"
-            onClick={() => navigate('/create')}
-          >
-            <FilePlus className="h-4 w-4 mr-1" />
-            New
-          </Button>
-        }
       />
       
       <SearchBar 
@@ -73,11 +50,8 @@ const Index: React.FC = () => {
           searchQuery={searchQuery}
           loading={loading}
           handleDeleteClick={handleDeleteClick}
-          onCreateDocument={handleCreateDocument}
         />
       </div>
-      
-      <CreateDocumentButtons onCreateDocument={handleCreateDocument} />
       
       <DeleteDocumentDialog 
         isOpen={isDeleteDialogOpen}

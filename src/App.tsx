@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider, useAuth } from "@/components/AuthContext";
 import Index from "./pages/Index";
-import CreateDocument from "./pages/CreateDocument";
 import ViewDocuments from "./pages/ViewDocuments";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -57,7 +56,6 @@ const AppRoutes = () => {
       
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-      <Route path="/create" element={<ProtectedRoute><CreateDocument /></ProtectedRoute>} />
       <Route path="/document/:id" element={<ProtectedRoute><ViewDocuments /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/settings/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
@@ -69,6 +67,9 @@ const AppRoutes = () => {
       <Route path="/settings/security" element={<ProtectedRoute><SecurityPage /></ProtectedRoute>} />
       <Route path="/settings/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
       <Route path="/settings/templates" element={<ProtectedRoute><TemplateSettingsPage /></ProtectedRoute>} />
+      
+      {/* Handle /create route - redirect to home */}
+      <Route path="/create" element={<Navigate to="/" replace />} />
       
       {/* 404 route */}
       <Route path="*" element={<NotFound />} />
