@@ -21,6 +21,7 @@ import AdsFreePage from "./pages/AdsFreePage";
 import SecurityPage from "./pages/SecurityPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import TemplateSettingsPage from "./pages/TemplateSettingsPage";
+import CreateQuotation from "./pages/CreateQuotation";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const AppRoutes = () => {
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
       <Route path="/document/:id" element={<ProtectedRoute><ViewDocuments /></ProtectedRoute>} />
+      <Route path="/create/quotation" element={<ProtectedRoute><CreateQuotation /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/settings/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
       <Route path="/settings/business" element={<ProtectedRoute><BusinessDetails /></ProtectedRoute>} />
