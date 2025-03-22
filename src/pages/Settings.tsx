@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Building, CreditCard, Bell, Lock, HelpCircle, LogOut, ChevronRight, Settings as SettingsIcon, Users, FileText } from 'lucide-react';
+import { User, Building, CreditCard, Bell, Lock, HelpCircle, LogOut, ChevronRight, Settings as SettingsIcon, Users, FileText, Coffee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import { Separator } from '@/components/ui/separator';
@@ -107,6 +107,13 @@ const Settings: React.FC = () => {
                   title="Security"
                   description="Manage your security settings"
                   onClick={() => {}}
+                />
+                <Separator />
+                <SettingsItem 
+                  icon={Coffee} 
+                  title="Ads Free"
+                  description="Support the developer and remove ads"
+                  onClick={() => navigate('/settings/ads-free')}
                 />
               </div>
             </section>

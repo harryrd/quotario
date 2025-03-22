@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,11 +72,10 @@ const GeneralSettings = () => {
       </div>
 
       <Tabs defaultValue="document" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-4">
+        <TabsList className="grid grid-cols-3 mb-4">
           <TabsTrigger value="document">Document</TabsTrigger>
           <TabsTrigger value="format">Format</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="theme">Theme</TabsTrigger>
         </TabsList>
         
         <TabsContent value="document" className="space-y-5">
@@ -199,10 +199,8 @@ const GeneralSettings = () => {
               </SelectContent>
             </Select>
           </div>
-        </TabsContent>
-
-        <TabsContent value="theme" className="space-y-5">
-          <div className="space-y-2">
+          
+          <div className="space-y-2 mt-4">
             <Label htmlFor="themeSelector">Theme Mode</Label>
             <ToggleGroup type="single" value={theme} onValueChange={(value) => value && setTheme(value as "light" | "dark" | "system")} className="justify-start">
               <ToggleGroupItem value="light" aria-label="Light Mode">
