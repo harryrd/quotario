@@ -14,17 +14,38 @@ interface DocumentDetailsFormProps {
   details: DocumentDetails;
   onDetailsChange: (details: DocumentDetails) => void;
   onContinue: () => void;
+  prefix?: string;
+  startNumber?: string;
+  currency?: string;
 }
 
 const DocumentDetailsForm: React.FC<DocumentDetailsFormProps> = ({
   documentType,
   details,
   onDetailsChange,
-  onContinue
+  onContinue,
+  prefix = documentType === 'quotation' ? 'QUO-' : 'INV-',
+  startNumber = '1001',
+  currency = 'USD'
 }) => {
   const handleClientSelect = (client: Client) => {
     onDetailsChange({...details, client});
   };
+  
+  // Format currency display
+  const getCurrencySymbol = (currencyCode: string) => {
+    switch (currencyCode) {
+      case 'USD': return '$';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      case 'JPY': return '¥';
+      case 'CAD': return 'C$';
+      case 'IDR': return 'Rp';
+      default: return '$';
+    }
+  };
+  
+  const currencySymbol = getCurrencySymbol(currency);
   
   return (
     <AnimatedTransition>
@@ -42,11 +63,39 @@ const DocumentDetailsForm: React.FC<DocumentDetailsFormProps> = ({
         </div>
         
         <div className="grid gap-1">
+          <Label htmlFor="documentNumber" className="text-xs">
+            {documentType === 'quotation' ? 'Quotation' : 'Invoice'} Number
+          </Label>
+          <Input
+            id="documentNumber"
+            value={`${prefix}${startNumber}`}
+            readOnly
+            className="compact-input bg-muted"
+          />
+          <p className="text-xs text-muted-foreground">
+            Number format set in General Settings
+          </p>
+        </div>
+        
+        <div className="grid gap-1">
           <Label htmlFor="client" className="text-xs">Client<span className="text-red-500">*</span></Label>
           <ClientSelector 
             onClientSelect={handleClientSelect}
             selectedClientName={details.client?.name || ''}
           />
+        </div>
+        
+        <div className="grid gap-1">
+          <Label htmlFor="currency" className="text-xs">Currency</Label>
+          <Input
+            id="currency"
+            value={`${currency} (${currencySymbol})`}
+            readOnly
+            className="compact-input bg-muted"
+          />
+          <p className="text-xs text-muted-foreground">
+            Currency set in General Settings
+          </p>
         </div>
         
         <div className="grid gap-1">

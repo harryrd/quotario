@@ -3,34 +3,57 @@ import React from 'react';
 import { Save, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface DocumentActionsProps {
   onSave: (status: 'draft' | 'sent') => void;
+  isLoading?: boolean;
 }
 
-const DocumentActions: React.FC<DocumentActionsProps> = ({ onSave }) => {
+const DocumentActions: React.FC<DocumentActionsProps> = ({ onSave, isLoading = false }) => {
   return (
     <motion.div 
-      className="fixed bottom-4 left-0 right-0 flex justify-center gap-3 px-3"
+      className="fixed bottom-4 left-0 right-0 flex justify-center gap-3 px-3 z-10"
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.3, duration: 0.5 }}
     >
-      <Button 
-        variant="outline"
-        className="flex-1 py-1 text-xs h-8"
-        onClick={() => onSave('draft')}
-      >
-        <Save className="h-3 w-3 mr-1" />
-        Save as Draft
-      </Button>
-      <Button 
-        className="flex-1 py-1 text-xs h-8"
-        onClick={() => onSave('sent')}
-      >
-        <Send className="h-3 w-3 mr-1" />
-        Send Document
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              variant="outline"
+              className="flex-1 py-1 text-xs h-8"
+              onClick={() => onSave('draft')}
+              disabled={isLoading}
+            >
+              <Save className="h-3 w-3 mr-1" />
+              {isLoading ? 'Saving...' : 'Save as Draft'}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Save your document as a draft</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              className="flex-1 py-1 text-xs h-8"
+              onClick={() => onSave('sent')}
+              disabled={isLoading}
+            >
+              <Send className="h-3 w-3 mr-1" />
+              {isLoading ? 'Sending...' : 'Send Document'}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Save and mark as sent</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </motion.div>
   );
 };

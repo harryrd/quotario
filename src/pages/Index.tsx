@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FilePlus, Search, Filter } from 'lucide-react';
+import { FilePlus, Search, Filter, Trash2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,8 +11,17 @@ import AnimatedTransition from '@/components/AnimatedTransition';
 import { useAuth } from '@/components/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-// Sample data for demo purposes
 const demoDocuments: DocumentCardProps[] = [
   // Quotations
   {
@@ -116,6 +124,9 @@ const Index: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -209,6 +220,55 @@ const Index: React.FC = () => {
     }
     navigate('/create', { state: { type } });
   };
+
+  const handleDeleteClick = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent opening the document
+    setDocumentToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const handleDeleteDocument = async () => {
+    if (!documentToDelete || !user) {
+      setIsDeleteDialogOpen(false);
+      return;
+    }
+    
+    setIsDeleting(true);
+    
+    try {
+      // First delete document items
+      const { error: itemsError } = await supabase
+        .from('document_items')
+        .delete()
+        .eq('document_id', documentToDelete);
+      
+      if (itemsError) {
+        throw itemsError;
+      }
+      
+      // Then delete the document
+      const { error: docError } = await supabase
+        .from('documents')
+        .delete()
+        .eq('id', documentToDelete)
+        .eq('user_id', user.id);
+      
+      if (docError) {
+        throw docError;
+      }
+      
+      // Update the UI
+      setDocuments(prev => prev.filter(doc => doc.id !== documentToDelete));
+      toast.success('Document deleted successfully');
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      toast.error('Failed to delete document');
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
+      setDocumentToDelete(null);
+    }
+  };
   
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -258,11 +318,20 @@ const Index: React.FC = () => {
                   </div>
                 ) : filteredDocuments.length > 0 ? (
                   filteredDocuments.map((doc) => (
-                    <DocumentCard 
-                      key={doc.id} 
-                      {...doc} 
-                      onClick={() => handleOpenDocument(doc.id)}
-                    />
+                    <div key={doc.id} className="relative">
+                      <DocumentCard 
+                        {...doc} 
+                        onClick={() => handleOpenDocument(doc.id)}
+                      />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-6 w-6"
+                        onClick={(e) => handleDeleteClick(doc.id, e)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   ))
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -307,6 +376,30 @@ const Index: React.FC = () => {
           New Invoice
         </Button>
       </motion.div>
+      
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Delete Document
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this document? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteDocument}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

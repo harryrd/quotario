@@ -11,11 +11,14 @@ import DocumentActions from '@/components/documents/DocumentActions';
 import { DocumentType, DocumentDetails } from '@/types/document';
 import { TableField, TableRow } from '@/components/CustomizableTable';
 import { Client } from '@/types/client';
+import { useAuth } from '@/components/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const CreateDocument: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialType = location.state?.type || 'quotation';
+  const { user } = useAuth();
   
   const [activeTab, setActiveTab] = useState('details');
   const [documentType, setDocumentType] = useState<DocumentType>(initialType);
@@ -25,6 +28,14 @@ const CreateDocument: React.FC = () => {
     date: new Date().toISOString().split('T')[0],
     dueDate: '',
     notes: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [userSettings, setUserSettings] = useState({
+    currency: 'USD',
+    quotationPrefix: 'QUO-',
+    quotationStartNumber: '1001',
+    invoicePrefix: 'INV-',
+    invoiceStartNumber: '1001'
   });
   
   // Define default fields for each document type
@@ -48,6 +59,40 @@ const CreateDocument: React.FC = () => {
   const [rows, setRows] = useState<TableRow[]>([
     { id: '1', desc: '', qty: '', price: '', tax: '' }
   ]);
+
+  // Fetch user settings
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (error) {
+          console.error('Error fetching user settings:', error);
+          return;
+        }
+        
+        if (data) {
+          setUserSettings({
+            currency: data.currency || 'USD',
+            quotationPrefix: data.quotation_prefix || 'QUO-',
+            quotationStartNumber: data.quotation_start_number || '1001',
+            invoicePrefix: data.invoice_prefix || 'INV-',
+            invoiceStartNumber: data.invoice_start_number || '1001'
+          });
+        }
+      } catch (error) {
+        console.error('Error in fetchUserSettings:', error);
+      }
+    };
+    
+    fetchUserSettings();
+  }, [user]);
   
   // Update fields when document type changes
   useEffect(() => {
@@ -66,7 +111,7 @@ const CreateDocument: React.FC = () => {
     setDetails(updatedDetails);
   };
   
-  const handleSave = (status: 'draft' | 'sent') => {
+  const handleSave = async (status: 'draft' | 'sent') => {
     // Validate required fields
     if (!details.title || !details.client || !details.date) {
       toast.error('Please fill in all required fields');
@@ -86,10 +131,65 @@ const CreateDocument: React.FC = () => {
       setActiveTab('items');
       return;
     }
-    
-    // In a real app, you would save to a database here
-    toast.success(`Your ${documentType} has been ${status === 'draft' ? 'saved' : 'sent'}`);
-    navigate('/');
+
+    // Save document to database if user is logged in
+    if (user) {
+      setIsLoading(true);
+      try {
+        // Insert document
+        const { data: documentData, error: documentError } = await supabase
+          .from('documents')
+          .insert({
+            user_id: user.id,
+            type: documentType,
+            title: details.title,
+            client_name: details.client?.name || '',
+            date: details.date,
+            due_date: details.dueDate || null,
+            notes: details.notes || null,
+            status: status
+          })
+          .select('id')
+          .single();
+        
+        if (documentError) {
+          throw documentError;
+        }
+        
+        // Insert document items
+        const documentItems = rows
+          .filter(row => row.desc && row.qty && row.price) // Only save valid rows
+          .map(row => ({
+            document_id: documentData.id,
+            description: row.desc,
+            quantity: Number(row.qty),
+            unit_price: Number(row.price),
+            tax: row.tax ? Number(row.tax) : null
+          }));
+        
+        if (documentItems.length > 0) {
+          const { error: itemsError } = await supabase
+            .from('document_items')
+            .insert(documentItems);
+          
+          if (itemsError) {
+            throw itemsError;
+          }
+        }
+        
+        toast.success(`Your ${documentType} has been ${status === 'draft' ? 'saved' : 'sent'}`);
+        navigate('/');
+      } catch (error) {
+        console.error(`Error saving ${documentType}:`, error);
+        toast.error(`Failed to save ${documentType}`);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // Demo mode without saving to database
+      toast.success(`Your ${documentType} has been ${status === 'draft' ? 'saved' : 'sent'}`);
+      navigate('/');
+    }
   };
   
   return (
@@ -117,6 +217,9 @@ const CreateDocument: React.FC = () => {
               details={details}
               onDetailsChange={handleDetailsChange}
               onContinue={() => setActiveTab('items')}
+              prefix={documentType === 'quotation' ? userSettings.quotationPrefix : userSettings.invoicePrefix}
+              startNumber={documentType === 'quotation' ? userSettings.quotationStartNumber : userSettings.invoiceStartNumber}
+              currency={userSettings.currency}
             />
           </TabsContent>
           
@@ -127,12 +230,13 @@ const CreateDocument: React.FC = () => {
               rows={rows}
               onFieldsChange={setFields}
               onRowsChange={setRows}
+              currency={userSettings.currency}
             />
           </TabsContent>
         </Tabs>
       </div>
       
-      <DocumentActions onSave={handleSave} />
+      <DocumentActions onSave={handleSave} isLoading={isLoading} />
     </div>
   );
 };
