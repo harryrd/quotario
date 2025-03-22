@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import DocumentTypeSelector from '@/components/documents/DocumentTypeSelector';
@@ -7,8 +7,11 @@ import DocumentDetailsForm from '@/components/documents/DocumentDetailsForm';
 import DocumentItemsSection from '@/components/documents/DocumentItemsSection';
 import DocumentActions from '@/components/documents/DocumentActions';
 import { useDocumentCreation } from '@/hooks/useDocumentCreation';
+import { useNavigate } from 'react-router-dom';
 
 const CreateDocument: React.FC = () => {
+  const navigate = useNavigate();
+  
   const {
     activeTab,
     setActiveTab,
@@ -23,8 +26,30 @@ const CreateDocument: React.FC = () => {
     handleSave,
     setFields,
     setRows,
-    handleClientSelect
+    handleClientSelect,
+    fetchTemplateFields,
+    documentId
   } = useDocumentCreation();
+  
+  // Fetch template fields when document type changes
+  useEffect(() => {
+    fetchTemplateFields(documentType);
+  }, [documentType, fetchTemplateFields]);
+  
+  // Handle document save with redirection
+  const handleDocumentSave = async (status: 'draft' | 'sent') => {
+    const savedId = await handleSave(status);
+    
+    if (savedId) {
+      if (status === 'draft') {
+        // Go back to documents list
+        navigate('/');
+      } else {
+        // Go to document details
+        navigate(`/document/${savedId}`);
+      }
+    }
+  };
   
   return (
     <div className="flex flex-col min-h-screen bg-background pb-20">
@@ -70,7 +95,7 @@ const CreateDocument: React.FC = () => {
         </Tabs>
       </div>
       
-      <DocumentActions onSave={handleSave} isLoading={isLoading} />
+      <DocumentActions onSave={handleDocumentSave} isLoading={isLoading} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { DocumentType, DocumentDetails } from '@/types/document';
@@ -7,6 +7,7 @@ import { TableField, TableRow } from '@/components/CustomizableTable';
 import { Client } from '@/types/client';
 import { useAuth } from '@/components/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { FieldTemplate } from '@/components/settings/template/types';
 
 // Define default fields for each document type
 const defaultQuotationFields: TableField[] = [
@@ -61,6 +62,8 @@ export const useDocumentCreation = () => {
   const [rows, setRows] = useState<TableRow[]>([
     { id: '1', desc: '', qty: '', price: '', tax: '' }
   ]);
+  
+  const [documentId, setDocumentId] = useState<string | null>(null);
 
   // Fetch user settings
   useEffect(() => {
@@ -96,10 +99,64 @@ export const useDocumentCreation = () => {
     fetchUserSettings();
   }, [user]);
   
-  // Update fields when document type changes
-  useEffect(() => {
-    setFields(documentType === 'quotation' ? defaultQuotationFields : defaultInvoiceFields);
-  }, [documentType]);
+  // Fetch template fields from user's template settings
+  const fetchTemplateFields = useCallback(async (type: DocumentType) => {
+    if (!user) {
+      // If not logged in, use defaults
+      setFields(type === 'quotation' ? defaultQuotationFields : defaultInvoiceFields);
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('document_templates')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('type', type)
+        .single();
+      
+      if (error) {
+        console.error(`Error fetching ${type} template:`, error);
+        setFields(type === 'quotation' ? defaultQuotationFields : defaultInvoiceFields);
+        return;
+      }
+      
+      if (data && data.fields) {
+        // Convert template fields to table fields
+        const templateFields = data.fields as unknown as FieldTemplate[];
+        const activeFields = templateFields
+          .filter(field => field.enabled)
+          .sort((a, b) => a.position - b.position)
+          .map(field => ({
+            id: field.id,
+            name: field.name,
+            type: field.type,
+            required: field.required,
+            options: field.options
+          }));
+        
+        if (activeFields.length > 0) {
+          setFields(activeFields);
+          
+          // Initialize rows with the new fields
+          const newRow: TableRow = { id: '1' };
+          activeFields.forEach(field => {
+            newRow[field.id] = '';
+          });
+          setRows([newRow]);
+        } else {
+          // Fallback to defaults if no fields are enabled
+          setFields(type === 'quotation' ? defaultQuotationFields : defaultInvoiceFields);
+        }
+      } else {
+        // Use defaults if no template is found
+        setFields(type === 'quotation' ? defaultQuotationFields : defaultInvoiceFields);
+      }
+    } catch (error) {
+      console.error('Error in fetchTemplateFields:', error);
+      setFields(type === 'quotation' ? defaultQuotationFields : defaultInvoiceFields);
+    }
+  }, [user]);
   
   const handleClientSelect = (client: Client) => {
     setDetails(prev => ({ ...prev, client }));
@@ -118,7 +175,7 @@ export const useDocumentCreation = () => {
     if (!details.title || !details.client || !details.date) {
       toast.error('Please fill in all required fields');
       setActiveTab('details');
-      return;
+      return null;
     }
     
     // Check if table has at least one row with required fields filled
@@ -131,7 +188,7 @@ export const useDocumentCreation = () => {
     if (!hasValidRow) {
       toast.error('Please add at least one complete item to your document');
       setActiveTab('items');
-      return;
+      return null;
     }
 
     // Save document to database if user is logged in
@@ -158,6 +215,9 @@ export const useDocumentCreation = () => {
           throw documentError;
         }
         
+        // Set document ID for redirection
+        setDocumentId(documentData.id);
+        
         // Insert document items
         const documentItems = rows
           .filter(row => row.desc && row.qty && row.price) // Only save valid rows
@@ -180,17 +240,18 @@ export const useDocumentCreation = () => {
         }
         
         toast.success(`Your ${documentType} has been ${status === 'draft' ? 'saved' : 'sent'}`);
-        navigate('/');
+        return documentData.id;
       } catch (error) {
         console.error(`Error saving ${documentType}:`, error);
         toast.error(`Failed to save ${documentType}`);
+        return null;
       } finally {
         setIsLoading(false);
       }
     } else {
       // Demo mode without saving to database
       toast.success(`Your ${documentType} has been ${status === 'draft' ? 'saved' : 'sent'}`);
-      navigate('/');
+      return 'demo-id';
     }
   };
 
@@ -208,6 +269,8 @@ export const useDocumentCreation = () => {
     handleSave,
     setFields,
     setRows,
-    handleClientSelect
+    handleClientSelect,
+    fetchTemplateFields,
+    documentId
   };
 };
