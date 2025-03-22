@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FilePlus, Search, Filter } from 'lucide-react';
@@ -9,52 +9,178 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import DocumentCard, { DocumentCardProps } from '@/components/DocumentCard';
 import AnimatedTransition from '@/components/AnimatedTransition';
+import { useAuth } from '@/components/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
-// Sample data
-const initialDocuments: DocumentCardProps[] = [
+// Sample data for demo purposes
+const demoDocuments: DocumentCardProps[] = [
+  // Quotations
   {
     id: '1',
     type: 'quotation',
-    title: 'Website Development',
-    clientName: 'Acme Corp',
-    date: '2023-10-15',
-    amount: 2500.00,
-    status: 'sent'
+    title: 'Website Redesign',
+    clientName: 'Acme Corporation',
+    date: '2024-03-01',
+    amount: 3750.00,
+    status: 'draft'
   },
   {
     id: '2',
-    type: 'invoice',
-    title: 'Logo Design',
+    type: 'quotation',
+    title: 'Mobile App Development',
     clientName: 'TechStart Inc',
-    date: '2023-11-01',
-    amount: 750.00,
-    status: 'paid'
+    date: '2024-03-05',
+    amount: 8250.00,
+    status: 'sent'
   },
   {
     id: '3',
     type: 'quotation',
-    title: 'Mobile App Development',
-    clientName: 'Bright Ideas LLC',
-    date: '2023-11-10',
+    title: 'SEO Optimization',
+    clientName: 'Global Media Group',
+    date: '2024-03-10',
+    amount: 2400.00,
+    status: 'accepted'
+  },
+  {
+    id: '4',
+    type: 'quotation',
+    title: 'Logo Design',
+    clientName: 'Bright Future LLC',
+    date: '2024-03-15',
+    amount: 950.00,
+    status: 'declined'
+  },
+  {
+    id: '5',
+    type: 'quotation',
+    title: 'Marketing Campaign',
+    clientName: 'Sunshine Foods',
+    date: '2024-03-20',
+    amount: 5500.00,
+    status: 'draft'
+  },
+  // Invoices
+  {
+    id: '6',
+    type: 'invoice',
+    title: 'Server Maintenance',
+    clientName: 'CloudTech Solutions',
+    date: '2024-03-02',
+    amount: 1850.00,
+    status: 'sent'
+  },
+  {
+    id: '7',
+    type: 'invoice',
+    title: 'Content Writing',
+    clientName: 'NewsDaily',
+    date: '2024-03-07',
+    amount: 3250.00,
+    status: 'paid'
+  },
+  {
+    id: '8',
+    type: 'invoice',
+    title: 'UI/UX Consulting',
+    clientName: 'Innovation Labs',
+    date: '2024-03-12',
     amount: 4800.00,
     status: 'draft'
   },
   {
-    id: '4',
+    id: '9',
     type: 'invoice',
-    title: 'SEO Services',
-    clientName: 'Golden Gate Media',
-    date: '2023-10-28',
-    amount: 1200.00,
-    status: 'accepted'
+    title: 'Video Production',
+    clientName: 'VisualArts Studio',
+    date: '2024-03-17',
+    amount: 7500.00,
+    status: 'sent'
+  },
+  {
+    id: '10',
+    type: 'invoice',
+    title: 'Data Analysis',
+    clientName: 'Research Insights',
+    date: '2024-03-22',
+    amount: 3950.00,
+    status: 'paid'
   }
 ];
 
 const Index: React.FC = () => {
   const navigate = useNavigate();
-  const [documents, setDocuments] = useState<DocumentCardProps[]>(initialDocuments);
+  const { user } = useAuth();
+  const [documents, setDocuments] = useState<DocumentCardProps[]>(demoDocuments);
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      // Only try to fetch from the database if the user is authenticated
+      if (user) {
+        try {
+          setLoading(true);
+          const { data, error } = await supabase
+            .from('documents')
+            .select(`
+              id,
+              type,
+              title,
+              client_name,
+              date,
+              status,
+              document_items(unit_price, quantity)
+            `)
+            .eq('user_id', user.id);
+            
+          if (error) {
+            console.error('Error fetching documents:', error);
+            // Fall back to demo data
+            setDocuments(demoDocuments);
+            return;
+          }
+          
+          if (data && data.length > 0) {
+            // Transform the data to match DocumentCardProps
+            const transformedData = data.map(doc => {
+              // Calculate total amount from document items
+              const totalAmount = doc.document_items?.reduce((sum, item) => {
+                return sum + (Number(item.quantity) * Number(item.unit_price));
+              }, 0) || 0;
+              
+              return {
+                id: doc.id,
+                type: doc.type as 'quotation' | 'invoice',
+                title: doc.title,
+                clientName: doc.client_name,
+                date: doc.date,
+                amount: totalAmount,
+                status: doc.status as 'draft' | 'sent' | 'accepted' | 'declined' | 'paid'
+              };
+            });
+            
+            setDocuments(transformedData);
+          } else {
+            // If no documents found, use demo data
+            setDocuments(demoDocuments);
+          }
+        } catch (error) {
+          console.error('Unexpected error:', error);
+          setDocuments(demoDocuments);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // Not authenticated, use demo data
+        setDocuments(demoDocuments);
+      }
+    };
+    
+    fetchDocuments();
+  }, [user]);
   
   const filteredDocuments = documents.filter(doc => {
     // Filter by tab
@@ -76,6 +202,11 @@ const Index: React.FC = () => {
   };
   
   const handleCreateDocument = (type: 'quotation' | 'invoice') => {
+    if (!user) {
+      toast.error("Please sign in to create documents");
+      navigate('/sign-in');
+      return;
+    }
     navigate('/create', { state: { type } });
   };
   
@@ -121,7 +252,11 @@ const Index: React.FC = () => {
           <TabsContent value={activeTab} className="mt-0">
             <AnimatedTransition>
               <div className="grid gap-3 pb-16">
-                {filteredDocuments.length > 0 ? (
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <p className="text-muted-foreground">Loading documents...</p>
+                  </div>
+                ) : filteredDocuments.length > 0 ? (
                   filteredDocuments.map((doc) => (
                     <DocumentCard 
                       key={doc.id} 
