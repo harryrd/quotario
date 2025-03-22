@@ -48,6 +48,7 @@ export function ThemeProvider({
     }
 
     root.classList.add(theme);
+    console.log("Theme class added:", theme); // Debug log
   }, [theme]);
 
   // Handle system theme changes
@@ -89,6 +90,7 @@ export function ThemeProvider({
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
+      console.log("Theme set to:", theme); // Debug log
     },
   };
 

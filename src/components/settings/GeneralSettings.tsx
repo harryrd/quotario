@@ -108,7 +108,7 @@ const GeneralSettings = () => {
     });
 
     // Apply theme changes immediately for preview
-    if (field === 'theme') {
+    if (field === 'theme' && (value === 'light' || value === 'dark' || value === 'system')) {
       setTheme(value as "light" | "dark" | "system");
     }
   };
@@ -318,7 +318,12 @@ const GeneralSettings = () => {
             <ToggleGroup 
               type="single" 
               value={settings.theme} 
-              onValueChange={(value) => value && handleChange('theme', value)} 
+              onValueChange={(value) => {
+                if (value) {
+                  handleChange('theme', value);
+                  console.log('Theme changed to:', value); // Debug log
+                }
+              }} 
               className="justify-start"
             >
               <ToggleGroupItem value="light" aria-label="Light Mode">
