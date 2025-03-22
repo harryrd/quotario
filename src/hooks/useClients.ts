@@ -12,6 +12,8 @@ export const useClients = (userId?: string) => {
     try {
       setLoading(true);
       if (!userId) {
+        // If no userId is provided, return early
+        setLoading(false);
         return;
       }
       
@@ -23,6 +25,7 @@ export const useClients = (userId?: string) => {
       if (error) {
         toast.error('Failed to fetch clients');
         console.error('Error fetching clients:', error);
+        setClients([]);
         return;
       }
 
@@ -40,6 +43,7 @@ export const useClients = (userId?: string) => {
     } catch (error) {
       console.error('Error:', error);
       toast.error('Something went wrong');
+      setClients([]);
     } finally {
       setLoading(false);
     }
@@ -157,6 +161,9 @@ export const useClients = (userId?: string) => {
   useEffect(() => {
     if (userId) {
       fetchClients();
+    } else {
+      // If no userId is available, set clients to empty array
+      setClients([]);
     }
   }, [userId]);
 

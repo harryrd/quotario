@@ -30,8 +30,11 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
-  const { clients = [], loading } = useClients(user?.id);
+  const { clients, loading } = useClients(user?.id);
   const [value, setValue] = useState(selectedClientName);
+  
+  // Make sure clients is always an array
+  const clientsList = Array.isArray(clients) ? clients : [];
 
   useEffect(() => {
     // If a client name is already selected (for instance, during edit mode)
@@ -60,12 +63,12 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
             {loading ? 'Loading clients...' : 'No client found.'}
           </CommandEmpty>
           <CommandGroup>
-            {Array.isArray(clients) && clients.map((client) => (
+            {clientsList.map((client) => (
               <CommandItem
                 key={client.id}
                 value={client.name}
                 onSelect={(currentValue) => {
-                  const selectedClient = clients.find(c => c.name.toLowerCase() === currentValue.toLowerCase());
+                  const selectedClient = clientsList.find(c => c.name.toLowerCase() === currentValue.toLowerCase());
                   if (selectedClient) {
                     setValue(selectedClient.name);
                     onClientSelect(selectedClient);
