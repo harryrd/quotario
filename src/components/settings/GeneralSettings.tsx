@@ -16,13 +16,7 @@ import {
   ToggleGroup,
   ToggleGroupItem
 } from '@/components/ui/toggle-group';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Moon, Sun, Monitor, Check, ChevronDown } from 'lucide-react';
+import { Moon, Sun, Monitor } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -35,7 +29,6 @@ type UserSettings = {
   dateFormat: string;
   language: string;
   fontSize: string;
-  colorPalette: string;
   theme: "light" | "dark" | "system";
 }
 
@@ -48,20 +41,8 @@ const defaultSettings: UserSettings = {
   dateFormat: 'MM/DD/YYYY',
   language: 'English',
   fontSize: 'M',
-  colorPalette: 'default',
   theme: 'system'
 };
-
-const ColorPalette = ({ color, name, isSelected, onClick }: { color: string, name: string, isSelected: boolean, onClick: () => void }) => (
-  <div 
-    className="flex items-center gap-2 p-2 hover:bg-accent cursor-pointer rounded-sm"
-    onClick={onClick}
-  >
-    <div className={`relative h-5 w-5 rounded-full ${color}`}></div>
-    <span>{name}</span>
-    {isSelected && <Check className="h-4 w-4 ml-auto" />}
-  </div>
-);
 
 const GeneralSettings = () => {
   const { theme, setTheme } = useTheme();
@@ -100,7 +81,6 @@ const GeneralSettings = () => {
             dateFormat: data.date_format,
             language: data.language,
             fontSize: data.font_size,
-            colorPalette: data.color_palette,
             theme: data.theme as "light" | "dark" | "system"
           };
           
@@ -108,7 +88,6 @@ const GeneralSettings = () => {
           
           // Apply settings to the UI
           document.documentElement.style.fontSize = getFontSizeValue(userSettings.fontSize);
-          applyColorPalette(userSettings.colorPalette);
           setTheme(userSettings.theme);
         }
       } catch (error) {
@@ -128,11 +107,7 @@ const GeneralSettings = () => {
       [field]: value,
     });
 
-    // Apply color palette and theme changes immediately for preview
-    if (field === 'colorPalette') {
-      applyColorPalette(value);
-    }
-    
+    // Apply theme changes immediately for preview
     if (field === 'theme') {
       setTheme(value as "light" | "dark" | "system");
     }
@@ -158,7 +133,6 @@ const GeneralSettings = () => {
         date_format: settings.dateFormat,
         language: settings.language,
         font_size: settings.fontSize,
-        color_palette: settings.colorPalette,
         theme: settings.theme
       };
 
@@ -173,9 +147,8 @@ const GeneralSettings = () => {
         return;
       }
 
-      // Apply font size and color palette globally
+      // Apply font size globally
       document.documentElement.style.fontSize = getFontSizeValue(settings.fontSize);
-      applyColorPalette(settings.colorPalette);
       setTheme(settings.theme);
       
       toast.success('Settings saved successfully');
@@ -195,40 +168,6 @@ const GeneralSettings = () => {
       case 'L': return '18px';
       case 'XL': return '20px';
       default: return '16px';
-    }
-  };
-
-  const applyColorPalette = (palette: string) => {
-    const root = document.documentElement;
-    
-    // Reset to defaults
-    root.style.removeProperty('--primary');
-    root.style.removeProperty('--primary-foreground');
-    root.style.removeProperty('--secondary');
-    root.style.removeProperty('--accent');
-    
-    switch (palette) {
-      case 'blue':
-        root.style.setProperty('--primary', 'hsl(221, 83%, 53%)');
-        root.style.setProperty('--primary-foreground', 'hsl(0, 0%, 100%)');
-        root.style.setProperty('--secondary', 'hsl(214, 32%, 91%)');
-        root.style.setProperty('--accent', 'hsl(217, 91%, 60%)');
-        break;
-      case 'purple':
-        root.style.setProperty('--primary', 'hsl(271, 91%, 65%)');
-        root.style.setProperty('--primary-foreground', 'hsl(0, 0%, 100%)');
-        root.style.setProperty('--secondary', 'hsl(270, 50%, 96%)');
-        root.style.setProperty('--accent', 'hsl(280, 67%, 69%)');
-        break;
-      case 'green':
-        root.style.setProperty('--primary', 'hsl(162, 47%, 50%)');
-        root.style.setProperty('--primary-foreground', 'hsl(0, 0%, 100%)');
-        root.style.setProperty('--secondary', 'hsl(168, 55%, 94%)');
-        root.style.setProperty('--accent', 'hsl(162, 73%, 46%)');
-        break;
-      default:
-        // Default (monochrome) - no need to set anything as we've already reset
-        break;
     }
   };
 
@@ -395,54 +334,6 @@ const GeneralSettings = () => {
                 System
               </ToggleGroupItem>
             </ToggleGroup>
-          </div>
-          
-          <div className="space-y-2 mt-4">
-            <Label>Color Palette</Label>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full justify-between">
-                  <div className="flex items-center">
-                    <div className={`h-4 w-4 rounded-full mr-2 ${
-                      settings.colorPalette === 'default' ? 'bg-gradient-to-br from-gray-700 to-gray-900' :
-                      settings.colorPalette === 'blue' ? 'bg-gradient-to-br from-blue-500 to-blue-700' :
-                      settings.colorPalette === 'purple' ? 'bg-gradient-to-br from-purple-500 to-purple-700' : 
-                      'bg-gradient-to-br from-emerald-500 to-emerald-700'
-                    }`}></div>
-                    {settings.colorPalette === 'default' ? 'Monochrome' : 
-                     settings.colorPalette === 'blue' ? 'Blue' :
-                     settings.colorPalette === 'purple' ? 'Purple' : 'Green'}
-                  </div>
-                  <ChevronDown className="h-4 w-4 opacity-50" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <ColorPalette 
-                  color="bg-gradient-to-br from-gray-700 to-gray-900" 
-                  name="Monochrome"
-                  isSelected={settings.colorPalette === 'default'} 
-                  onClick={() => handleChange('colorPalette', 'default')} 
-                />
-                <ColorPalette 
-                  color="bg-gradient-to-br from-blue-500 to-blue-700" 
-                  name="Blue"
-                  isSelected={settings.colorPalette === 'blue'} 
-                  onClick={() => handleChange('colorPalette', 'blue')} 
-                />
-                <ColorPalette 
-                  color="bg-gradient-to-br from-purple-500 to-purple-700" 
-                  name="Purple"
-                  isSelected={settings.colorPalette === 'purple'} 
-                  onClick={() => handleChange('colorPalette', 'purple')} 
-                />
-                <ColorPalette 
-                  color="bg-gradient-to-br from-emerald-500 to-emerald-700" 
-                  name="Green"
-                  isSelected={settings.colorPalette === 'green'} 
-                  onClick={() => handleChange('colorPalette', 'green')} 
-                />
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </TabsContent>
       </Tabs>
