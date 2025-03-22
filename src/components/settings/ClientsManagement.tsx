@@ -15,7 +15,7 @@ type Client = {
   email: string;
   phone: string;
   address: string;
-  company?: string;
+  company: string | null;
 };
 
 const ClientsManagement = () => {
@@ -62,7 +62,7 @@ const ClientsManagement = () => {
         email: client.email || '',
         phone: client.phone || '',
         address: client.address || '',
-        company: client.company
+        company: client.company || null
       }));
 
       setClients(mappedClients);
@@ -156,7 +156,7 @@ const ClientsManagement = () => {
             email: data.email || '',
             phone: data.phone || '',
             address: data.address || '',
-            company: data.company
+            company: data.company || null
           } : client
         ));
         toast.success('Client updated successfully');
@@ -180,7 +180,7 @@ const ClientsManagement = () => {
           email: data.email || '',
           phone: data.phone || '',
           address: data.address || '',
-          company: data.company
+          company: data.company || null
         }]);
         toast.success('Client added successfully');
       }

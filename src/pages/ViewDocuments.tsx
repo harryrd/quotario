@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Download, Share, Printer, Edit, FileText, Menu, FilePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import { toast } from 'sonner';
@@ -84,8 +84,12 @@ const ViewDocuments: React.FC = () => {
           return;
         }
         
+        // Ensure document type is one of the allowed types
+        const documentType = documentData.type === 'invoice' ? 'invoice' : 'quotation';
+        
         setDocument({
           ...documentData,
+          type: documentType as 'quotation' | 'invoice',
           items: itemsData || []
         });
       } catch (error) {
