@@ -1,8 +1,15 @@
 
 import React, { useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, SortAsc } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { useAuth } from '@/components/AuthContext';
 import { Client } from '@/types/client';
 import { useClients } from '@/hooks/useClients';
@@ -13,6 +20,7 @@ const ClientsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentClient, setCurrentClient] = useState<Client | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<'name' | 'company'>('name');
   const { user } = useAuth();
   
   const { 
@@ -65,8 +73,8 @@ const ClientsManagement = () => {
         </p>
       </div>
 
-      <div className="flex items-center justify-between gap-2">
-        <div className="relative flex-1">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search clients..."
@@ -75,10 +83,24 @@ const ClientsManagement = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button onClick={handleAddClient} size="sm">
-          <Plus className="h-3.5 w-3.5 mr-1" />
-          Add
-        </Button>
+        
+        <div className="flex items-center gap-2">
+          <Select value={sortBy} onValueChange={(value) => setSortBy(value as 'name' | 'company')}>
+            <SelectTrigger className="h-9 w-[130px]">
+              <SortAsc className="h-3.5 w-3.5 mr-1" />
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="company">Company</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Button onClick={handleAddClient} size="sm">
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            Add Client
+          </Button>
+        </div>
       </div>
 
       <ClientsList 
@@ -87,6 +109,7 @@ const ClientsManagement = () => {
         loading={loading}
         onEdit={handleEditClient}
         onDelete={handleDeleteClient}
+        sortBy={sortBy}
       />
 
       <ClientForm 

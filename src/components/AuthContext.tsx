@@ -81,13 +81,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signup = async (email: string, password: string, fullName: string) => {
     try {
       setLoading(true);
+      // Disable email verification by setting emailRedirectTo to window.location.origin
+      // This will automatically sign the user in after signup without email confirmation
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
-          }
+          },
+          emailRedirectTo: window.location.origin,
         }
       });
       
@@ -95,7 +98,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast.error(error.message);
         throw error;
       } else {
-        toast.success('Account created! Please check your email to confirm your account.');
+        // Since we're not requiring email verification, we can just show a success message
+        toast.success('Account created! You are now signed in.');
+        
+        // After successful signup, automatically log the user in
+        await login(email, password);
       }
     } catch (error) {
       console.error('Signup error:', error);
