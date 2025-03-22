@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Building, Edit, Trash, User, Mail, Phone } from 'lucide-react';
+import { Edit, Trash, User, Mail, Phone, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Client } from '@/types/client';
 
@@ -14,13 +14,6 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, onEdit, onDelet
   return (
     <div className="p-3 hover:bg-muted/50 flex items-start justify-between gap-3">
       <div className="flex items-start gap-3">
-        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-          {client.company ? (
-            <Building className="h-5 w-5 text-primary" />
-          ) : (
-            <User className="h-5 w-5 text-primary" />
-          )}
-        </div>
         <div>
           <h3 className="font-medium text-sm">{client.name}</h3>
           

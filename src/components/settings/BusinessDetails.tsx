@@ -24,6 +24,7 @@ const BusinessDetails: React.FC = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [businessDetails, setBusinessDetails] = useState<BusinessDetails>({
     company_name: '',
     address: '',
@@ -74,13 +75,44 @@ const BusinessDetails: React.FC = () => {
     fetchBusinessDetails();
   }, [user]);
 
+  const uploadLogo = async (file: File) => {
+    if (!user) return;
+    
+    try {
+      // Create a unique file path
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-logo-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `logos/${fileName}`;
+      
+      // Upload the file to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('logos')
+        .upload(filePath, file);
+      
+      if (uploadError) {
+        throw uploadError;
+      }
+      
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('logos')
+        .getPublicUrl(filePath);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      toast.error('Failed to upload logo');
+      return null;
+    }
+  };
+
   const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // In a real app, this would upload to a storage service
+      // Create a local preview
       const objectUrl = URL.createObjectURL(file);
       setBusinessDetails({ ...businessDetails, logo_url: objectUrl });
-      toast.success('Company logo updated successfully');
+      setLogoFile(file);
     }
   };
 
@@ -95,6 +127,15 @@ const BusinessDetails: React.FC = () => {
     try {
       setSaving(true);
 
+      // Upload logo if there's a new one
+      let logoUrl = businessDetails.logo_url;
+      if (logoFile) {
+        const newLogoUrl = await uploadLogo(logoFile);
+        if (newLogoUrl) {
+          logoUrl = newLogoUrl;
+        }
+      }
+
       const detailsToUpsert = {
         user_id: user.id,
         company_name: businessDetails.company_name,
@@ -102,7 +143,7 @@ const BusinessDetails: React.FC = () => {
         phone: businessDetails.phone,
         email: businessDetails.email,
         website: businessDetails.website,
-        logo_url: businessDetails.logo_url,
+        logo_url: logoUrl,
       };
 
       const { error } = await supabase
@@ -115,6 +156,10 @@ const BusinessDetails: React.FC = () => {
         return;
       }
 
+      // Update the business details with the new logo URL
+      setBusinessDetails({ ...businessDetails, logo_url: logoUrl });
+      setLogoFile(null);
+      
       toast.success('Business details saved successfully');
     } catch (error) {
       console.error('Error in handleSubmit:', error);
@@ -163,6 +208,7 @@ const BusinessDetails: React.FC = () => {
             accept="image/*"
             className="hidden" 
             onChange={handleLogoChange}
+            disabled={saving}
           />
         </div>
       </div>
@@ -176,6 +222,8 @@ const BusinessDetails: React.FC = () => {
               value={businessDetails.company_name}
               onChange={(e) => setBusinessDetails({...businessDetails, company_name: e.target.value})}
               className="pl-9"
+              placeholder="Enter your company name"
+              disabled={saving}
             />
             <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           </div>
@@ -187,6 +235,8 @@ const BusinessDetails: React.FC = () => {
             id="address"
             value={businessDetails.address}
             onChange={(e) => setBusinessDetails({...businessDetails, address: e.target.value})}
+            placeholder="Enter your company address"
+            disabled={saving}
           />
         </div>
         
@@ -198,6 +248,8 @@ const BusinessDetails: React.FC = () => {
               value={businessDetails.phone}
               onChange={(e) => setBusinessDetails({...businessDetails, phone: e.target.value})}
               className="pl-9"
+              placeholder="Enter your phone number"
+              disabled={saving}
             />
             <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           </div>
@@ -212,6 +264,8 @@ const BusinessDetails: React.FC = () => {
               value={businessDetails.email}
               onChange={(e) => setBusinessDetails({...businessDetails, email: e.target.value})}
               className="pl-9"
+              placeholder="Enter your business email"
+              disabled={saving}
             />
             <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           </div>
@@ -225,6 +279,8 @@ const BusinessDetails: React.FC = () => {
               value={businessDetails.website}
               onChange={(e) => setBusinessDetails({...businessDetails, website: e.target.value})}
               className="pl-9"
+              placeholder="Enter your website URL"
+              disabled={saving}
             />
             <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           </div>

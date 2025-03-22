@@ -17,6 +17,7 @@ const ProfileSettings: React.FC = () => {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -105,9 +106,7 @@ const ProfileSettings: React.FC = () => {
       // Create a local preview
       const objectUrl = URL.createObjectURL(file);
       setAvatarUrl(objectUrl);
-      
-      // Upload to Supabase
-      uploadAvatar(file);
+      setAvatarFile(file);
     }
   };
 
@@ -117,6 +116,11 @@ const ProfileSettings: React.FC = () => {
     
     try {
       setLoading(true);
+      
+      // Upload avatar if we have a new one
+      if (avatarFile) {
+        await uploadAvatar(avatarFile);
+      }
       
       // Update profile
       const { error } = await supabase
@@ -189,6 +193,7 @@ const ProfileSettings: React.FC = () => {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="pl-9"
+              placeholder="Enter your full name"
               disabled={loading}
             />
             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
