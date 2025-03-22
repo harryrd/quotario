@@ -79,25 +79,31 @@ const BusinessDetails: React.FC = () => {
     if (!user) return null;
     
     try {
-      // Create a unique file path
+      console.log('Starting logo upload');
+      
+      // Create a unique file path - now following the folder structure required by RLS
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-logo-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
       
       // Upload the file to Supabase Storage
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('logos')
         .upload(filePath, file);
       
       if (uploadError) {
+        console.error('Error uploading logo:', uploadError);
         throw uploadError;
       }
+      
+      console.log('Upload successful:', uploadData);
       
       // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('logos')
         .getPublicUrl(filePath);
       
+      console.log('Logo public URL:', publicUrl);
       return publicUrl;
     } catch (error) {
       console.error('Error uploading logo:', error);
@@ -133,6 +139,18 @@ const BusinessDetails: React.FC = () => {
         const newLogoUrl = await uploadLogo(logoFile);
         if (newLogoUrl) {
           logoUrl = newLogoUrl;
+        } else if (logoUrl.startsWith('blob:')) {
+          // If upload failed but we're using a local preview, try to get the original logo
+          const { data } = await supabase
+            .from('business_details')
+            .select('logo_url')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (data && data.logo_url) {
+            logoUrl = data.logo_url;
+            toast.error('Logo upload failed, keeping previous logo');
+          }
         }
       }
 

@@ -61,22 +61,10 @@ const ProfileSettings: React.FC = () => {
     try {
       console.log('Starting avatar upload');
       
-      // Check if the 'avatars' bucket exists
-      const { data: buckets, error: bucketsError } = await supabase
-        .storage
-        .listBuckets();
-        
-      if (bucketsError) {
-        console.error('Error checking buckets:', bucketsError);
-        return null;
-      }
-      
-      console.log('Available buckets:', buckets);
-      
-      // Create a unique file path
+      // Create a unique file path - now following the folder structure required by RLS
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
       
       // Upload the file to Supabase Storage
       const { error: uploadError, data: uploadData } = await supabase.storage
