@@ -11,6 +11,10 @@ export const useClients = (userId?: string) => {
   const fetchClients = async () => {
     try {
       setLoading(true);
+      if (!userId) {
+        return;
+      }
+      
       const { data, error } = await supabase
         .from('clients')
         .select('*')

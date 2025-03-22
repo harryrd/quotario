@@ -60,7 +60,7 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
             {loading ? 'Loading clients...' : 'No client found.'}
           </CommandEmpty>
           <CommandGroup>
-            {clients.map((client) => (
+            {Array.isArray(clients) && clients.map((client) => (
               <CommandItem
                 key={client.id}
                 value={client.name}
