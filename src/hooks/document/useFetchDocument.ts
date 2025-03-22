@@ -73,7 +73,7 @@ export const useFetchDocument = (documentId: string | undefined, userId: string 
         // Ensure document type is one of the allowed types
         const documentType = documentData.type === 'invoice' ? 'invoice' : 'quotation';
         
-        const fullDocument = {
+        const fullDocument: Document = {
           ...documentData,
           type: documentType as 'quotation' | 'invoice',
           items: itemsData || []

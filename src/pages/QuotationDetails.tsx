@@ -10,7 +10,7 @@ import BusinessClientInfo from '@/components/quotation/BusinessClientInfo';
 import QuotationItemsTable from '@/components/quotation/QuotationItemsTable';
 import QuotationNotes from '@/components/quotation/QuotationNotes';
 import QuotationLoadingState from '@/components/quotation/QuotationLoadingState';
-import { useQuotationDetails } from '@/hooks/useQuotationDetails';
+import { useQuotationDetails } from '@/hooks/quotation/useQuotationDetails';
 
 const QuotationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();

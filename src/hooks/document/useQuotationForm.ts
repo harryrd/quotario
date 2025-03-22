@@ -121,6 +121,12 @@ export const useQuotationForm = (userId: string | undefined) => {
     setDetails(prev => ({ ...prev, notes }));
   };
 
+  // Stub for updateDocumentNumber - this functionality will be handled internally by handleSave
+  const updateDocumentNumber = () => {
+    // Document number is generated automatically during save
+    console.log('Document number will be generated automatically');
+  };
+
   return {
     details,
     fields,
@@ -130,6 +136,7 @@ export const useQuotationForm = (userId: string | undefined) => {
     updateTitle,
     updateDate,
     updateNotes,
+    updateDocumentNumber,
     handleClientSelect,
     handleSubmitQuotation,
     setFields,

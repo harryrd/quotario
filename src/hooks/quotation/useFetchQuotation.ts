@@ -3,31 +3,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { QuotationData, QuotationItem } from '@/types/document-details';
 
-export interface QuotationItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  tax?: number;
-}
-
-export interface QuotationData {
-  id: string;
-  document_number: string;
-  title: string;
-  date: string;
-  status: string;
-  client_name: string;
-  client_email?: string;
-  client_phone?: string;
-  client_address?: string;
-  client_company?: string;
-  notes?: string;
-  items: QuotationItem[];
-}
-
-export const useQuotationDetails = (quotationId: string | undefined, user: User | null) => {
+export const useFetchQuotation = (quotationId: string | undefined, user: User | null) => {
   const navigate = useNavigate();
   const [quotation, setQuotation] = useState<QuotationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -110,18 +88,9 @@ export const useQuotationDetails = (quotationId: string | undefined, user: User 
     fetchQuotationDetails();
   }, [quotationId, user, navigate]);
 
-  // Format currency according to the user's settings
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD' // This should ideally come from user settings
-    }).format(amount);
-  };
-
   return {
     quotation,
     loading,
-    total,
-    formatCurrency
+    total
   };
 };
