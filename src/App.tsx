@@ -76,7 +76,7 @@ const AppRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="system" storageKey="documents-theme">
+    <ThemeProvider storageKey="documents-theme">
       <TooltipProvider>
         <Toaster />
         <Sonner />
