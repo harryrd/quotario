@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -33,17 +34,19 @@ const TemplateSettings: React.FC = () => {
         }
         
         if (data && data.length > 0) {
-          const quotationTemplate = data.find(t => t.type === 'quotation') as DocumentTemplate | undefined;
-          const invoiceTemplate = data.find(t => t.type === 'invoice') as DocumentTemplate | undefined;
+          const quotationTemplate = data.find(t => t.type === 'quotation');
+          const invoiceTemplate = data.find(t => t.type === 'invoice');
           
           if (quotationTemplate) {
-            setQuotationFields(quotationTemplate.fields);
+            // Convert from Json to FieldTemplate[]
+            setQuotationFields(quotationTemplate.fields as unknown as FieldTemplate[]);
           } else {
             setQuotationFields(getDefaultQuotationFields());
           }
           
           if (invoiceTemplate) {
-            setInvoiceFields(invoiceTemplate.fields);
+            // Convert from Json to FieldTemplate[]
+            setInvoiceFields(invoiceTemplate.fields as unknown as FieldTemplate[]);
           } else {
             setInvoiceFields(getDefaultInvoiceFields());
           }
@@ -95,7 +98,7 @@ const TemplateSettings: React.FC = () => {
         .upsert({
           user_id: user.id,
           type: 'quotation',
-          fields: quotationFields
+          fields: quotationFields as unknown as any
         }, { onConflict: 'user_id,type' });
       
       if (quotationError) {
@@ -108,7 +111,7 @@ const TemplateSettings: React.FC = () => {
         .upsert({
           user_id: user.id,
           type: 'invoice',
-          fields: invoiceFields
+          fields: invoiceFields as unknown as any
         }, { onConflict: 'user_id,type' });
       
       if (invoiceError) {
