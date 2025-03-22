@@ -18,6 +18,18 @@ interface PaymentAccount {
   swiftCode: string;
 }
 
+// Define the database row type to match the actual table structure
+type PaymentAccountRow = {
+  id: string;
+  user_id: string;
+  account_name: string;
+  account_number: string;
+  bank_name: string;
+  swift_code: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 const PaymentMethods: React.FC = () => {
   const { user } = useAuth();
   const [accounts, setAccounts] = useState<PaymentAccount[]>([]);
@@ -50,7 +62,7 @@ const PaymentMethods: React.FC = () => {
         
         if (data && data.length > 0) {
           // Transform data to match our interface
-          const transformedAccounts = data.map(account => ({
+          const transformedAccounts = (data as PaymentAccountRow[]).map(account => ({
             id: account.id,
             accountName: account.account_name,
             accountNumber: account.account_number,
@@ -107,11 +119,11 @@ const PaymentMethods: React.FC = () => {
       
       // Add to local state
       const newPaymentAccount: PaymentAccount = {
-        id: data.id,
-        accountName: data.account_name,
-        accountNumber: data.account_number,
-        bankName: data.bank_name,
-        swiftCode: data.swift_code || ''
+        id: (data as PaymentAccountRow).id,
+        accountName: (data as PaymentAccountRow).account_name,
+        accountNumber: (data as PaymentAccountRow).account_number,
+        bankName: (data as PaymentAccountRow).bank_name,
+        swiftCode: (data as PaymentAccountRow).swift_code || ''
       };
       
       setAccounts([...accounts, newPaymentAccount]);
