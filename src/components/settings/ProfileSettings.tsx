@@ -59,25 +59,43 @@ const ProfileSettings: React.FC = () => {
     if (!user) return null;
     
     try {
+      console.log('Starting avatar upload');
+      
+      // Check if the 'avatars' bucket exists
+      const { data: buckets, error: bucketsError } = await supabase
+        .storage
+        .listBuckets();
+        
+      if (bucketsError) {
+        console.error('Error checking buckets:', bucketsError);
+        return null;
+      }
+      
+      console.log('Available buckets:', buckets);
+      
       // Create a unique file path
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;
       
       // Upload the file to Supabase Storage
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
       
       if (uploadError) {
+        console.error('Error during avatar upload:', uploadError);
         throw uploadError;
       }
+      
+      console.log('Upload successful:', uploadData);
       
       // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
       
+      console.log('Avatar public URL:', publicUrl);
       return publicUrl;
     } catch (error) {
       console.error('Error uploading avatar:', error);
@@ -109,6 +127,21 @@ const ProfileSettings: React.FC = () => {
         const uploadedUrl = await uploadAvatar(avatarFile);
         if (uploadedUrl) {
           finalAvatarUrl = uploadedUrl;
+        } else {
+          // If upload failed but we're using a local preview, don't update the avatar URL
+          if (avatarUrl.startsWith('blob:')) {
+            toast.error('Avatar upload failed, keeping previous avatar');
+            // Fetch the current avatar URL from the database to reset the UI
+            const { data } = await supabase
+              .from('profiles')
+              .select('avatar_url')
+              .eq('id', user.id)
+              .single();
+            
+            if (data && data.avatar_url) {
+              finalAvatarUrl = data.avatar_url;
+            }
+          }
         }
       }
       
