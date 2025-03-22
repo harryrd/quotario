@@ -99,14 +99,14 @@ const Settings: React.FC = () => {
                   icon={Bell} 
                   title="Notifications"
                   description="Configure notification preferences"
-                  onClick={() => {}}
+                  onClick={() => navigate('/settings/notifications')}
                 />
                 <Separator />
                 <SettingsItem 
                   icon={Lock} 
                   title="Security"
                   description="Manage your security settings"
-                  onClick={() => {}}
+                  onClick={() => navigate('/settings/security')}
                 />
                 <Separator />
                 <SettingsItem 

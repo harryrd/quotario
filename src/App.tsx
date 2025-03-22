@@ -19,6 +19,8 @@ import ClientsPage from "./pages/ClientsPage";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import AdsFreePage from "./pages/AdsFreePage";
+import SecurityPage from "./pages/SecurityPage";
+import NotificationsPage from "./pages/NotificationsPage";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +65,8 @@ const AppRoutes = () => {
       <Route path="/settings/general" element={<ProtectedRoute><GeneralSettingsPage /></ProtectedRoute>} />
       <Route path="/settings/clients" element={<ProtectedRoute><ClientsPage /></ProtectedRoute>} />
       <Route path="/settings/ads-free" element={<ProtectedRoute><AdsFreePage /></ProtectedRoute>} />
+      <Route path="/settings/security" element={<ProtectedRoute><SecurityPage /></ProtectedRoute>} />
+      <Route path="/settings/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
       
       {/* 404 route */}
       <Route path="*" element={<NotFound />} />

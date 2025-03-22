@@ -103,7 +103,7 @@ const ClientsManagement = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
         <h2 className="text-lg font-medium">Clients Management</h2>
         <p className="text-sm text-muted-foreground">
@@ -116,14 +116,14 @@ const ClientsManagement = () => {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search clients..."
-            className="pl-8"
+            className="pl-8 h-9"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button onClick={handleAddClient}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Client
+        <Button onClick={handleAddClient} size="sm">
+          <Plus className="h-3.5 w-3.5 mr-1" />
+          Add
         </Button>
       </div>
 
@@ -132,46 +132,51 @@ const ClientsManagement = () => {
           filteredClients.map((client) => (
             <div 
               key={client.id} 
-              className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="p-2 flex items-center justify-between gap-2"
             >
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                   {client.company ? (
-                    <Building className="h-5 w-5 text-primary" />
+                    <Building className="h-4 w-4 text-primary" />
                   ) : (
-                    <User className="h-5 w-5 text-primary" />
+                    <User className="h-4 w-4 text-primary" />
                   )}
                 </div>
                 <div>
-                  <h3 className="font-medium">{client.name}</h3>
-                  {client.company && (
-                    <p className="text-sm text-muted-foreground">{client.company}</p>
-                  )}
-                  <p className="text-sm">{client.email}</p>
-                  <p className="text-sm text-muted-foreground">{client.phone}</p>
+                  <h3 className="font-medium text-sm">{client.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-muted-foreground">{client.email}</p>
+                    {client.company && (
+                      <span className="text-xs bg-secondary px-1.5 py-0.5 rounded-full">
+                        {client.company}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 self-end sm:self-auto">
+              <div className="flex items-center gap-1">
                 <Button 
-                  variant="outline" 
+                  variant="ghost" 
                   size="icon"
+                  className="h-7 w-7"
                   onClick={() => handleEditClient(client)}
                 >
-                  <Edit className="h-4 w-4" />
+                  <Edit className="h-3.5 w-3.5" />
                 </Button>
                 <Button 
-                  variant="outline" 
+                  variant="ghost" 
                   size="icon"
+                  className="h-7 w-7"
                   onClick={() => handleDeleteClient(client.id)}
                 >
-                  <Trash className="h-4 w-4" />
+                  <Trash className="h-3.5 w-3.5" />
                 </Button>
               </div>
             </div>
           ))
         ) : (
-          <div className="p-8 text-center">
-            <p className="text-muted-foreground">No clients found</p>
+          <div className="p-4 text-center">
+            <p className="text-muted-foreground text-sm">No clients found</p>
           </div>
         )}
       </div>
@@ -186,66 +191,75 @@ const ClientsManagement = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input 
-                id="name"
-                name="name"
-                value={currentClient?.name || ''}
-                onChange={handleInputChange}
-                placeholder="John Doe"
-                required
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <Label htmlFor="name" className="text-xs">Full Name</Label>
+                <Input 
+                  id="name"
+                  name="name"
+                  value={currentClient?.name || ''}
+                  onChange={handleInputChange}
+                  placeholder="John Doe"
+                  className="h-9"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="email" className="text-xs">Email</Label>
+                <Input 
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={currentClient?.email || ''}
+                  onChange={handleInputChange}
+                  placeholder="john@example.com"
+                  className="h-9"
+                  required
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email"
-                name="email"
-                type="email"
-                value={currentClient?.email || ''}
-                onChange={handleInputChange}
-                placeholder="john@example.com"
-                required
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <Label htmlFor="phone" className="text-xs">Phone Number</Label>
+                <Input 
+                  id="phone"
+                  name="phone"
+                  value={currentClient?.phone || ''}
+                  onChange={handleInputChange}
+                  placeholder="(123) 456-7890"
+                  className="h-9"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="company" className="text-xs">Company (Optional)</Label>
+                <Input 
+                  id="company"
+                  name="company"
+                  value={currentClient?.company || ''}
+                  onChange={handleInputChange}
+                  placeholder="Acme Corp"
+                  className="h-9"
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input 
-                id="phone"
-                name="phone"
-                value={currentClient?.phone || ''}
-                onChange={handleInputChange}
-                placeholder="(123) 456-7890"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="company">Company (Optional)</Label>
-              <Input 
-                id="company"
-                name="company"
-                value={currentClient?.company || ''}
-                onChange={handleInputChange}
-                placeholder="Acme Corp"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="address">Address</Label>
+            <div className="space-y-1">
+              <Label htmlFor="address" className="text-xs">Address</Label>
               <Input 
                 id="address"
                 name="address"
                 value={currentClient?.address || ''}
                 onChange={handleInputChange}
                 placeholder="123 Main St, City, State 12345"
+                className="h-9"
               />
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSaveClient}>
-              Save Client
+            <Button size="sm" onClick={handleSaveClient}>
+              Save
             </Button>
           </div>
         </DialogContent>

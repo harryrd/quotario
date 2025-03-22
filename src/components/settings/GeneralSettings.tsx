@@ -16,7 +16,22 @@ import {
   ToggleGroup,
   ToggleGroupItem
 } from '@/components/ui/toggle-group';
-import { Moon, Sun, Monitor } from 'lucide-react';
+import { Moon, Sun, Monitor, Check } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+const ColorPalette = ({ color, isSelected, onClick }: { color: string, isSelected: boolean, onClick: () => void }) => (
+  <div 
+    className={`relative h-12 w-12 rounded-md cursor-pointer overflow-hidden border-2 ${isSelected ? 'border-primary' : 'border-transparent'}`}
+    onClick={onClick}
+  >
+    <div className={`h-full w-full ${color}`} />
+    {isSelected && (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Check className="h-5 w-5 text-white drop-shadow-md" />
+      </div>
+    )}
+  </div>
+);
 
 const GeneralSettings = () => {
   const { theme, setTheme } = useTheme();
@@ -29,6 +44,7 @@ const GeneralSettings = () => {
     dateFormat: 'MM/DD/YYYY',
     language: 'English',
     fontSize: 'M',
+    colorPalette: 'default',
   });
 
   const handleChange = (field: string, value: string) => {
@@ -36,6 +52,11 @@ const GeneralSettings = () => {
       ...settings,
       [field]: value,
     });
+
+    // Apply color palette immediately
+    if (field === 'colorPalette') {
+      applyColorPalette(value);
+    }
   };
 
   const handleSave = () => {
@@ -44,6 +65,9 @@ const GeneralSettings = () => {
     
     // Apply font size globally
     document.documentElement.style.fontSize = getFontSizeValue(settings.fontSize);
+    
+    // Apply color palette
+    applyColorPalette(settings.colorPalette);
   };
   
   const getFontSizeValue = (size: string) => {
@@ -54,6 +78,40 @@ const GeneralSettings = () => {
       case 'L': return '18px';
       case 'XL': return '20px';
       default: return '16px';
+    }
+  };
+
+  const applyColorPalette = (palette: string) => {
+    const root = document.documentElement;
+    
+    // Reset to defaults
+    root.style.removeProperty('--primary');
+    root.style.removeProperty('--primary-foreground');
+    root.style.removeProperty('--secondary');
+    root.style.removeProperty('--accent');
+    
+    switch (palette) {
+      case 'blue':
+        root.style.setProperty('--primary', 'hsl(221, 83%, 53%)');
+        root.style.setProperty('--primary-foreground', 'hsl(0, 0%, 100%)');
+        root.style.setProperty('--secondary', 'hsl(214, 32%, 91%)');
+        root.style.setProperty('--accent', 'hsl(217, 91%, 60%)');
+        break;
+      case 'purple':
+        root.style.setProperty('--primary', 'hsl(271, 91%, 65%)');
+        root.style.setProperty('--primary-foreground', 'hsl(0, 0%, 100%)');
+        root.style.setProperty('--secondary', 'hsl(270, 50%, 96%)');
+        root.style.setProperty('--accent', 'hsl(280, 67%, 69%)');
+        break;
+      case 'green':
+        root.style.setProperty('--primary', 'hsl(162, 47%, 50%)');
+        root.style.setProperty('--primary-foreground', 'hsl(0, 0%, 100%)');
+        root.style.setProperty('--secondary', 'hsl(168, 55%, 94%)');
+        root.style.setProperty('--accent', 'hsl(162, 73%, 46%)');
+        break;
+      default:
+        // Default (monochrome) - no need to set anything as we've already reset
+        break;
     }
   };
 
@@ -216,6 +274,63 @@ const GeneralSettings = () => {
                 System
               </ToggleGroupItem>
             </ToggleGroup>
+          </div>
+          
+          <div className="space-y-2 mt-4">
+            <Label>Color Palette</Label>
+            <RadioGroup 
+              value={settings.colorPalette}
+              onValueChange={(value) => handleChange('colorPalette', value)}
+              className="flex flex-wrap gap-3 mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="default" id="default" className="sr-only" />
+                <Label htmlFor="default" className="flex items-center space-x-2 cursor-pointer">
+                  <ColorPalette 
+                    color="bg-gradient-to-br from-gray-700 to-gray-900" 
+                    isSelected={settings.colorPalette === 'default'} 
+                    onClick={() => handleChange('colorPalette', 'default')} 
+                  />
+                  <div>Monochrome</div>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="blue" id="blue" className="sr-only" />
+                <Label htmlFor="blue" className="flex items-center space-x-2 cursor-pointer">
+                  <ColorPalette 
+                    color="bg-gradient-to-br from-blue-500 to-blue-700" 
+                    isSelected={settings.colorPalette === 'blue'} 
+                    onClick={() => handleChange('colorPalette', 'blue')} 
+                  />
+                  <div>Blue</div>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="purple" id="purple" className="sr-only" />
+                <Label htmlFor="purple" className="flex items-center space-x-2 cursor-pointer">
+                  <ColorPalette 
+                    color="bg-gradient-to-br from-purple-500 to-purple-700" 
+                    isSelected={settings.colorPalette === 'purple'} 
+                    onClick={() => handleChange('colorPalette', 'purple')} 
+                  />
+                  <div>Purple</div>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="green" id="green" className="sr-only" />
+                <Label htmlFor="green" className="flex items-center space-x-2 cursor-pointer">
+                  <ColorPalette 
+                    color="bg-gradient-to-br from-emerald-500 to-emerald-700" 
+                    isSelected={settings.colorPalette === 'green'} 
+                    onClick={() => handleChange('colorPalette', 'green')} 
+                  />
+                  <div>Green</div>
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
         </TabsContent>
       </Tabs>
