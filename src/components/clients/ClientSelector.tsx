@@ -30,7 +30,7 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
-  const { clients, loading } = useClients(user?.id);
+  const { clients = [], loading } = useClients(user?.id);
   const [value, setValue] = useState(selectedClientName);
 
   useEffect(() => {

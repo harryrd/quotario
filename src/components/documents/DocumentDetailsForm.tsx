@@ -7,14 +7,7 @@ import { Label } from '@/components/ui/label';
 import ClientSelector from '@/components/clients/ClientSelector';
 import { Client } from '@/types/client';
 import AnimatedTransition from '@/components/AnimatedTransition';
-
-interface DocumentDetails {
-  title: string;
-  client: Client | null;
-  date: string;
-  dueDate?: string;
-  notes?: string;
-}
+import { DocumentDetails } from '@/types/document';
 
 interface DocumentDetailsFormProps {
   documentType: 'quotation' | 'invoice';
