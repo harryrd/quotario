@@ -19,6 +19,7 @@ const CreateInvoice: React.FC = () => {
     updateDate,
     updateDueDate,
     updateNotes,
+    updateDocumentNumber,
     handleClientSelect,
     handleSubmitInvoice,
     setFields,
@@ -30,6 +31,7 @@ const CreateInvoice: React.FC = () => {
       <Header 
         title="Create New Invoice" 
         showBack={true}
+        showSettings={false}
       />
       
       <div className="flex-1 container max-w-5xl py-6 space-y-8">
@@ -41,6 +43,7 @@ const CreateInvoice: React.FC = () => {
           onDateChange={updateDate}
           onDueDateChange={updateDueDate}
           onNotesChange={updateNotes}
+          onDocumentNumberChange={updateDocumentNumber}
         />
         
         {/* Items table */}

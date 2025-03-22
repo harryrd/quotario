@@ -38,7 +38,7 @@ const Index: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-background">
       <Header title="Documents" />
       
-      <div className="flex-1 container max-w-5xl py-4 space-y-4">
+      <div className="flex-1 container max-w-5xl py-4 px-4 space-y-4">
         <AnimatedTransition>
           <SearchBar 
             searchQuery={searchQuery}
@@ -56,23 +56,23 @@ const Index: React.FC = () => {
         </AnimatedTransition>
       </div>
       
-      {/* Floating action buttons */}
-      <div className="fixed bottom-4 right-4 flex gap-2">
+      {/* Centered action buttons */}
+      <div className="fixed bottom-4 left-0 right-0 flex justify-center gap-4 px-4">
         <Button 
-          className="shadow-lg" 
-          onClick={() => navigate('/create/invoice')}
-          size="default"
-        >
-          <FileText className="mr-2 h-4 w-4" />
-          New Invoice
-        </Button>
-        <Button 
-          className="shadow-lg" 
+          className="shadow-lg flex-1 max-w-xs" 
           onClick={() => navigate('/create/quotation')}
           variant="default"
         >
           <FilePlus className="mr-2 h-4 w-4" />
           New Quotation
+        </Button>
+        <Button 
+          className="shadow-lg flex-1 max-w-xs" 
+          onClick={() => navigate('/create/invoice')}
+          variant="default"
+        >
+          <FileText className="mr-2 h-4 w-4" />
+          New Invoice
         </Button>
       </div>
       

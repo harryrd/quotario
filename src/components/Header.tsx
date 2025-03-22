@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, MoreVertical, Settings } from 'lucide-react';
+import { ChevronLeft, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -11,13 +11,15 @@ interface HeaderProps {
   showBack?: boolean;
   actions?: React.ReactNode;
   className?: string;
+  showSettings?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
   title, 
   showBack = false, 
   actions,
-  className
+  className,
+  showSettings = true
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,14 +53,16 @@ const Header: React.FC<HeaderProps> = ({
       
       <div className="flex items-center gap-1">
         {actions}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="rounded-full h-8 w-8"
-          onClick={() => navigate('/settings')}
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
+        {showSettings && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full h-8 w-8"
+            onClick={() => navigate('/settings')}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </motion.header>
   );

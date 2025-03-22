@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import Header from '@/components/Header';
 import QuotationDetailsForm from '@/components/quotation/QuotationDetailsForm';
@@ -19,6 +18,7 @@ const CreateQuotation: React.FC = () => {
     updateTitle,
     updateDate,
     updateNotes,
+    updateDocumentNumber,
     handleClientSelect,
     handleSubmitQuotation,
     setFields,
@@ -30,6 +30,7 @@ const CreateQuotation: React.FC = () => {
       <Header 
         title="Create New Quotation" 
         showBack={true}
+        showSettings={false}
       />
       
       <div className="flex-1 container max-w-5xl py-6 space-y-8">
@@ -40,6 +41,7 @@ const CreateQuotation: React.FC = () => {
           onClientSelect={handleClientSelect}
           onDateChange={updateDate}
           onNotesChange={updateNotes}
+          onDocumentNumberChange={updateDocumentNumber}
         />
         
         {/* Items table */}

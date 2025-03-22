@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, FileText, Building } from 'lucide-react';
+import { Calendar, FileText, Building, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Card, 
   CardContent
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export type DocumentType = 'quotation' | 'invoice';
 export type DocumentStatus = 'draft' | 'sent' | 'accepted' | 'declined' | 'paid';
@@ -22,6 +23,7 @@ export interface DocumentCardProps {
   amount: number;
   status: DocumentStatus;
   onClick?: () => void;
+  onDelete?: (id: string, e: React.MouseEvent) => void;
   className?: string;
   currency?: string;
 }
@@ -57,6 +59,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   amount,
   status,
   onClick,
+  onDelete,
   className,
   currency = 'USD',
 }) => {
@@ -111,6 +114,16 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
               <Calendar className="h-2.5 w-2.5 mr-1" />
               <span>{date}</span>
             </div>
+            {onDelete && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-1 mt-2 ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={(e) => onDelete(id, e)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            )}
           </div>
         </div>
       </Card>

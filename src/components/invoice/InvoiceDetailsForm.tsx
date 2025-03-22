@@ -23,6 +23,7 @@ interface InvoiceDetailsFormProps {
   onDateChange: (date: string) => void;
   onDueDateChange: (dueDate: string) => void;
   onNotesChange: (notes: string) => void;
+  onDocumentNumberChange?: (documentNumber: string) => void;
 }
 
 const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
@@ -31,7 +32,8 @@ const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
   onClientSelect,
   onDateChange,
   onDueDateChange,
-  onNotesChange
+  onNotesChange,
+  onDocumentNumberChange
 }) => {
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -43,6 +45,16 @@ const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
             value={details.title}
             onChange={e => onTitleChange(e.target.value)}
             placeholder="Enter document title"
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="documentNumber">Invoice Number</Label>
+          <Input
+            id="documentNumber"
+            value={details.documentNumber || ''}
+            onChange={e => onDocumentNumberChange && onDocumentNumberChange(e.target.value)}
+            placeholder="e.g., INV-001"
           />
         </div>
         

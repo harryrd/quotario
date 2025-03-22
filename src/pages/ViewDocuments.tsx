@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import AnimatedTransition from '@/components/AnimatedTransition';
@@ -10,6 +10,10 @@ import DocumentDetails from '@/components/documents/DocumentDetails';
 import DocumentActions from '@/components/documents/DocumentActions';
 import DocumentEditActions from '@/components/documents/DocumentEditActions';
 import { useDocumentDetails, Document, DocumentItem, BusinessDetails } from '@/hooks/useDocumentDetails';
+import DeleteDocumentDialog from '@/components/documents/DeleteDocumentDialog';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 // Re-export the types for other components to use
 export type { Document, DocumentItem, BusinessDetails };
@@ -17,6 +21,9 @@ export type { Document, DocumentItem, BusinessDetails };
 const ViewDocuments: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
   
   const {
     document,
@@ -33,6 +40,47 @@ const ViewDocuments: React.FC = () => {
     handlePreviewPDF,
     formatDate
   } = useDocumentDetails(id, user?.id);
+  
+  const handleDeleteClick = () => {
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const handleDeleteDocument = async () => {
+    if (!id || !user?.id) return;
+    
+    setIsDeleting(true);
+    try {
+      // First delete document items
+      const { error: itemsError } = await supabase
+        .from('document_items')
+        .delete()
+        .eq('document_id', id);
+      
+      if (itemsError) {
+        throw itemsError;
+      }
+      
+      // Then delete the document
+      const { error: docError } = await supabase
+        .from('documents')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+      
+      if (docError) {
+        throw docError;
+      }
+      
+      toast.success('Document deleted successfully');
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      toast.error('Failed to delete document');
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
   
   if (loading) {
     return (
@@ -64,13 +112,23 @@ const ViewDocuments: React.FC = () => {
         title={`${document.type === 'quotation' ? 'Quotation' : 'Invoice'} Details`}
         showBack
         actions={
-          <DocumentEditActions 
-            isEditing={isEditing}
-            savingChanges={savingChanges}
-            onStartEditing={handleStartEditing}
-            onCancelEditing={handleCancelEditing}
-            onSaveChanges={handleSaveChanges}
-          />
+          <>
+            <DocumentEditActions 
+              isEditing={isEditing}
+              savingChanges={savingChanges}
+              onStartEditing={handleStartEditing}
+              onCancelEditing={handleCancelEditing}
+              onSaveChanges={handleSaveChanges}
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full h-8 w-8 text-destructive hover:bg-destructive/10"
+              onClick={handleDeleteClick}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </>
         }
       />
       
@@ -93,6 +151,13 @@ const ViewDocuments: React.FC = () => {
         documentType={document.type}
         onPreviewPDF={handlePreviewPDF}
         onConvertToInvoice={handleConvertToInvoice}
+      />
+      
+      <DeleteDocumentDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onDelete={handleDeleteDocument}
+        isDeleting={isDeleting}
       />
     </div>
   );

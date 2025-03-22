@@ -22,6 +22,7 @@ interface QuotationDetailsFormProps {
   onClientSelect: (client: Client) => void;
   onDateChange: (date: string) => void;
   onNotesChange: (notes: string) => void;
+  onDocumentNumberChange?: (documentNumber: string) => void;
 }
 
 const QuotationDetailsForm: React.FC<QuotationDetailsFormProps> = ({
@@ -29,7 +30,8 @@ const QuotationDetailsForm: React.FC<QuotationDetailsFormProps> = ({
   onTitleChange,
   onClientSelect,
   onDateChange,
-  onNotesChange
+  onNotesChange,
+  onDocumentNumberChange
 }) => {
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -41,6 +43,16 @@ const QuotationDetailsForm: React.FC<QuotationDetailsFormProps> = ({
             value={details.title}
             onChange={e => onTitleChange(e.target.value)}
             placeholder="Enter document title"
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="documentNumber">Quotation Number</Label>
+          <Input
+            id="documentNumber"
+            value={details.documentNumber || ''}
+            onChange={e => onDocumentNumberChange && onDocumentNumberChange(e.target.value)}
+            placeholder="e.g., QUO-001"
           />
         </div>
         
