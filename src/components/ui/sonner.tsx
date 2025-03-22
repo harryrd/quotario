@@ -1,16 +1,13 @@
 
 import * as React from "react"
-import { useTheme } from "@/components/ThemeProvider"
 import { Toaster as Sonner } from "sonner"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { resolvedTheme } = useTheme()
-
   return (
     <Sonner
-      theme={resolvedTheme}
+      theme="monochrome"
       className="toaster group"
       position="top-right"
       duration={3000}

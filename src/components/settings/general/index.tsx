@@ -24,7 +24,6 @@ export type UserSettings = {
   dateFormat: string;
   language: string;
   fontSize: string;
-  theme: "light" | "dark" | "system";
 }
 
 const defaultSettings: UserSettings = {
@@ -35,8 +34,7 @@ const defaultSettings: UserSettings = {
   invoiceStartNumber: '1001',
   dateFormat: 'MM/DD/YYYY',
   language: 'English',
-  fontSize: 'M',
-  theme: 'system'
+  fontSize: 'M'
 };
 
 export const getFontSizeValue = (size: string) => {
@@ -51,9 +49,9 @@ export const getFontSizeValue = (size: string) => {
 };
 
 const GeneralSettings = () => {
-  const { theme, setTheme } = useTheme();
+  const { setFontSize } = useTheme();
   const { user } = useAuth();
-  const [settings, setSettings] = useState<UserSettings>({...defaultSettings, theme});
+  const [settings, setSettings] = useState<UserSettings>({...defaultSettings});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -86,15 +84,14 @@ const GeneralSettings = () => {
             invoiceStartNumber: data.invoice_start_number,
             dateFormat: data.date_format,
             language: data.language,
-            fontSize: data.font_size,
-            theme: data.theme as "light" | "dark" | "system"
+            fontSize: data.font_size
           };
           
           setSettings(userSettings);
           
           // Apply settings to the UI
           document.documentElement.style.fontSize = getFontSizeValue(userSettings.fontSize);
-          setTheme(userSettings.theme);
+          setFontSize(userSettings.fontSize);
         }
       } catch (error) {
         console.error('Error in fetchUserSettings:', error);
@@ -105,18 +102,13 @@ const GeneralSettings = () => {
     };
 
     fetchUserSettings();
-  }, [user, setTheme]);
+  }, [user, setFontSize]);
 
   const handleChange = (field: keyof UserSettings, value: string) => {
     setSettings({
       ...settings,
       [field]: value,
     });
-
-    // Apply theme changes immediately for preview
-    if (field === 'theme' && (value === 'light' || value === 'dark' || value === 'system')) {
-      setTheme(value as "light" | "dark" | "system");
-    }
   };
 
   const handleSave = async () => {
@@ -138,8 +130,7 @@ const GeneralSettings = () => {
         invoice_start_number: settings.invoiceStartNumber,
         date_format: settings.dateFormat,
         language: settings.language,
-        font_size: settings.fontSize,
-        theme: settings.theme
+        font_size: settings.fontSize
       };
 
       const { data, error } = await supabase
@@ -155,7 +146,7 @@ const GeneralSettings = () => {
 
       // Apply font size globally
       document.documentElement.style.fontSize = getFontSizeValue(settings.fontSize);
-      setTheme(settings.theme);
+      setFontSize(settings.fontSize);
       
       toast.success('Settings saved successfully');
     } catch (error) {
