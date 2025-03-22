@@ -10,7 +10,7 @@ export interface DocumentDetails {
   date: string;
   dueDate?: string;
   notes?: string;
-  documentNumber?: string; // Add this property
+  documentNumber?: string;
 }
 
 export interface DocumentState {

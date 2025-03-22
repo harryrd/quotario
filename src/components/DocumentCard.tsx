@@ -1,13 +1,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, FileText, Building, Trash2 } from 'lucide-react';
+import { Calendar, FileText, Building } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Card, 
   CardContent
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 export type DocumentType = 'quotation' | 'invoice';
@@ -27,14 +26,6 @@ export interface DocumentCardProps {
   className?: string;
   currency?: string;
 }
-
-const statusColors: Record<DocumentStatus, string> = {
-  draft: 'bg-muted text-muted-foreground',
-  sent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-  accepted: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  declined: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-  paid: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-};
 
 // Function to get currency symbol based on currency code
 const getCurrencySymbol = (currencyCode: string = 'USD') => {
@@ -63,10 +54,6 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   className,
   currency = 'USD',
 }) => {
-  const typeIcon = type === 'invoice' ? 
-    <FileText className="h-3 w-3 mr-1" /> : 
-    <FileText className="h-3 w-3 mr-1" />;
-
   const currencySymbol = getCurrencySymbol(currency);
 
   return (
@@ -79,20 +66,8 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         className="w-full overflow-hidden border-border/50 hover:shadow-sm smooth-transition p-4"
         onClick={onClick}
       >
-        <div className="flex justify-between items-start mb-2">
+        <div className="flex justify-between items-start">
           <div className="flex-1">
-            <div className="flex items-center mb-2">
-              <Badge 
-                variant="outline" 
-                className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-medium mr-2 flex items-center"
-              >
-                {typeIcon}
-                {type}
-              </Badge>
-              <Badge className={cn("text-[10px] px-1 py-0 h-4 rounded-full", statusColors[status])}>
-                {status}
-              </Badge>
-            </div>
             <h3 className="text-sm font-medium line-clamp-1">{title}</h3>
             <div className="flex flex-col mt-1">
               <p className="text-xs text-muted-foreground line-clamp-1">
@@ -121,7 +96,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
                 className="h-6 px-1 mt-2 ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
                 onClick={(e) => onDelete(id, e)}
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <span className="sr-only">Delete</span>
               </Button>
             )}
           </div>

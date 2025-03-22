@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,10 @@ import { DocumentDetails } from '@/types/document';
 
 interface QuotationDetailsFormProps {
   details: DocumentDetails;
+  userSettings?: {
+    quotationPrefix?: string;
+    quotationStartNumber?: string;
+  };
   onTitleChange: (title: string) => void;
   onClientSelect: (client: Client) => void;
   onDateChange: (date: string) => void;
@@ -27,12 +31,25 @@ interface QuotationDetailsFormProps {
 
 const QuotationDetailsForm: React.FC<QuotationDetailsFormProps> = ({
   details,
+  userSettings,
   onTitleChange,
   onClientSelect,
   onDateChange,
   onNotesChange,
   onDocumentNumberChange
 }) => {
+  // Auto-fill document number if empty and settings are available
+  useEffect(() => {
+    if (
+      onDocumentNumberChange && 
+      (!details.documentNumber || details.documentNumber === '') && 
+      userSettings?.quotationPrefix && 
+      userSettings?.quotationStartNumber
+    ) {
+      onDocumentNumberChange(`${userSettings.quotationPrefix}${userSettings.quotationStartNumber}`);
+    }
+  }, [userSettings, details.documentNumber, onDocumentNumberChange]);
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <div className="space-y-4">
@@ -53,6 +70,7 @@ const QuotationDetailsForm: React.FC<QuotationDetailsFormProps> = ({
             value={details.documentNumber || ''}
             onChange={e => onDocumentNumberChange && onDocumentNumberChange(e.target.value)}
             placeholder="e.g., QUO-001"
+            disabled={!!userSettings?.quotationPrefix}
           />
         </div>
         

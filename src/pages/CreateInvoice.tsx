@@ -34,10 +34,11 @@ const CreateInvoice: React.FC = () => {
         showSettings={false}
       />
       
-      <div className="flex-1 container max-w-5xl py-6 space-y-8">
+      <div className="flex-1 container max-w-5xl py-6 px-4 md:px-6 space-y-8">
         {/* Document details section */}
         <InvoiceDetailsForm
           details={details}
+          userSettings={userSettings}
           onTitleChange={updateTitle}
           onClientSelect={handleClientSelect}
           onDateChange={updateDate}
@@ -56,10 +57,12 @@ const CreateInvoice: React.FC = () => {
         />
         
         {/* Action buttons */}
-        <InvoiceActions
-          onSave={handleSubmitInvoice}
-          isLoading={isLoading}
-        />
+        <div className="fixed bottom-4 left-0 right-0 px-4 md:px-6">
+          <InvoiceActions
+            onSave={handleSubmitInvoice}
+            isLoading={isLoading}
+          />
+        </div>
       </div>
     </div>
   );

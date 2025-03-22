@@ -1,13 +1,9 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2 } from 'lucide-react';
-import { BusinessDetails, Document } from '@/pages/ViewDocuments';
+import { BusinessDetails, Document } from '@/types/document-details';
 import DocumentItemsTable from '@/components/documents/DocumentItemsTable';
-import QuotationHeader from '@/components/quotation/QuotationHeader';
-import QuotationNotes from '@/components/quotation/QuotationNotes';
 
 interface DocumentDetailsProps {
   document: Document;
@@ -58,64 +54,52 @@ const DocumentDetails: React.FC<DocumentDetailsProps> = ({
 
   return (
     <div className="p-6 md:p-8 bg-white rounded-lg shadow-sm border">
-      <div className="flex justify-between items-start mb-4">
-        <div>
+      <div className="mb-6">
+        <p className="text-sm text-muted-foreground uppercase tracking-wide mb-1">
+          {document.type === 'quotation' ? 'Quotation' : 'Invoice'}
+        </p>
+        
+        {isEditing ? (
+          <Input
+            value={editableDocument.title}
+            onChange={(e) => setEditableDocument({...editableDocument, title: e.target.value})}
+            className="text-xl font-semibold mb-2 h-auto py-1"
+          />
+        ) : (
+          <h1 className="text-xl md:text-2xl font-semibold mb-4">{document.title}</h1>
+        )}
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="space-y-1">
+          <h3 className="font-medium mb-2">From:</h3>
+          <p className="font-semibold">{businessDetails.company_name}</p>
+          <p className="text-sm">{businessDetails.address}</p>
+          <p className="text-sm">{businessDetails.email}</p>
+          <p className="text-sm">{businessDetails.phone}</p>
+        </div>
+        
+        <div className="space-y-1">
+          <h3 className="font-medium mb-2">To:</h3>
           {isEditing ? (
             <Input
-              value={editableDocument.title}
-              onChange={(e) => setEditableDocument({...editableDocument, title: e.target.value})}
-              className="text-xl font-semibold mb-2 h-auto py-1"
+              value={editableDocument.client_name}
+              onChange={(e) => setEditableDocument({...editableDocument, client_name: e.target.value})}
+              className="mb-2 h-auto py-1"
             />
           ) : (
-            <h1 className="text-xl md:text-2xl font-semibold mb-2">{document.title}</h1>
+            <p className="font-semibold">{document.client_name}</p>
           )}
-          <p className="text-muted-foreground mb-6">
-            {document.type === 'quotation' ? 'Quotation for' : 'Invoice for'} 
-            {isEditing ? (
-              <Input
-                value={editableDocument.client_name}
-                onChange={(e) => setEditableDocument({...editableDocument, client_name: e.target.value})}
-                className="mt-1 h-auto py-1"
-              />
-            ) : (
-              <> {document.client_name}</>
-            )}
-          </p>
-        </div>
-        <Badge 
-          className={`
-            uppercase px-2 py-1 
-            ${document.status === 'paid' ? 'bg-emerald-100 text-emerald-800' : ''}
-            ${document.status === 'sent' ? 'bg-blue-100 text-blue-800' : ''}
-            ${document.status === 'draft' ? 'bg-gray-100 text-gray-800' : ''}
-            ${document.status === 'accepted' ? 'bg-green-100 text-green-800' : ''}
-            ${document.status === 'declined' ? 'bg-red-100 text-red-800' : ''}
-          `}
-        >
-          {document.status}
-        </Badge>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div>
-          <h3 className="font-medium mb-1">From:</h3>
-          <p>{businessDetails.company_name}</p>
-          <p>{businessDetails.address}</p>
-          <p>{businessDetails.email}</p>
-          <p>{businessDetails.phone}</p>
-        </div>
-        <div>
-          <h3 className="font-medium mb-1">To:</h3>
-          <p>{document.client_name}</p>
-          <p>Client Address</p>
+          <p className="text-sm">Client Address</p>
         </div>
       </div>
       
-      <div className="flex flex-col md:flex-row md:justify-between mb-4 gap-4">
+      <div className="flex flex-col md:flex-row md:justify-between mb-6 gap-6">
         <div>
           <h3 className="font-medium mb-1">Document Number:</h3>
-          <p>{document.type === 'quotation' ? 'QUO-' : 'INV-'}{document.id.substring(0, 8).toUpperCase()}</p>
+          <p>{document.document_number || `${document.type === 'quotation' ? 'QUO-' : 'INV-'}${document.id.substring(0, 8).toUpperCase()}`}</p>
         </div>
+        
         <div>
           <h3 className="font-medium mb-1">Date:</h3>
           {isEditing ? (
@@ -129,11 +113,10 @@ const DocumentDetails: React.FC<DocumentDetailsProps> = ({
             <p>{formatDate(document.date)}</p>
           )}
         </div>
-        {(document.due_date || isEditing) && (
+        
+        {(document.due_date || isEditing) && document.type === 'invoice' && (
           <div>
-            <h3 className="font-medium mb-1">
-              {document.type === 'quotation' ? 'Valid Until' : 'Due Date'}:
-            </h3>
+            <h3 className="font-medium mb-1">Due Date:</h3>
             {isEditing ? (
               <Input
                 type="date"

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,10 @@ import { DocumentDetails } from '@/types/document';
 
 interface InvoiceDetailsFormProps {
   details: DocumentDetails;
+  userSettings?: {
+    invoicePrefix?: string;
+    invoiceStartNumber?: string;
+  };
   onTitleChange: (title: string) => void;
   onClientSelect: (client: Client) => void;
   onDateChange: (date: string) => void;
@@ -28,6 +32,7 @@ interface InvoiceDetailsFormProps {
 
 const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
   details,
+  userSettings,
   onTitleChange,
   onClientSelect,
   onDateChange,
@@ -35,6 +40,18 @@ const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
   onNotesChange,
   onDocumentNumberChange
 }) => {
+  // Auto-fill document number if empty and settings are available
+  useEffect(() => {
+    if (
+      onDocumentNumberChange && 
+      (!details.documentNumber || details.documentNumber === '') && 
+      userSettings?.invoicePrefix && 
+      userSettings?.invoiceStartNumber
+    ) {
+      onDocumentNumberChange(`${userSettings.invoicePrefix}${userSettings.invoiceStartNumber}`);
+    }
+  }, [userSettings, details.documentNumber, onDocumentNumberChange]);
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <div className="space-y-4">
@@ -55,6 +72,7 @@ const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
             value={details.documentNumber || ''}
             onChange={e => onDocumentNumberChange && onDocumentNumberChange(e.target.value)}
             placeholder="e.g., INV-001"
+            disabled={!!userSettings?.invoicePrefix}
           />
         </div>
         

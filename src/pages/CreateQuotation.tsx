@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import Header from '@/components/Header';
 import QuotationDetailsForm from '@/components/quotation/QuotationDetailsForm';
@@ -33,10 +33,11 @@ const CreateQuotation: React.FC = () => {
         showSettings={false}
       />
       
-      <div className="flex-1 container max-w-5xl py-6 space-y-8">
+      <div className="flex-1 container max-w-5xl py-6 px-4 md:px-6 space-y-8">
         {/* Document details section */}
         <QuotationDetailsForm
           details={details}
+          userSettings={userSettings}
           onTitleChange={updateTitle}
           onClientSelect={handleClientSelect}
           onDateChange={updateDate}
@@ -54,10 +55,12 @@ const CreateQuotation: React.FC = () => {
         />
         
         {/* Action buttons */}
-        <QuotationActions
-          onSave={handleSubmitQuotation}
-          isLoading={isLoading}
-        />
+        <div className="fixed bottom-4 left-0 right-0 px-4 md:px-6">
+          <QuotationActions
+            onSave={handleSubmitQuotation}
+            isLoading={isLoading}
+          />
+        </div>
       </div>
     </div>
   );
