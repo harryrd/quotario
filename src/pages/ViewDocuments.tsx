@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Loader2, Trash2 } from 'lucide-react';
@@ -9,14 +8,14 @@ import { useAuth } from '@/components/AuthContext';
 import DocumentDetails from '@/components/documents/DocumentDetails';
 import DocumentActions from '@/components/documents/DocumentActions';
 import DocumentEditActions from '@/components/documents/DocumentEditActions';
-import { useDocumentDetails, Document, DocumentItem, BusinessDetails } from '@/hooks/useDocumentDetails';
+import { useDocumentDetails, Document, BusinessDetails } from '@/hooks/document/useDocumentDetails';
 import DeleteDocumentDialog from '@/components/documents/DeleteDocumentDialog';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 // Re-export the types for other components to use
-export type { Document, DocumentItem, BusinessDetails };
+export type { Document, BusinessDetails };
 
 const ViewDocuments: React.FC = () => {
   const { id } = useParams<{ id: string }>();
