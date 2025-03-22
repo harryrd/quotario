@@ -32,7 +32,7 @@ const ClientsManagement = () => {
     email: '',
     phone: '',
     address: '',
-    company: '',
+    company: null,
   };
 
   useEffect(() => {
