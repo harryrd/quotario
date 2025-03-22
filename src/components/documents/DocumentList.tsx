@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DocumentCard, { DocumentCardProps } from '@/components/DocumentCard';
 import AnimatedTransition from '@/components/AnimatedTransition';
-import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface DocumentListProps {
@@ -57,27 +56,18 @@ const DocumentList: React.FC<DocumentListProps> = ({
       
       <TabsContent value={activeTab} className="mt-0">
         <AnimatedTransition>
-          <div className="grid gap-3 pb-16">
+          <div className="grid gap-2 pb-16">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-8">
                 <p className="text-muted-foreground">Loading documents...</p>
               </div>
             ) : filteredDocuments.length > 0 ? (
               filteredDocuments.map((doc) => (
-                <div key={doc.id} className="relative">
-                  <DocumentCard 
-                    {...doc} 
-                    onClick={() => handleOpenDocument(doc.id)}
-                  />
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 h-6 w-6"
-                    onClick={(e) => handleDeleteClick(doc.id, e)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
+                <DocumentCard 
+                  key={doc.id}
+                  {...doc} 
+                  onClick={() => handleOpenDocument(doc.id)}
+                />
               ))
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-center">

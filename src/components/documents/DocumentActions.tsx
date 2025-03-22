@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Save, Send } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -45,8 +45,8 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({ onSave, isLoading = f
               onClick={() => onSave('sent')}
               disabled={isLoading}
             >
-              <Send className="h-3 w-3 mr-1" />
-              {isLoading ? 'Sending...' : 'Send Document'}
+              <Save className="h-3 w-3 mr-1" />
+              {isLoading ? 'Saving...' : 'Save Document'}
             </Button>
           </TooltipTrigger>
           <TooltipContent>

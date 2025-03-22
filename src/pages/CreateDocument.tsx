@@ -41,13 +41,8 @@ const CreateDocument: React.FC = () => {
     const savedId = await handleSave(status);
     
     if (savedId) {
-      if (status === 'draft') {
-        // Go back to documents list
-        navigate('/');
-      } else {
-        // Go to document details
-        navigate(`/document/${savedId}`);
-      }
+      // Always navigate to document details
+      navigate(`/document/${savedId}`);
     }
   };
   

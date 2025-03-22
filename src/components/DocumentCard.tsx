@@ -1,14 +1,11 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Calendar } from 'lucide-react';
+import { Calendar, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { 
   Card, 
-  CardContent, 
-  CardFooter, 
-  CardHeader 
+  CardContent
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -46,6 +43,10 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   onClick,
   className,
 }) => {
+  const typeIcon = type === 'invoice' ? 
+    <FileText className="h-3 w-3 mr-1" /> : 
+    <FileText className="h-3 w-3 mr-1" />;
+
   return (
     <motion.div
       whileHover={{ y: -2, transition: { duration: 0.2 } }}
@@ -53,38 +54,36 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       className={cn("w-full", className)}
     >
       <Card 
-        className="w-full overflow-hidden shadow-sm border-border/50 hover:shadow-md smooth-transition"
+        className="w-full overflow-hidden border-border/50 hover:shadow-sm smooth-transition p-3"
         onClick={onClick}
       >
-        <CardHeader className="p-2 pb-0 flex flex-row items-start justify-between">
-          <div>
-            <Badge 
-              variant="outline" 
-              className="mb-1 uppercase text-xs tracking-wider font-medium"
-            >
-              {type}
-            </Badge>
+        <div className="flex justify-between items-start mb-1">
+          <div className="flex-1">
+            <div className="flex items-center mb-1">
+              <Badge 
+                variant="outline" 
+                className="text-[10px] px-1 py-0 h-4 uppercase tracking-wider font-medium mr-2 flex items-center"
+              >
+                {typeIcon}
+                {type}
+              </Badge>
+              <Badge className={cn("text-[10px] px-1 py-0 h-4 rounded-full", statusColors[status])}>
+                {status}
+              </Badge>
+            </div>
             <h3 className="text-sm font-medium line-clamp-1">{title}</h3>
-            <p className="text-xs text-muted-foreground">{clientName}</p>
+            <p className="text-xs text-muted-foreground line-clamp-1">{clientName}</p>
           </div>
-          <Badge className={cn("rounded-full text-xs font-medium py-0 h-5", statusColors[status])}>
-            {status}
-          </Badge>
-        </CardHeader>
-        <CardContent className="p-2 pt-1">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Calendar className="h-3 w-3" />
-            <span>{date}</span>
+          <div className="text-right">
+            <p className="font-medium text-xs">
+              ${amount.toFixed(2)}
+            </p>
+            <div className="flex items-center justify-end text-[10px] text-muted-foreground mt-1">
+              <Calendar className="h-2.5 w-2.5 mr-1" />
+              <span>{date}</span>
+            </div>
           </div>
-        </CardContent>
-        <CardFooter className="p-2 pt-0 flex justify-between items-center">
-          <p className="font-medium text-sm">
-            ${amount.toFixed(2)}
-          </p>
-          <Button variant="ghost" size="icon" className="rounded-full h-6 w-6">
-            <ArrowRight className="h-3 w-3" />
-          </Button>
-        </CardFooter>
+        </div>
       </Card>
     </motion.div>
   );
