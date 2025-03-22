@@ -1,14 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { ChevronLeft, Building, User, Phone, Mail, Globe, MapPin } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useBusinessDetails } from '@/hooks/useBusinessDetails';
+import QuotationHeader from '@/components/quotation/QuotationHeader';
+import BusinessClientInfo from '@/components/quotation/BusinessClientInfo';
+import QuotationItemsTable from '@/components/quotation/QuotationItemsTable';
+import QuotationNotes from '@/components/quotation/QuotationNotes';
 
 interface QuotationItem {
   id: string;
@@ -23,6 +25,7 @@ interface QuotationData {
   document_number: string;
   title: string;
   date: string;
+  status: string;
   client_name: string;
   client_email?: string;
   client_phone?: string;
@@ -100,6 +103,7 @@ const QuotationDetails: React.FC = () => {
           document_number: quotationData.document_number || 'N/A',
           title: quotationData.title,
           date: quotationData.date,
+          status: quotationData.status,
           client_name: quotationData.client_name,
           client_email: clientData?.email || '',
           client_phone: clientData?.phone || '',
@@ -160,6 +164,14 @@ const QuotationDetails: React.FC = () => {
     );
   }
 
+  const clientInfo = {
+    name: quotation.client_name,
+    company: quotation.client_company,
+    address: quotation.client_address,
+    email: quotation.client_email,
+    phone: quotation.client_phone
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header 
@@ -168,129 +180,31 @@ const QuotationDetails: React.FC = () => {
       />
       
       <div className="flex-1 container max-w-4xl py-6 space-y-8">
-        {/* Quotation header */}
-        <div className="flex flex-col space-y-2">
-          <h1 className="text-2xl font-bold">{quotation.title}</h1>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            <span>Quotation #{quotation.document_number}</span>
-            <span>Date: {format(new Date(quotation.date), 'PPP')}</span>
-          </div>
-        </div>
+        {/* Quotation header with title, number, and date */}
+        <QuotationHeader 
+          title={quotation.title}
+          documentNumber={quotation.document_number}
+          date={quotation.date}
+          status={quotation.status}
+        />
         
         <Separator />
         
-        {/* Business and client details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Sender details */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium flex items-center">
-              <Building className="mr-2 h-4 w-4" />
-              From
-            </h3>
-            <div className="space-y-1">
-              <p className="font-medium">{businessDetails.company_name}</p>
-              {businessDetails.address && (
-                <p className="flex items-start text-sm text-muted-foreground">
-                  <MapPin className="mr-1 h-4 w-4 shrink-0 mt-0.5" />
-                  <span>{businessDetails.address}</span>
-                </p>
-              )}
-              {businessDetails.phone && (
-                <p className="flex items-center text-sm text-muted-foreground">
-                  <Phone className="mr-1 h-4 w-4 shrink-0" />
-                  <span>{businessDetails.phone}</span>
-                </p>
-              )}
-              {businessDetails.email && (
-                <p className="flex items-center text-sm text-muted-foreground">
-                  <Mail className="mr-1 h-4 w-4 shrink-0" />
-                  <span>{businessDetails.email}</span>
-                </p>
-              )}
-              {businessDetails.website && (
-                <p className="flex items-center text-sm text-muted-foreground">
-                  <Globe className="mr-1 h-4 w-4 shrink-0" />
-                  <span>{businessDetails.website}</span>
-                </p>
-              )}
-            </div>
-          </div>
-          
-          {/* Recipient details */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium flex items-center">
-              <User className="mr-2 h-4 w-4" />
-              To
-            </h3>
-            <div className="space-y-1">
-              <p className="font-medium">{quotation.client_name}</p>
-              {quotation.client_company && (
-                <p className="text-sm">{quotation.client_company}</p>
-              )}
-              {quotation.client_address && (
-                <p className="flex items-start text-sm text-muted-foreground">
-                  <MapPin className="mr-1 h-4 w-4 shrink-0 mt-0.5" />
-                  <span>{quotation.client_address}</span>
-                </p>
-              )}
-              {quotation.client_phone && (
-                <p className="flex items-center text-sm text-muted-foreground">
-                  <Phone className="mr-1 h-4 w-4 shrink-0" />
-                  <span>{quotation.client_phone}</span>
-                </p>
-              )}
-              {quotation.client_email && (
-                <p className="flex items-center text-sm text-muted-foreground">
-                  <Mail className="mr-1 h-4 w-4 shrink-0" />
-                  <span>{quotation.client_email}</span>
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+        {/* Business and client information */}
+        <BusinessClientInfo 
+          businessDetails={businessDetails}
+          clientDetails={clientInfo}
+        />
         
-        {/* Quotation items */}
-        <div className="border rounded-md overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted">
-              <tr>
-                <th className="text-left p-3 font-medium">Description</th>
-                <th className="text-right p-3 font-medium">Qty</th>
-                <th className="text-right p-3 font-medium">Price</th>
-                <th className="text-right p-3 font-medium">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quotation.items.map((item) => {
-                const itemTotal = item.quantity * item.unit_price;
-                return (
-                  <tr key={item.id} className="border-t">
-                    <td className="p-3">{item.description}</td>
-                    <td className="p-3 text-right">{item.quantity}</td>
-                    <td className="p-3 text-right">{formatCurrency(item.unit_price)}</td>
-                    <td className="p-3 text-right">{formatCurrency(itemTotal)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-            <tfoot className="border-t bg-muted/50">
-              <tr>
-                <td colSpan={3} className="p-3 text-right font-medium">Total</td>
-                <td className="p-3 text-right font-bold">{formatCurrency(total)}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
+        {/* Quotation items table */}
+        <QuotationItemsTable 
+          items={quotation.items}
+          formatCurrency={formatCurrency}
+          total={total}
+        />
         
-        {/* Notes */}
-        {quotation.notes && (
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Notes</h3>
-            <div className="p-4 border rounded-md bg-muted/20">
-              <p className="text-sm whitespace-pre-line">{quotation.notes}</p>
-            </div>
-          </div>
-        )}
+        {/* Notes section */}
+        <QuotationNotes notes={quotation.notes} />
       </div>
     </div>
   );

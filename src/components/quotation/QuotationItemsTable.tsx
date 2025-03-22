@@ -1,34 +1,56 @@
 
 import React from 'react';
-import { TableField, TableRow } from '@/components/table/types';
-import CustomizableTable from '@/components/table/CustomizableTable';
+
+interface QuotationItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unit_price: number;
+  tax?: number;
+}
 
 interface QuotationItemsTableProps {
-  fields: TableField[];
-  rows: TableRow[];
-  onFieldsChange: (fields: TableField[]) => void;
-  onRowsChange: (rows: TableRow[]) => void;
-  currency: string;
+  items: QuotationItem[];
+  formatCurrency: (amount: number) => string;
+  total: number;
 }
 
 const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
-  fields,
-  rows,
-  onFieldsChange,
-  onRowsChange,
-  currency
+  items,
+  formatCurrency,
+  total
 }) => {
   return (
-    <div>
-      <h3 className="text-lg font-medium mb-4">Quotation Items</h3>
-      <CustomizableTable
-        title="Items"
-        fields={fields}
-        rows={rows}
-        onFieldsChange={onFieldsChange}
-        onRowsChange={onRowsChange}
-        currency={currency}
-      />
+    <div className="border rounded-md overflow-hidden">
+      <table className="w-full text-sm">
+        <thead className="bg-muted">
+          <tr>
+            <th className="text-left p-3 font-medium">Description</th>
+            <th className="text-right p-3 font-medium">Qty</th>
+            <th className="text-right p-3 font-medium">Price</th>
+            <th className="text-right p-3 font-medium">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => {
+            const itemTotal = item.quantity * item.unit_price;
+            return (
+              <tr key={item.id} className="border-t">
+                <td className="p-3">{item.description}</td>
+                <td className="p-3 text-right">{item.quantity}</td>
+                <td className="p-3 text-right">{formatCurrency(item.unit_price)}</td>
+                <td className="p-3 text-right">{formatCurrency(itemTotal)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+        <tfoot className="border-t bg-muted/50">
+          <tr>
+            <td colSpan={3} className="p-3 text-right font-medium">Total</td>
+            <td className="p-3 text-right font-bold">{formatCurrency(total)}</td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
   );
 };
