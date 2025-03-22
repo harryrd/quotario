@@ -7,7 +7,8 @@ import { useTemplateFields } from './document/useTemplateFields';
 import { useUserSettings } from './document/useUserSettings';
 import { useDocumentSave } from './document/useDocumentSave';
 
-export { UserSettings } from './document/useUserSettings';
+// Fix for TS1205: use export type
+export type { UserSettings } from './document/useUserSettings';
 
 export const useDocumentCreation = () => {
   const { user } = useAuth();

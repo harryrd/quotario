@@ -3,9 +3,9 @@ import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import DocumentTypeSelector from '@/components/documents/DocumentTypeSelector';
-import DocumentDetailsForm from '@/components/documents/DocumentDetailsForm';
-import DocumentItemsSection from '@/components/documents/DocumentItemsSection';
 import DocumentActions from '@/components/documents/DocumentActions';
+import DocumentDetailsTab from '@/components/documents/DocumentDetailsTab';
+import DocumentItemsTab from '@/components/documents/DocumentItemsTab';
 import { useDocumentCreation } from '@/hooks/useDocumentCreation';
 import { useNavigate } from 'react-router-dom';
 
@@ -71,19 +71,17 @@ const CreateDocument: React.FC = () => {
           </TabsList>
           
           <TabsContent value="details" className="mt-0">
-            <DocumentDetailsForm
+            <DocumentDetailsTab
               documentType={documentType}
               details={details}
               onDetailsChange={handleDetailsChange}
               onContinue={() => setActiveTab('items')}
-              prefix={documentType === 'quotation' ? userSettings.quotationPrefix : userSettings.invoicePrefix}
-              startNumber={documentType === 'quotation' ? userSettings.quotationStartNumber : userSettings.invoiceStartNumber}
-              currency={userSettings.currency}
+              userSettings={userSettings}
             />
           </TabsContent>
           
           <TabsContent value="items" className="mt-0">
-            <DocumentItemsSection
+            <DocumentItemsTab
               documentType={documentType}
               fields={fields}
               rows={rows}
