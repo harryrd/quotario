@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useAuth } from '@/components/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { FieldTemplate } from './types';
+import { FieldTemplate, DocumentTemplate } from './types';
 import TemplateManager from './TemplateManager';
 
 const TemplateSettings: React.FC = () => {
@@ -27,15 +26,15 @@ const TemplateSettings: React.FC = () => {
           .select('*')
           .eq('user_id', user.id);
           
-        if (error && error.code !== 'PGRST116') {
+        if (error) {
           console.error('Error fetching templates:', error);
           toast.error('Failed to load templates');
           return;
         }
         
         if (data && data.length > 0) {
-          const quotationTemplate = data.find(t => t.type === 'quotation');
-          const invoiceTemplate = data.find(t => t.type === 'invoice');
+          const quotationTemplate = data.find(t => t.type === 'quotation') as DocumentTemplate | undefined;
+          const invoiceTemplate = data.find(t => t.type === 'invoice') as DocumentTemplate | undefined;
           
           if (quotationTemplate) {
             setQuotationFields(quotationTemplate.fields);

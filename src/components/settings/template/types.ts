@@ -8,3 +8,12 @@ export interface FieldTemplate {
   type: 'text' | 'number' | 'date' | 'select';
   options?: string[]; // For select fields
 }
+
+export interface DocumentTemplate {
+  id: string;
+  user_id: string;
+  type: 'quotation' | 'invoice';
+  fields: FieldTemplate[];
+  created_at?: string;
+  updated_at?: string;
+}
