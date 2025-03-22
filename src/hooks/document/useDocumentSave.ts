@@ -80,14 +80,6 @@ export const useDocumentSave = (userId: string | undefined) => {
     // Set navigation flag based on status
     setNavigateToDetails(status === 'sent');
 
-    // Calculate total amount
-    let totalAmount = 0;
-    rows.forEach(row => {
-      const qty = parseFloat(row.qty) || 0;
-      const price = parseFloat(row.price) || 0;
-      totalAmount += qty * price;
-    });
-
     // Save document to database if user is logged in
     if (userId) {
       setIsLoading(true);
@@ -96,7 +88,7 @@ export const useDocumentSave = (userId: string | undefined) => {
         const nextNumber = await getNextDocumentNumber(documentType, prefix, startNumber);
         const documentNumber = `${prefix}${nextNumber}`;
         
-        // Insert document
+        // Insert document - removed the 'amount' field which doesn't exist in the table
         const { data: documentData, error: documentError } = await supabase
           .from('documents')
           .insert({
@@ -108,8 +100,7 @@ export const useDocumentSave = (userId: string | undefined) => {
             date: details.date || new Date().toISOString().split('T')[0],
             due_date: details.dueDate || null,
             notes: details.notes || null,
-            status: status,
-            amount: totalAmount
+            status: status
           })
           .select('id')
           .single();
