@@ -1,27 +1,46 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreditCard } from 'lucide-react';
-import { PaymentAccount } from '@/types/payment';
+import { PaymentAccount, PaymentAccountFormData } from '@/types/payment';
 
 interface PaymentAccountFormProps {
-  onAddAccount: (account: Omit<PaymentAccount, 'id'>) => Promise<void>;
+  onSubmit: (account: PaymentAccountFormData) => Promise<void>;
   onCancel: () => void;
+  account?: PaymentAccount;
+  isEditing?: boolean;
 }
 
-const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ onAddAccount, onCancel }) => {
-  const [newAccount, setNewAccount] = useState<Omit<PaymentAccount, 'id'>>({
+const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ 
+  onSubmit, 
+  onCancel, 
+  account,
+  isEditing = false
+}) => {
+  const [formData, setFormData] = useState<PaymentAccountFormData>({
     accountName: '',
     accountNumber: '',
     bankName: '',
     swiftCode: ''
   });
 
+  // Load existing account data if editing
+  useEffect(() => {
+    if (account && isEditing) {
+      setFormData({
+        accountName: account.accountName,
+        accountNumber: account.accountNumber,
+        bankName: account.bankName,
+        swiftCode: account.swiftCode
+      });
+    }
+  }, [account, isEditing]);
+
   const handleSubmit = async () => {
-    await onAddAccount(newAccount);
+    await onSubmit(formData);
     // Reset form is handled by parent after successful submission
   };
 
@@ -33,7 +52,7 @@ const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ onAddAccount, o
     >
       <h3 className="font-medium flex items-center gap-2">
         <CreditCard className="h-4 w-4" />
-        Add New Payment Account
+        {isEditing ? 'Edit Payment Account' : 'Add New Payment Account'}
       </h3>
       
       <div className="space-y-3">
@@ -41,8 +60,8 @@ const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ onAddAccount, o
           <Label htmlFor="account-name">Account Name</Label>
           <Input
             id="account-name"
-            value={newAccount.accountName}
-            onChange={(e) => setNewAccount({...newAccount, accountName: e.target.value})}
+            value={formData.accountName}
+            onChange={(e) => setFormData({...formData, accountName: e.target.value})}
           />
         </div>
         
@@ -50,8 +69,8 @@ const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ onAddAccount, o
           <Label htmlFor="bank-name">Bank Name</Label>
           <Input
             id="bank-name"
-            value={newAccount.bankName}
-            onChange={(e) => setNewAccount({...newAccount, bankName: e.target.value})}
+            value={formData.bankName}
+            onChange={(e) => setFormData({...formData, bankName: e.target.value})}
           />
         </div>
         
@@ -59,8 +78,8 @@ const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ onAddAccount, o
           <Label htmlFor="account-number">Account Number</Label>
           <Input
             id="account-number"
-            value={newAccount.accountNumber}
-            onChange={(e) => setNewAccount({...newAccount, accountNumber: e.target.value})}
+            value={formData.accountNumber}
+            onChange={(e) => setFormData({...formData, accountNumber: e.target.value})}
           />
         </div>
         
@@ -68,14 +87,14 @@ const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ onAddAccount, o
           <Label htmlFor="swift-code">SWIFT Code (optional)</Label>
           <Input
             id="swift-code"
-            value={newAccount.swiftCode}
-            onChange={(e) => setNewAccount({...newAccount, swiftCode: e.target.value})}
+            value={formData.swiftCode}
+            onChange={(e) => setFormData({...formData, swiftCode: e.target.value})}
           />
         </div>
         
         <div className="flex gap-2">
           <Button onClick={handleSubmit}>
-            Save Account
+            {isEditing ? 'Save Changes' : 'Save Account'}
           </Button>
           <Button 
             variant="outline" 

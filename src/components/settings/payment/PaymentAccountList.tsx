@@ -10,6 +10,7 @@ interface PaymentAccountListProps {
   accounts: PaymentAccount[];
   onDelete: (id: string) => Promise<void>;
   onAddClick: () => void;
+  onEditClick: (account: PaymentAccount) => void;
   isLoading: boolean;
   showAddButton: boolean;
 }
@@ -18,6 +19,7 @@ const PaymentAccountList: React.FC<PaymentAccountListProps> = ({
   accounts, 
   onDelete, 
   onAddClick, 
+  onEditClick,
   isLoading,
   showAddButton
 }) => {
@@ -56,6 +58,7 @@ const PaymentAccountList: React.FC<PaymentAccountListProps> = ({
             key={account.id} 
             account={account} 
             onDelete={onDelete}
+            onEdit={onEditClick}
           />
         ))}
       </div>

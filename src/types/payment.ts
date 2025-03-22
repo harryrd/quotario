@@ -6,3 +6,5 @@ export interface PaymentAccount {
   bankName: string;
   swiftCode: string;
 }
+
+export type PaymentAccountFormData = Omit<PaymentAccount, 'id'>;

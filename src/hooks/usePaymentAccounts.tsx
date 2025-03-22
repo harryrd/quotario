@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/AuthContext';
-import { PaymentAccount } from '@/types/payment';
+import { PaymentAccount, PaymentAccountFormData } from '@/types/payment';
 
 // Define the database row type to match the actual table structure
 type PaymentAccountRow = {
@@ -66,7 +66,7 @@ export const usePaymentAccounts = () => {
     fetchPaymentAccounts();
   }, [user]);
 
-  const addAccount = async (newAccount: Omit<PaymentAccount, 'id'>) => {
+  const addAccount = async (newAccount: PaymentAccountFormData) => {
     if (!user) {
       toast.error('You must be logged in to add payment accounts');
       return;
@@ -116,6 +116,51 @@ export const usePaymentAccounts = () => {
     }
   };
 
+  const editAccount = async (id: string, updatedAccount: PaymentAccountFormData) => {
+    if (!user) {
+      toast.error('You must be logged in to edit payment accounts');
+      return;
+    }
+    
+    if (!updatedAccount.accountName || !updatedAccount.accountNumber) {
+      toast.error('Account name and number are required');
+      return;
+    }
+    
+    try {
+      // Update in Supabase
+      const { error } = await supabase
+        .from('payment_accounts')
+        .update({
+          account_name: updatedAccount.accountName,
+          account_number: updatedAccount.accountNumber,
+          bank_name: updatedAccount.bankName,
+          swift_code: updatedAccount.swiftCode
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
+        
+      if (error) {
+        console.error('Error updating payment account:', error);
+        toast.error('Failed to update payment account');
+        return;
+      }
+      
+      // Update local state
+      setAccounts(accounts.map(account => 
+        account.id === id 
+          ? { ...account, ...updatedAccount }
+          : account
+      ));
+      
+      toast.success('Payment account updated successfully');
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast.error('Something went wrong while updating payment account');
+      throw error;
+    }
+  };
+
   const deleteAccount = async (id: string) => {
     if (!user) return;
     
@@ -145,6 +190,7 @@ export const usePaymentAccounts = () => {
     accounts,
     isLoading,
     addAccount,
+    editAccount,
     deleteAccount
   };
 };
