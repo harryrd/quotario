@@ -3,7 +3,7 @@ import React from 'react';
 import CustomizableTable from '@/components/CustomizableTable';
 import { TableField, TableRow } from '@/components/table/types';
 
-interface QuotationItemsTableProps {
+interface InvoiceItemsTableProps {
   fields: TableField[];
   rows: TableRow[];
   onFieldsChange: (fields: TableField[]) => void;
@@ -11,7 +11,7 @@ interface QuotationItemsTableProps {
   currency: string;
 }
 
-const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
+const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
   fields,
   rows,
   onFieldsChange,
@@ -20,7 +20,7 @@ const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
 }) => {
   return (
     <CustomizableTable
-      title="Items"
+      title="Invoice Items"
       fields={fields}
       rows={rows}
       onFieldsChange={onFieldsChange}
@@ -30,4 +30,4 @@ const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
   );
 };
 
-export default QuotationItemsTable;
+export default InvoiceItemsTable;

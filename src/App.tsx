@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +21,7 @@ import SecurityPage from "./pages/SecurityPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import TemplateSettingsPage from "./pages/TemplateSettingsPage";
 import CreateQuotation from "./pages/CreateQuotation";
+import CreateInvoice from "./pages/CreateInvoice";
 import QuotationDetails from "./pages/QuotationDetails";
 
 const queryClient = new QueryClient();
@@ -58,8 +58,9 @@ const AppRoutes = () => {
       
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-      <Route path="/document/:id" element={<ProtectedRoute><QuotationDetails /></ProtectedRoute>} />
+      <Route path="/document/:id" element={<ProtectedRoute><ViewDocuments /></ProtectedRoute>} />
       <Route path="/create/quotation" element={<ProtectedRoute><CreateQuotation /></ProtectedRoute>} />
+      <Route path="/create/invoice" element={<ProtectedRoute><CreateInvoice /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/settings/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
       <Route path="/settings/business" element={<ProtectedRoute><BusinessDetails /></ProtectedRoute>} />

@@ -1,0 +1,132 @@
+
+import React from 'react';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import ClientSelector from '@/components/clients/ClientSelector';
+import { Client } from '@/types/client';
+import { DocumentDetails } from '@/types/document';
+
+interface InvoiceDetailsFormProps {
+  details: DocumentDetails;
+  onTitleChange: (title: string) => void;
+  onClientSelect: (client: Client) => void;
+  onDateChange: (date: string) => void;
+  onDueDateChange: (dueDate: string) => void;
+  onNotesChange: (notes: string) => void;
+}
+
+const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
+  details,
+  onTitleChange,
+  onClientSelect,
+  onDateChange,
+  onDueDateChange,
+  onNotesChange
+}) => {
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="title">Document Title</Label>
+          <Input
+            id="title"
+            value={details.title}
+            onChange={e => onTitleChange(e.target.value)}
+            placeholder="Enter document title"
+          />
+        </div>
+        
+        <div>
+          <Label>Client</Label>
+          <ClientSelector
+            onClientSelect={onClientSelect}
+            selectedClientName={details.client?.name || ''}
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Invoice Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal h-10"
+                >
+                  {details.date ? (
+                    format(new Date(details.date), 'PPP')
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={details.date ? new Date(details.date) : undefined}
+                  onSelect={(date) => date && onDateChange(format(date, 'yyyy-MM-dd'))}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          
+          <div>
+            <Label>Due Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal h-10"
+                >
+                  {details.dueDate ? (
+                    format(new Date(details.dueDate), 'PPP')
+                  ) : (
+                    <span>Pick a due date</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={details.dueDate ? new Date(details.dueDate) : undefined}
+                  onSelect={(date) => date && onDueDateChange(format(date, 'yyyy-MM-dd'))}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+        
+        <div>
+          <Label htmlFor="notes">Notes</Label>
+          <Textarea
+            id="notes"
+            value={details.notes || ''}
+            onChange={e => onNotesChange(e.target.value)}
+            placeholder="Add any notes or payment terms"
+            className="min-h-[80px]"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default InvoiceDetailsForm;
