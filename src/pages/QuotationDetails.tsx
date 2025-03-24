@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/components/AuthContext';
 import Header from '@/components/Header';
 import { Separator } from '@/components/ui/separator';
@@ -15,9 +15,15 @@ import { useQuotationDetails } from '@/hooks/quotation/useQuotationDetails';
 const QuotationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { businessDetails } = useBusinessDetails(user);
   
   const { quotation, loading, total, formatCurrency } = useQuotationDetails(id, user);
+
+  // Custom back handler to return to the documents page
+  const handleBack = () => {
+    navigate('/');
+  };
 
   // Show loading state while fetching data
   if (loading) {
@@ -31,10 +37,10 @@ const QuotationDetails: React.FC = () => {
 
   const clientInfo = {
     name: quotation.client_name,
-    company: quotation.client_company,
-    address: quotation.client_address,
-    email: quotation.client_email,
-    phone: quotation.client_phone
+    company: quotation.client_company || '',
+    address: quotation.client_address || '',
+    email: quotation.client_email || '',
+    phone: quotation.client_phone || ''
   };
 
   return (
@@ -42,6 +48,7 @@ const QuotationDetails: React.FC = () => {
       <Header 
         title="Quotation Details" 
         showBack 
+        onBack={handleBack}
       />
       
       <div className="flex-1 container max-w-4xl py-6 space-y-8">

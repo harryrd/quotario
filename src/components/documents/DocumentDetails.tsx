@@ -88,9 +88,14 @@ const DocumentDetails: React.FC<DocumentDetailsProps> = ({
               className="mb-2 h-auto py-1"
             />
           ) : (
-            <p className="font-semibold">{document.client_name}</p>
+            <>
+              <p className="font-semibold">{document.client_name}</p>
+              {document.client_company && <p className="text-sm">{document.client_company}</p>}
+              {document.client_address && <p className="text-sm">{document.client_address}</p>}
+              {document.client_email && <p className="text-sm">{document.client_email}</p>}
+              {document.client_phone && <p className="text-sm">{document.client_phone}</p>}
+            </>
           )}
-          <p className="text-sm">Client Address</p>
         </div>
       </div>
       

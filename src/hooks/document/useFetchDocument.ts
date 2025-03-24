@@ -58,6 +58,14 @@ export const useFetchDocument = (documentId: string | undefined, userId: string 
           return;
         }
         
+        // Fetch client information
+        const { data: clientData } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('name', documentData.client_name)
+          .eq('user_id', userId)
+          .maybeSingle();
+        
         // Fetch document items
         const { data: itemsData, error: itemsError } = await supabase
           .from('document_items')
@@ -70,11 +78,20 @@ export const useFetchDocument = (documentId: string | undefined, userId: string 
           return;
         }
         
+        // Enhance document with client information if available
+        const enhancedDocument = {
+          ...documentData,
+          client_address: clientData?.address || '',
+          client_email: clientData?.email || '',
+          client_phone: clientData?.phone || '',
+          client_company: clientData?.company || ''
+        };
+        
         // Ensure document type is one of the allowed types
         const documentType = documentData.type === 'invoice' ? 'invoice' : 'quotation';
         
         const fullDocument: Document = {
-          ...documentData,
+          ...enhancedDocument,
           type: documentType as 'quotation' | 'invoice',
           items: itemsData || []
         };

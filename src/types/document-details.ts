@@ -1,3 +1,4 @@
+
 export interface DocumentItem {
   id: string;
   description: string;
@@ -17,6 +18,10 @@ export interface Document {
   status: string;
   items: DocumentItem[];
   document_number?: string;
+  client_address?: string;
+  client_email?: string;
+  client_phone?: string;
+  client_company?: string;
 }
 
 export interface BusinessDetails {

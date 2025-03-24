@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
@@ -11,7 +12,6 @@ import DocumentEditActions from '@/components/documents/DocumentEditActions';
 import { useDocumentDetails } from '@/hooks/document/useDocumentDetails';
 import { Document, BusinessDetails, DocumentItem } from '@/types/document-details';
 import DeleteDocumentDialog from '@/components/documents/DeleteDocumentDialog';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -82,10 +82,15 @@ const ViewDocuments: React.FC = () => {
     }
   };
   
+  // Custom back handler to return to the documents page
+  const handleBack = () => {
+    navigate('/');
+  };
+  
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
-        <Header title="Loading..." showBack />
+        <Header title="Loading..." showBack onBack={handleBack} />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="h-6 w-6 animate-spin text-primary mr-2" />
           <p>Loading document...</p>
@@ -97,10 +102,10 @@ const ViewDocuments: React.FC = () => {
   if (!document || !editableDocument) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
-        <Header title="Document Not Found" showBack />
+        <Header title="Document Not Found" showBack onBack={handleBack} />
         <div className="flex-1 flex items-center justify-center flex-col gap-4 p-4">
           <p>The document you're looking for doesn't exist or you don't have permission to view it.</p>
-          <Button onClick={() => window.history.back()}>Go Back</Button>
+          <Button onClick={() => navigate('/')}>Go Back</Button>
         </div>
       </div>
     );
@@ -111,6 +116,7 @@ const ViewDocuments: React.FC = () => {
       <Header 
         title={`${document.type === 'quotation' ? 'Quotation' : 'Invoice'} Details`}
         showBack
+        onBack={handleBack}
         actions={
           <>
             <DocumentEditActions 

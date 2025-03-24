@@ -32,11 +32,12 @@ export const useFetchQuotation = (quotationId: string | undefined, user: User | 
           return;
         }
         
-        // Fetch the client details
+        // Fetch the client details - look for exact match by client name
         const { data: clientData, error: clientError } = await supabase
           .from('clients')
           .select('*')
           .eq('name', quotationData.client_name)
+          .eq('user_id', user.id)
           .maybeSingle();
         
         if (clientError && clientError.code !== 'PGRST116') {
@@ -57,7 +58,7 @@ export const useFetchQuotation = (quotationId: string | undefined, user: User | 
         // Calculate total
         let calculatedTotal = 0;
         itemsData.forEach((item) => {
-          const itemTotal = item.quantity * item.unit_price;
+          const itemTotal = Number(item.quantity) * Number(item.unit_price);
           calculatedTotal += itemTotal;
         });
         
