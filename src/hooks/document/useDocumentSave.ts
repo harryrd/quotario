@@ -112,14 +112,21 @@ export const useDocumentSave = (userId: string | undefined) => {
         // Set document ID for redirection
         setDocumentId(documentData.id);
         
-        // Insert document items - save all rows, including incomplete ones
-        const documentItems = rows.map(row => ({
-          document_id: documentData.id,
-          description: row.desc || '',
-          quantity: Number(row.qty) || 0,
-          unit_price: Number(row.price) || 0,
-          tax: row.tax ? Number(row.tax) : null
-        }));
+        // Insert document items - properly convert string values to numbers
+        const documentItems = rows.map(row => {
+          // Parse numeric values, ensuring they are valid numbers
+          const quantity = parseFloat(row.qty as string) || 0;
+          const unitPrice = parseFloat(row.price as string) || 0;
+          const tax = row.tax ? parseFloat(row.tax as string) || 0 : null;
+          
+          return {
+            document_id: documentData.id,
+            description: row.desc || '',
+            quantity: quantity,
+            unit_price: unitPrice,
+            tax: tax
+          };
+        });
         
         if (documentItems.length > 0) {
           const { error: itemsError } = await supabase

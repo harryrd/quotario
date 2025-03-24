@@ -47,8 +47,9 @@ const CustomizableTable: React.FC<CustomizableTableProps> = ({
   useEffect(() => {
     let calculatedTotal = 0;
     rows.forEach(row => {
-      const qty = parseFloat(row.qty) || 0;
-      const price = parseFloat(row.price) || 0;
+      // Ensure we parse string values to numbers
+      const qty = parseFloat(row.qty as string) || 0;
+      const price = parseFloat(row.price as string) || 0;
       calculatedTotal += qty * price;
     });
     setTotal(calculatedTotal);

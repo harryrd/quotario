@@ -25,7 +25,7 @@ const TableRowComponent: React.FC<TableRowComponentProps> = ({
   const formatCurrencyInput = (value: string) => {
     if (!value) return '';
     
-    // Remove non-numeric characters
+    // Remove non-numeric characters except decimal point
     const numericValue = value.replace(/[^\d.]/g, '');
     
     // Allow only one decimal point
@@ -35,6 +35,15 @@ const TableRowComponent: React.FC<TableRowComponentProps> = ({
     }
     
     return numericValue;
+  };
+
+  // Handle numeric input to ensure it's valid
+  const handleNumericInput = (fieldId: string, value: string) => {
+    const formattedValue = fieldId === 'price' 
+      ? formatCurrencyInput(value)
+      : value.replace(/[^\d.]/g, '');
+    
+    onUpdateCell(row.id, fieldId, formattedValue);
   };
 
   const getCurrencySymbol = (currencyCode: string) => {
@@ -62,19 +71,16 @@ const TableRowComponent: React.FC<TableRowComponentProps> = ({
                 <Input
                   type="text"
                   value={row[field.id] || ''}
-                  onChange={(e) => onUpdateCell(
-                    row.id, 
-                    field.id, 
-                    formatCurrencyInput(e.target.value)
-                  )}
+                  onChange={(e) => handleNumericInput(field.id, e.target.value)}
                   className="border-0 focus-visible:ring-0 rounded-none h-full pl-8"
                 />
               </div>
             ) : (
               <Input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={row[field.id] || ''}
-                onChange={(e) => onUpdateCell(row.id, field.id, e.target.value)}
+                onChange={(e) => handleNumericInput(field.id, e.target.value)}
                 className="border-0 focus-visible:ring-0 rounded-none h-full"
               />
             )
