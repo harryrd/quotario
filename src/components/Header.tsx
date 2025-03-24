@@ -12,6 +12,7 @@ interface HeaderProps {
   actions?: React.ReactNode;
   className?: string;
   showSettings?: boolean;
+  onBack?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
@@ -19,13 +20,16 @@ const Header: React.FC<HeaderProps> = ({
   showBack = false, 
   actions,
   className,
-  showSettings = true
+  showSettings = true,
+  onBack
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
   const goBack = () => {
-    if (location.pathname === '/create') {
+    if (onBack) {
+      onBack();
+    } else if (location.pathname === '/create') {
       navigate('/');
     } else {
       navigate(-1);
