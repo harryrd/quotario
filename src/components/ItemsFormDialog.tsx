@@ -100,7 +100,6 @@ const ItemsFormDialog: React.FC<ItemsFormDialogProps> = ({
                       </div>
                     );
                   } else {
-                    // For other fields, show input based on type
                     const commonInputProps = {
                       value,
                       onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -146,7 +145,6 @@ const ItemsFormDialog: React.FC<ItemsFormDialogProps> = ({
                         </div>
                       );
                     } else {
-                      // default text input
                       return (
                         <div key={field.id} className="flex flex-col">
                           <label htmlFor={commonInputProps.id} className="text-sm font-medium mb-1">{field.name}</label>
@@ -164,15 +162,15 @@ const ItemsFormDialog: React.FC<ItemsFormDialogProps> = ({
           ))}
         </div>
 
-        {/* Arrange Save and Cancel buttons with equal space */}
+        {/* Arrange Save and Cancel buttons with cancel on left, save on right horizontally */}
         <div className="mt-6 flex justify-between items-center">
-          <DialogFooter className="flex-1 flex justify-between">
+          <DialogFooter className="flex-1 flex flex-row justify-between gap-4">
             <DialogClose asChild>
-              <Button variant="ghost" className="w-1/2 mr-2">
+              <Button variant="ghost" className="w-1/2">
                 Cancel
               </Button>
             </DialogClose>
-            <Button onClick={handleSaveClick} className="w-1/2 ml-2">
+            <Button onClick={handleSaveClick} className="w-1/2">
               Save
             </Button>
           </DialogFooter>
