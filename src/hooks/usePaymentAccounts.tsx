@@ -12,13 +12,26 @@ type PaymentAccountRow = {
   account_number: string;
   bank_name: string;
   swift_code: string | null;
-  type: 'bank' | 'paypal' | string; // temporarily string to avoid TS errors from DB
+  type: 'bank' | 'paypal' | string; // temporarily include string to avoid TS errors from DB
   created_at: string;
   updated_at: string;
 };
 
 const isValidType = (type: string): type is 'bank' | 'paypal' => {
   return type === 'bank' || type === 'paypal';
+};
+
+const transformAccountRowToPaymentAccount = (account: PaymentAccountRow): PaymentAccount => {
+  const accountType: 'bank' | 'paypal' = isValidType(account.type) ? account.type : 'bank';
+
+  return {
+    id: account.id,
+    accountName: account.account_name,
+    accountNumber: account.account_number,
+    bankName: account.bank_name || '',
+    swiftCode: account.swift_code || '',
+    type: accountType
+  };
 };
 
 export const usePaymentAccounts = () => {
@@ -29,7 +42,7 @@ export const usePaymentAccounts = () => {
   useEffect(() => {
     const fetchPaymentAccounts = async () => {
       if (!user) return;
-      
+
       try {
         setIsLoading(true);
         const { data, error } = await supabase
@@ -44,20 +57,7 @@ export const usePaymentAccounts = () => {
         }
 
         if (data && data.length > 0) {
-          const transformedAccounts = (data as PaymentAccountRow[]).map(account => {
-            // Ensure the type is either 'bank' or 'paypal', fallback to 'bank' if unknown
-            const accountType: 'bank' | 'paypal' = isValidType(account.type) ? account.type : 'bank';
-
-            return {
-              id: account.id,
-              accountName: account.account_name,
-              accountNumber: account.account_number,
-              bankName: account.bank_name || '',
-              swiftCode: account.swift_code || '',
-              type: accountType
-            };
-          });
-
+          const transformedAccounts = (data as PaymentAccountRow[]).map(transformAccountRowToPaymentAccount);
           setAccounts(transformedAccounts);
         } else {
           setAccounts([]);
@@ -69,7 +69,7 @@ export const usePaymentAccounts = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchPaymentAccounts();
   }, [user]);
 
@@ -107,18 +107,7 @@ export const usePaymentAccounts = () => {
         return;
       }
 
-      // Ensure the type is strictly 'bank' or 'paypal'
-      const accountType: 'bank' | 'paypal' = isValidType(data.type) ? data.type : 'bank';
-
-      const newPaymentAccount: PaymentAccount = {
-        id: data.id,
-        accountName: data.account_name,
-        accountNumber: data.account_number,
-        bankName: data.bank_name || '',
-        swiftCode: data.swift_code || '',
-        type: accountType
-      };
-
+      const newPaymentAccount = transformAccountRowToPaymentAccount(data);
       setAccounts(prevAccounts => [...prevAccounts, newPaymentAccount]);
       toast.success('Payment account added successfully');
       return newPaymentAccount;
@@ -162,9 +151,12 @@ export const usePaymentAccounts = () => {
         return;
       }
 
-      setAccounts(accounts.map(account => 
-        account.id === id 
-          ? { ...account, ...updatedAccount }
+      // Correctly ensure the type in the updated account for state update
+      const correctedType: 'bank' | 'paypal' = isValidType(updatedAccount.type) ? updatedAccount.type : 'bank';
+
+      setAccounts(accounts.map(account =>
+        account.id === id
+          ? { ...account, ...updatedAccount, type: correctedType }
           : account
       ));
 
@@ -209,3 +201,4 @@ export const usePaymentAccounts = () => {
     deleteAccount
   };
 };
+
