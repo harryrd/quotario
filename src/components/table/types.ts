@@ -2,7 +2,7 @@
 export interface TableField {
   id: string;
   name: string;
-  type: 'text' | 'number' | 'date' | 'select';
+  type: 'text' | 'number' | 'date' | 'select' | 'image'; // Added 'image' to support the custom field type
   options?: string[];
   required?: boolean;
 }
