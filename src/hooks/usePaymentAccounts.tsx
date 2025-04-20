@@ -17,6 +17,15 @@ type PaymentAccountRow = {
   updated_at: string;
 };
 
+type InsertedPaymentAccountData = {
+  id: string;
+  account_name: string;
+  account_number: string;
+  bank_name: string;
+  swift_code: string | null;
+  type: string;
+};
+
 const isValidType = (type: string): type is 'bank' | 'paypal' => {
   return type === 'bank' || type === 'paypal';
 };
@@ -30,6 +39,20 @@ const transformAccountRowToPaymentAccount = (account: PaymentAccountRow): Paymen
     accountNumber: account.account_number,
     bankName: account.bank_name || '',
     swiftCode: account.swift_code || '',
+    type: accountType
+  };
+};
+
+// New transform for the inserted payment account data (partial)
+const transformInsertedDataToPaymentAccount = (data: InsertedPaymentAccountData): PaymentAccount => {
+  const accountType: 'bank' | 'paypal' = isValidType(data.type) ? data.type : 'bank';
+
+  return {
+    id: data.id,
+    accountName: data.account_name,
+    accountNumber: data.account_number,
+    bankName: data.bank_name || '',
+    swiftCode: data.swift_code || '',
     type: accountType
   };
 };
@@ -107,7 +130,12 @@ export const usePaymentAccounts = () => {
         return;
       }
 
-      const newPaymentAccount = transformAccountRowToPaymentAccount(data);
+      if (!data) {
+        toast.error('Failed to add payment account: no data returned');
+        return;
+      }
+
+      const newPaymentAccount = transformInsertedDataToPaymentAccount(data);
       setAccounts(prevAccounts => [...prevAccounts, newPaymentAccount]);
       toast.success('Payment account added successfully');
       return newPaymentAccount;
@@ -151,7 +179,6 @@ export const usePaymentAccounts = () => {
         return;
       }
 
-      // Correctly ensure the type in the updated account for state update
       const correctedType: 'bank' | 'paypal' = isValidType(updatedAccount.type) ? updatedAccount.type : 'bank';
 
       setAccounts(accounts.map(account =>
