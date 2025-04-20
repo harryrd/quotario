@@ -11,6 +11,7 @@ type PaymentAccountRow = {
   account_number: string;
   bank_name: string;
   swift_code: string | null;
+  type: 'bank' | 'paypal';
   created_at: string;
   updated_at: string;
 };
@@ -43,7 +44,8 @@ export const usePaymentAccounts = () => {
             accountName: account.account_name,
             accountNumber: account.account_number,
             bankName: account.bank_name,
-            swiftCode: account.swift_code || ''
+            swiftCode: account.swift_code || '',
+            type: account.type
           }));
           
           setAccounts(transformedAccounts);
