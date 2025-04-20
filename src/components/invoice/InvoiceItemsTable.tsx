@@ -1,4 +1,3 @@
-
 import React from 'react';
 import CustomizableTable from '@/components/CustomizableTable';
 import { TableField, TableRow } from '@/components/table/types';
@@ -24,6 +23,7 @@ interface InvoiceItemsTableProps {
   onRowsChange: (rows: TableRow[]) => void;
   currency: string;
   editable?: boolean;
+  showTax?: boolean;
 }
 
 const InvoiceItemsTable: React.FC<InvoiceItemsTableProps | InvoiceDetailsTableProps> = (props) => {
@@ -65,7 +65,7 @@ const InvoiceItemsTable: React.FC<InvoiceItemsTableProps | InvoiceDetailsTablePr
       </div>
     );
   } else {
-    const { fields, rows, onFieldsChange, onRowsChange, currency, editable = true } = props;
+    const { fields, rows, onFieldsChange, onRowsChange, currency, editable = true, showTax = true } = props;
     if (!editable) {
       const formatCurrency = (amount: number) => {
         switch(currency) {
@@ -136,4 +136,3 @@ const InvoiceItemsTable: React.FC<InvoiceItemsTableProps | InvoiceDetailsTablePr
 };
 
 export default InvoiceItemsTable;
-
