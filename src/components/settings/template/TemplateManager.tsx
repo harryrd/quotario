@@ -14,35 +14,35 @@ interface TemplateManagerProps {
   templateType: 'quotation' | 'invoice';
 }
 
-const TemplateManager: React.FC<TemplateManagerProps> = ({ 
-  fields, 
+const TemplateManager: React.FC<TemplateManagerProps> = ({
+  fields,
   setFields,
   templateType
 }) => {
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
-    
+
     const items = Array.from(fields);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-    
+
     // Update positions
     const updatedItems = items.map((item, index) => ({
       ...item,
       position: index
     }));
-    
+
     setFields(updatedItems);
   };
-  
+
   const toggleFieldEnabled = (fieldId: string) => {
-    setFields(fields.map(field => 
-      field.id === fieldId 
-        ? { ...field, enabled: !field.enabled } 
+    setFields(fields.map(field =>
+      field.id === fieldId
+        ? { ...field, enabled: !field.enabled }
         : field
     ));
   };
-  
+
   return (
     <div className="space-y-4">
       <div className="bg-muted/50 p-3 rounded-md">
@@ -52,11 +52,11 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
         <p className="text-xs text-muted-foreground mb-3">
           Drag and drop to reorder fields or toggle to show/hide them
         </p>
-      
+
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="fields">
             {(provided) => (
-              <div 
+              <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 className="space-y-2"
@@ -64,9 +64,9 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
                 {fields
                   .sort((a, b) => a.position - b.position)
                   .map((field, index) => (
-                    <Draggable 
-                      key={field.id} 
-                      draggableId={field.id} 
+                    <Draggable
+                      key={field.id}
+                      draggableId={field.id}
                       index={index}
                     >
                       {(provided) => (
@@ -78,8 +78,8 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
                           <CardContent className="p-3">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
-                                <div 
-                                  {...provided.dragHandleProps} 
+                                <div
+                                  {...provided.dragHandleProps}
                                   className="cursor-move text-muted-foreground"
                                 >
                                   <GripVertical size={16} />
@@ -102,13 +102,13 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
                               </div>
                               <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-2">
-                                  <Switch 
+                                  <Switch
                                     id={`toggle-${field.id}`}
                                     checked={field.enabled}
                                     onCheckedChange={() => toggleFieldEnabled(field.id)}
                                     disabled={field.required}
                                   />
-                                  <Label 
+                                  <Label
                                     htmlFor={`toggle-${field.id}`}
                                     className="text-xs cursor-pointer"
                                   >
@@ -138,7 +138,7 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
           </Droppable>
         </DragDropContext>
       </div>
-      
+
       <div className="bg-muted/30 p-3 rounded text-sm">
         <p className="text-muted-foreground">
           <strong>Note:</strong> Required fields cannot be disabled but can be reordered.
@@ -149,3 +149,4 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
 };
 
 export default TemplateManager;
+
