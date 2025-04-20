@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -84,11 +83,9 @@ const TemplateSettings: React.FC = () => {
   const [customFieldType, setCustomFieldType] = useState<'text' | 'image'>('text');
   const [activeTab, setActiveTab] = useState<'quotation' | 'invoice'>('quotation');
 
-  // Helper to get count of custom fields in a field list
   const countCustomFields = (fields: FieldTemplate[]) =>
     fields.filter(f => f.id.startsWith('custom_')).length;
 
-  // Add custom field
   const addCustomField = () => {
     if (customFieldName.trim() === '') {
       toast.error('Custom field name cannot be empty');
@@ -102,7 +99,6 @@ const TemplateSettings: React.FC = () => {
       return;
     }
 
-    // Check duplicate name in current fields (case insensitive)
     const duplicate = currentFields.some(
       f => f.name.toLowerCase() === customFieldName.trim().toLowerCase()
     );
@@ -112,7 +108,7 @@ const TemplateSettings: React.FC = () => {
     }
 
     const newField: FieldTemplate = {
-      id: `custom_${Date.now()}`, // unique id for custom fields
+      id: `custom_${Date.now()}`,
       name: customFieldName.trim(),
       required: false,
       position: currentFields.length,
@@ -132,6 +128,14 @@ const TemplateSettings: React.FC = () => {
     toast.success('Custom field added');
   };
 
+  const removeCustomField = (fieldId: string) => {
+    if (activeTab === 'quotation') {
+      setQuotationFields(prevFields => prevFields.filter(f => f.id !== fieldId));
+    } else {
+      setInvoiceFields(prevFields => prevFields.filter(f => f.id !== fieldId));
+    }
+  };
+
   const handleSave = async () => {
     if (!user) {
       toast.error('You must be logged in to save settings');
@@ -141,7 +145,6 @@ const TemplateSettings: React.FC = () => {
     try {
       setSaving(true);
 
-      // Upsert quotation template
       const { error: quotationError } = await supabase
         .from('document_templates')
         .upsert({
@@ -154,7 +157,6 @@ const TemplateSettings: React.FC = () => {
         throw quotationError;
       }
 
-      // Upsert invoice template
       const { error: invoiceError } = await supabase
         .from('document_templates')
         .upsert({
@@ -208,6 +210,7 @@ const TemplateSettings: React.FC = () => {
             fields={quotationFields}
             setFields={setQuotationFields}
             templateType="quotation"
+            onRemoveField={removeCustomField}
           />
         </TabsContent>
 
@@ -216,6 +219,7 @@ const TemplateSettings: React.FC = () => {
             fields={invoiceFields}
             setFields={setInvoiceFields}
             templateType="invoice"
+            onRemoveField={removeCustomField}
           />
         </TabsContent>
       </Tabs>
@@ -266,4 +270,3 @@ const TemplateSettings: React.FC = () => {
 };
 
 export default TemplateSettings;
-

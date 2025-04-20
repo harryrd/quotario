@@ -1,23 +1,26 @@
 
 import React from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { GripVertical, Check, X } from 'lucide-react';
+import { GripVertical, Check, X, Trash2 } from 'lucide-react'; // Added Trash2 icon for delete
 import { FieldTemplate } from './types';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 interface TemplateManagerProps {
   fields: FieldTemplate[];
   setFields: React.Dispatch<React.SetStateAction<FieldTemplate[]>>;
   templateType: 'quotation' | 'invoice';
+  onRemoveField?: (fieldId: string) => void; // passed handler for removing custom fields
 }
 
 const TemplateManager: React.FC<TemplateManagerProps> = ({
   fields,
   setFields,
-  templateType
+  templateType,
+  onRemoveField
 }) => {
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -41,6 +44,25 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
         ? { ...field, enabled: !field.enabled }
         : field
     ));
+  };
+
+  // Determine if field is locked and can't be removed
+  // Locked IDs per requirement:
+  // Quotation: Description, Quantity, Unit Price, Discount, Total
+  // Invoice: Description, Quantity, Unit Price, Tax, Discount, Total
+  // Custom fields start with 'custom_' and can be removed
+  const isLockedField = (fieldId: string) => {
+    const lockedFieldsQuotation = ['description', 'quantity', 'unit_price', 'discount', 'total'];
+    const lockedFieldsInvoice = ['description', 'quantity', 'unit_price', 'tax', 'discount', 'total'];
+
+    if (fieldId.startsWith('custom_')) return false;
+
+    if (templateType === 'quotation') {
+      return lockedFieldsQuotation.includes(fieldId);
+    } else if (templateType === 'invoice') {
+      return lockedFieldsInvoice.includes(fieldId);
+    }
+    return false;
   };
 
   return (
@@ -125,6 +147,18 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
                                     )}
                                   </Label>
                                 </div>
+                                {/* Show Delete button only if the field is not locked and onRemoveField prop exists */}
+                                {!isLockedField(field.id) && onRemoveField && (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    aria-label={`Remove ${field.name}`}
+                                    onClick={() => onRemoveField(field.id)}
+                                    className="h-7 w-7"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                )}
                               </div>
                             </div>
                           </CardContent>
@@ -141,7 +175,7 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
 
       <div className="bg-muted/30 p-3 rounded text-sm">
         <p className="text-muted-foreground">
-          <strong>Note:</strong> Required fields cannot be disabled but can be reordered.
+          <strong>Note:</strong> Required fields cannot be disabled or deleted but can be reordered.
         </p>
       </div>
     </div>
