@@ -64,6 +64,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
                   key={doc.id}
                   {...doc} 
                   onClick={() => handleOpenDocument(doc.id)}
+                  onDelete={handleDeleteClick}
                 />
               ))
             ) : (
@@ -79,3 +80,4 @@ const DocumentList: React.FC<DocumentListProps> = ({
 };
 
 export default DocumentList;
+

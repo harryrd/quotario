@@ -25,6 +25,7 @@ export interface DocumentCardProps {
   onDelete?: (id: string, e: React.MouseEvent) => void;
   className?: string;
   currency?: string;
+  documentNumber?: string;  // added document number prop
 }
 
 // Function to get currency symbol based on currency code
@@ -53,8 +54,12 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   onDelete,
   className,
   currency = 'USD',
+  documentNumber = ''  // default empty if missing
 }) => {
   const currencySymbol = getCurrencySymbol(currency);
+
+  // Capitalize type label
+  const typeLabel = type === 'quotation' ? 'Quotation' : 'Invoice';
 
   return (
     <motion.div
@@ -68,7 +73,21 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       >
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h3 className="text-sm font-medium line-clamp-1">{title}</h3>
+            {/* Title and Document Number */}
+            <div className="flex items-center space-x-2 mb-1">
+              <h3 className="text-sm font-medium line-clamp-1">{title}</h3>
+              {documentNumber && (
+                <span className="text-xs text-muted-foreground border border-muted-foreground rounded px-1.5 py-0.5">
+                  #{documentNumber}
+                </span>
+              )}
+            </div>
+            {/* Label for Quotation or Invoice */}
+            <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded ${
+              type === 'quotation' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+            }`}>
+              {typeLabel}
+            </span>
             <div className="flex flex-col mt-1">
               <p className="text-xs text-muted-foreground line-clamp-1">
                 {clientName}
@@ -107,3 +126,4 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 };
 
 export default DocumentCard;
+
