@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,7 +46,7 @@ export const usePaymentAccounts = () => {
             accountNumber: account.account_number,
             bankName: account.bank_name,
             swiftCode: account.swift_code || '',
-            type: account.type
+            type: account.type || 'bank'
           }));
           
           setAccounts(transformedAccounts);
@@ -81,9 +82,9 @@ export const usePaymentAccounts = () => {
           user_id: user.id,
           account_name: newAccount.accountName,
           account_number: newAccount.accountNumber,
-          bank_name: newAccount.bankName,
-          swift_code: newAccount.swiftCode,
-          type: newAccount.type || 'bank'
+          bank_name: newAccount.bankName || '', // For PayPal, this can be empty string
+          swift_code: newAccount.swiftCode || '', // For PayPal, this can be empty string
+          type: newAccount.type // type must always be provided
         })
         .select()
         .single();
@@ -98,12 +99,12 @@ export const usePaymentAccounts = () => {
         id: (data as any).id,
         accountName: (data as any).account_name,
         accountNumber: (data as any).account_number,
-        bankName: (data as any).bank_name,
+        bankName: (data as any).bank_name || '',
         swiftCode: (data as any).swift_code || '',
         type: (data as any).type || 'bank'
       };
       
-      setAccounts([...accounts, newPaymentAccount]);
+      setAccounts(prevAccounts => [...prevAccounts, newPaymentAccount]);
       toast.success('Payment account added successfully');
       return newPaymentAccount;
     } catch (error) {
@@ -130,9 +131,9 @@ export const usePaymentAccounts = () => {
         .update({
           account_name: updatedAccount.accountName,
           account_number: updatedAccount.accountNumber,
-          bank_name: updatedAccount.bankName,
-          swift_code: updatedAccount.swiftCode,
-          type: updatedAccount.type || 'bank'
+          bank_name: updatedAccount.bankName || '',
+          swift_code: updatedAccount.swiftCode || '',
+          type: updatedAccount.type // type must be provided
         })
         .eq('id', id)
         .eq('user_id', user.id);
@@ -190,3 +191,4 @@ export const usePaymentAccounts = () => {
     deleteAccount
   };
 };
+
