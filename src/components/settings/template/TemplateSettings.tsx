@@ -6,6 +6,7 @@ import { useAuth } from '@/components/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { FieldTemplate } from './types';
 import TemplateManager from './TemplateManager';
+import AddCustomFieldDialog from './AddCustomFieldDialog';
 
 const TemplateSettings: React.FC = () => {
   const { user } = useAuth();
@@ -79,15 +80,13 @@ const TemplateSettings: React.FC = () => {
     { id: 'total', name: 'Total', required: false, position: 5, enabled: true, type: 'number' }
   ];
 
-  const [customFieldName, setCustomFieldName] = useState('');
-  const [customFieldType, setCustomFieldType] = useState<'text' | 'image'>('text');
   const [activeTab, setActiveTab] = useState<'quotation' | 'invoice'>('quotation');
 
   const countCustomFields = (fields: FieldTemplate[]) =>
     fields.filter(f => f.id.startsWith('custom_')).length;
 
-  const addCustomField = () => {
-    if (customFieldName.trim() === '') {
+  const addCustomField = (name: string, type: 'text' | 'image') => {
+    if (name.trim() === '') {
       toast.error('Custom field name cannot be empty');
       return;
     }
@@ -100,7 +99,7 @@ const TemplateSettings: React.FC = () => {
     }
 
     const duplicate = currentFields.some(
-      f => f.name.toLowerCase() === customFieldName.trim().toLowerCase()
+      (f) => f.name.toLowerCase() === name.toLowerCase()
     );
     if (duplicate) {
       toast.error('Custom field name already exists');
@@ -109,11 +108,11 @@ const TemplateSettings: React.FC = () => {
 
     const newField: FieldTemplate = {
       id: `custom_${Date.now()}`,
-      name: customFieldName.trim(),
+      name: name,
       required: false,
       position: currentFields.length,
       enabled: true,
-      type: customFieldType,
+      type: type,
     };
 
     if (activeTab === 'quotation') {
@@ -121,9 +120,6 @@ const TemplateSettings: React.FC = () => {
     } else {
       setInvoiceFields([...invoiceFields, newField]);
     }
-
-    setCustomFieldName('');
-    setCustomFieldType('text');
 
     toast.success('Custom field added');
   };
@@ -224,38 +220,14 @@ const TemplateSettings: React.FC = () => {
         </TabsContent>
       </Tabs>
 
-      <div className="border rounded-md p-4 bg-muted/30">
-        <h3 className="text-base font-semibold mb-2">Add Custom Field</h3>
+      <div className="border rounded-md p-4 bg-muted/30 flex flex-col items-start">
+        <h3 className="text-base font-semibold mb-3">Add Custom Field</h3>
         {!canAddCustomField && (
-          <p className="text-sm text-destructive mb-2">
+          <p className="text-sm text-destructive mb-3">
             You have reached the maximum of 3 custom fields per template.
           </p>
         )}
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <input
-            type="text"
-            className="flex-grow rounded border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-            placeholder="Field name"
-            value={customFieldName}
-            onChange={(e) => setCustomFieldName(e.target.value)}
-            disabled={!canAddCustomField}
-          />
-          <select
-            className="rounded border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-            value={customFieldType}
-            onChange={(e) => setCustomFieldType(e.target.value as 'text' | 'image')}
-            disabled={!canAddCustomField}
-          >
-            <option value="text">Text</option>
-            <option value="image">Image</option>
-          </select>
-          <Button
-            onClick={addCustomField}
-            disabled={!canAddCustomField}
-          >
-            Add
-          </Button>
-        </div>
+        <AddCustomFieldDialog onAddField={addCustomField} disabled={!canAddCustomField} />
       </div>
 
       <Button 
