@@ -3,7 +3,6 @@ import React from 'react';
 import CustomizableTable from '@/components/CustomizableTable';
 import { TableField, TableRow } from '@/components/table/types';
 
-// Add a new interface for consistency with QuotationItemsTable
 interface InvoiceDetailsTableProps {
   items: {
     id: string;
@@ -15,6 +14,7 @@ interface InvoiceDetailsTableProps {
   formatCurrency: (amount: number) => string;
   total: number;
   showTax?: boolean;
+  editable?: boolean;
 }
 
 interface InvoiceItemsTableProps {
@@ -23,14 +23,12 @@ interface InvoiceItemsTableProps {
   onFieldsChange: (fields: TableField[]) => void;
   onRowsChange: (rows: TableRow[]) => void;
   currency: string;
+  editable?: boolean;
 }
 
 const InvoiceItemsTable: React.FC<InvoiceItemsTableProps | InvoiceDetailsTableProps> = (props) => {
-  // Check which interface we're using
   if ('items' in props) {
-    // This is the InvoiceDetailsTableProps version
-    const { items, formatCurrency, total, showTax = true } = props;
-    
+    const { items, formatCurrency, total, showTax = true, editable = false } = props;
     return (
       <div className="overflow-x-auto mb-8">
         <table className="w-full border-collapse">
@@ -67,9 +65,63 @@ const InvoiceItemsTable: React.FC<InvoiceItemsTableProps | InvoiceDetailsTablePr
       </div>
     );
   } else {
-    // This is the original CustomizableTable version
-    const { fields, rows, onFieldsChange, onRowsChange, currency } = props;
-    
+    const { fields, rows, onFieldsChange, onRowsChange, currency, editable = true } = props;
+    if (!editable) {
+      const formatCurrency = (amount: number) => {
+        switch(currency) {
+          case 'USD': return '$' + amount.toFixed(2);
+          case 'EUR': return '€' + amount.toFixed(2);
+          case 'GBP': return '£' + amount.toFixed(2);
+          case 'JPY': return '¥' + amount.toFixed(2);
+          case 'CAD': return 'C$' + amount.toFixed(2);
+          case 'IDR': return 'Rp' + amount.toFixed(2);
+          default: return currency + amount.toFixed(2);
+        }
+      };
+
+      const total = rows.reduce((sum, row) => {
+        const qty = parseFloat(row.qty as string) || 0;
+        const price = parseFloat(row.price as string) || 0;
+        return sum + qty * price;
+      }, 0);
+
+      return (
+        <div className="overflow-x-auto mb-8">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b">
+                <th className="py-2 px-4 text-left">Description</th>
+                <th className="py-2 px-4 text-right">Quantity</th>
+                <th className="py-2 px-4 text-right">Unit Price</th>
+                {showTax && <th className="py-2 px-4 text-right">Tax (%)</th>}
+                <th className="py-2 px-4 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => {
+                const rowTotal = (parseFloat(row.qty as string) || 0) * (parseFloat(row.price as string) || 0);
+                return (
+                  <tr key={row.id} className="border-b">
+                    <td className="py-2 px-4">{row.desc}</td>
+                    <td className="py-2 px-4 text-right">{row.qty}</td>
+                    <td className="py-2 px-4 text-right">{formatCurrency(parseFloat(row.price as string) || 0)}</td>
+                    {showTax && <td className="py-2 px-4 text-right">{row.tax || 0}%</td>}
+                    <td className="py-2 px-4 text-right">{formatCurrency(rowTotal)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colSpan={showTax ? 4 : 3} className="text-right py-4 px-4 font-medium">Total:</td>
+                <td className="text-right py-4 px-4 font-bold">{formatCurrency(total)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      );
+    }
+
     return (
       <CustomizableTable
         title="Invoice Items"
@@ -84,3 +136,4 @@ const InvoiceItemsTable: React.FC<InvoiceItemsTableProps | InvoiceDetailsTablePr
 };
 
 export default InvoiceItemsTable;
+

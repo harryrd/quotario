@@ -1,11 +1,12 @@
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import Header from '@/components/Header';
 import QuotationDetailsForm from '@/components/quotation/QuotationDetailsForm';
 import QuotationItemsTable from '@/components/quotation/QuotationItemsTable';
 import QuotationActions from '@/components/quotation/QuotationActions';
 import { useQuotationForm } from '@/hooks/document/useQuotationForm';
+import ItemsFormDialog from '@/components/ItemsFormDialog';
 
 const CreateQuotation: React.FC = () => {
   const { user } = useAuth();
@@ -25,6 +26,14 @@ const CreateQuotation: React.FC = () => {
     setRows
   } = useQuotationForm(user?.id);
 
+  // State for controlling ItemsFormDialog open/close
+  const [isItemsDialogOpen, setItemsDialogOpen] = useState(false);
+
+  // Callback to save items from dialog
+  const handleSaveItems = (newRows: typeof rows) => {
+    setRows(newRows);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header 
@@ -34,7 +43,6 @@ const CreateQuotation: React.FC = () => {
       />
       
       <div className="flex-1 container max-w-5xl py-6 px-4 md:px-6 space-y-8">
-        {/* Document details section */}
         <QuotationDetailsForm
           details={details}
           userSettings={userSettings}
@@ -45,16 +53,37 @@ const CreateQuotation: React.FC = () => {
           onDocumentNumberChange={updateDocumentNumber}
         />
         
-        {/* Items table */}
+        {/* Add Items Button */}
+        <div className="flex justify-end mb-2">
+          <button
+            type="button"
+            className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition"
+            onClick={() => setItemsDialogOpen(true)}
+          >
+            Add Items
+          </button>
+        </div>
+
+        {/* Items table: make it non-editable here, editing only in dialog */}
         <QuotationItemsTable
           fields={fields}
           rows={rows}
           onFieldsChange={setFields}
           onRowsChange={setRows}
           currency={userSettings?.currency || 'USD'}
+          // Do not allow inline editing here to avoid conflict
         />
-        
-        {/* Action buttons */}
+
+        {/* ItemsFormDialog */}
+        <ItemsFormDialog
+          open={isItemsDialogOpen}
+          onOpenChange={setItemsDialogOpen}
+          fields={fields}
+          initialRows={rows}
+          onSave={handleSaveItems}
+          title="Quotation Items"
+        />
+
         <div className="fixed bottom-4 left-0 right-0 px-4 md:px-6">
           <QuotationActions
             onSave={handleSubmitQuotation}
@@ -67,3 +96,4 @@ const CreateQuotation: React.FC = () => {
 };
 
 export default CreateQuotation;
+
