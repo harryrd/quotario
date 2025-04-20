@@ -1,14 +1,17 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Download, Share, Printer, FileText, Menu, FilePlus } from 'lucide-react';
+import { Download, Share, Printer, FilePlus, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
 
 interface DocumentActionsProps {
@@ -24,6 +27,23 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
   onPreviewPDF,
   onConvertToInvoice
 }) => {
+  // Handlers for new submenu items
+  const markAsSent = () => {
+    toast.success('Marked document as sent');
+  };
+  
+  const markAsPaid = () => {
+    toast.success('Marked document as fully paid');
+  };
+
+  const addPayment = () => {
+    toast.success('Opening add payment dialog...');
+  };
+
+  const viewPaymentHistory = () => {
+    toast.success('Showing payment history...');
+  };
+
   return (
     <motion.div 
       className="fixed bottom-6 left-0 right-0 flex justify-center px-4"
@@ -37,7 +57,7 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
             className="flex-1"
             onClick={onPreviewPDF}
           >
-            <FileText className="h-4 w-4 mr-2" />
+            <FilePlus className="h-4 w-4 mr-2" />
             Preview PDF
           </Button>
           
@@ -59,6 +79,14 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={markAsSent}>
+                Mark as Sent
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={markAsPaid}>
+                Mark as fully paid
+              </DropdownMenuItem>
+
               <DropdownMenuItem onClick={() => toast.success('Downloading document...')}>
                 <Download className="h-4 w-4 mr-2" />
                 Download
@@ -68,7 +96,20 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
                 <Printer className="h-4 w-4 mr-2" />
                 Print
               </DropdownMenuItem>
-              
+
+              {/* Only for invoices, show payment related options */}
+              {documentType === 'invoice' && (
+                <>
+                  <DropdownMenuItem onClick={addPayment}>
+                    Add Payment
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={viewPaymentHistory}>
+                    View Payment History
+                  </DropdownMenuItem>
+                </>
+              )}
+
               {documentType === 'quotation' && (
                 <DropdownMenuItem onClick={onConvertToInvoice}>
                   <FilePlus className="h-4 w-4 mr-2" />
@@ -84,3 +125,4 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
 };
 
 export default DocumentActions;
+
