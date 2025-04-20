@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Download, Share, Printer, FilePlus, Menu } from 'lucide-react';
+import { Download, Share, Printer, FilePlus, Menu, Send, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
@@ -72,18 +72,20 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
-                variant="outline"
-                className="h-13 w-13 p-2 aspect-square"
+                variant="default" 
+                className="h-13 w-13 p-2 aspect-square" // same style as other buttons
               >
                 <Menu className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={markAsSent}>
+                <Send className="h-4 w-4 mr-2" />
                 Mark as Sent
               </DropdownMenuItem>
               
               <DropdownMenuItem onClick={markAsPaid}>
+                <Check className="h-4 w-4 mr-2" />
                 Mark as fully paid
               </DropdownMenuItem>
 
@@ -101,10 +103,12 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
               {documentType === 'invoice' && (
                 <>
                   <DropdownMenuItem onClick={addPayment}>
+                    <Check className="h-4 w-4 mr-2" />
                     Add Payment
                   </DropdownMenuItem>
 
                   <DropdownMenuItem onClick={viewPaymentHistory}>
+                    <Check className="h-4 w-4 mr-2" />
                     View Payment History
                   </DropdownMenuItem>
                 </>
