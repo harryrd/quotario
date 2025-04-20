@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { TableField, TableRow } from '@/components/table/types';
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 interface ItemsFormDialogProps {
@@ -65,89 +64,107 @@ const ItemsFormDialog: React.FC<ItemsFormDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl w-full">
+      <DialogContent className="max-w-3xl w-full max-h-[600px] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="overflow-x-auto max-h-[400px]">
-          <table className="w-full border-collapse border border-gray-200">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-300">
-                {fields.map(field => (
-                  <th
-                    key={field.id}
-                    className={cn(
-                      "text-left py-2 px-3 border-r border-gray-300",
-                      field.id === fields[fields.length - 1].id ? 'border-r-0' : ''
-                    )}
-                  >
-                    {field.name}
-                  </th>
-                ))}
-                <th className="w-12 text-center">Remove</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id} className="border-b border-gray-300">
-                  {fields.map(field => {
-                    const value = row[field.id] ?? '';
+
+        {rows.length === 0 && (
+          <div className="text-center py-10 text-muted-foreground">No items added yet.</div>
+        )}
+
+        <div className="space-y-6">
+          {rows.map((row, rowIndex) => (
+            <div key={row.id} className="border border-gray-300 rounded-md p-4 shadow-sm bg-white relative">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-sm text-gray-700">Item {rowIndex + 1}</h3>
+                <button
+                  type="button"
+                  onClick={() => removeRow(row.id)}
+                  aria-label="Remove item"
+                  className="text-red-600 hover:text-red-800 font-semibold"
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {fields.map(field => {
+                  const value = row[field.id] ?? '';
+                  const commonInputProps = {
+                    value,
+                    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+                      updateCell(row.id, field.id, e.target.value),
+                    className: "w-full border border-gray-300 rounded px-2 py-1",
+                    id: `${field.id}-${row.id}`,
+                    'aria-label': field.name,
+                  };
+
+                  if (field.type === 'number') {
                     return (
-                      <td key={field.id} className="py-1 px-2 border-r border-gray-300">
-                        {field.type === 'number' ? (
-                          <input
-                            type="number"
-                            value={value}
-                            onChange={e => updateCell(row.id, field.id, e.target.value)}
-                            className="w-full border border-gray-300 rounded px-2 py-1 text-right"
-                          />
-                        ) : field.type === 'date' ? (
-                          <input
-                            type="date"
-                            value={value}
-                            onChange={e => updateCell(row.id, field.id, e.target.value)}
-                            className="w-full border border-gray-300 rounded px-2 py-1"
-                          />
-                        ) : field.type === 'select' && field.options ? (
-                          <select
-                            value={value}
-                            onChange={e => updateCell(row.id, field.id, e.target.value)}
-                            className="w-full border border-gray-300 rounded px-2 py-1"
-                          >
-                            <option value="">Select</option>
-                            {field.options.map(option => (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            type="text"
-                            value={value}
-                            onChange={e => updateCell(row.id, field.id, e.target.value)}
-                            className="w-full border border-gray-300 rounded px-2 py-1"
-                          />
-                        )}
-                      </td>
+                      <div key={field.id} className="flex flex-col">
+                        <label htmlFor={commonInputProps.id} className="text-sm font-medium mb-1">{field.name}</label>
+                        <input
+                          type="number"
+                          {...commonInputProps}
+                          className={cn(commonInputProps.className, "text-right")}
+                        />
+                      </div>
                     );
-                  })}
-                  <td className="text-center">
-                    <button
-                      type="button"
-                      onClick={() => removeRow(row.id)}
-                      className="text-red-600 hover:text-red-800 font-semibold"
-                      aria-label="Remove item"
-                    >
-                      &times;
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  } else if (field.type === 'date') {
+                    return (
+                      <div key={field.id} className="flex flex-col">
+                        <label htmlFor={commonInputProps.id} className="text-sm font-medium mb-1">{field.name}</label>
+                        <input
+                          type="date"
+                          {...commonInputProps}
+                        />
+                      </div>
+                    );
+                  } else if (field.type === 'select' && field.options) {
+                    return (
+                      <div key={field.id} className="flex flex-col">
+                        <label htmlFor={commonInputProps.id} className="text-sm font-medium mb-1">{field.name}</label>
+                        <select
+                          {...commonInputProps}
+                        >
+                          <option value="">Select</option>
+                          {field.options.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+                    );
+                  } else if (field.type === 'image') {
+                    // For image type, simple text input for URL or description (can be enhanced later)
+                    return (
+                      <div key={field.id} className="flex flex-col">
+                        <label htmlFor={commonInputProps.id} className="text-sm font-medium mb-1">{field.name}</label>
+                        <input
+                          type="text"
+                          {...commonInputProps}
+                          placeholder="Image URL"
+                        />
+                      </div>
+                    );
+                  } else {
+                    // default text input
+                    return (
+                      <div key={field.id} className="flex flex-col">
+                        <label htmlFor={commonInputProps.id} className="text-sm font-medium mb-1">{field.name}</label>
+                        <input
+                          type="text"
+                          {...commonInputProps}
+                        />
+                      </div>
+                    );
+                  }
+                })}
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="mt-3 flex justify-between items-center">
+
+        <div className="mt-6 flex justify-between items-center">
           <Button variant="outline" onClick={addRow}>
             Add Row
           </Button>
