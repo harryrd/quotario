@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, FileText, Building } from 'lucide-react';
+import { Calendar, Building } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Card, 
@@ -58,8 +58,12 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 }) => {
   const currencySymbol = getCurrencySymbol(currency);
 
-  // Capitalize type label
-  const typeLabel = type === 'quotation' ? 'Quotation' : 'Invoice';
+  // Use monochrome colors for the label (gray shades)
+  // We use a medium gray background and darker gray text
+  const labelClasses = "inline-block text-[10px] font-semibold px-2 py-0.5 rounded text-gray-700 bg-gray-200";
+
+  // Capitalize first letter of type
+  const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
 
   return (
     <motion.div
@@ -73,32 +77,18 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       >
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            {/* Title and Document Number */}
+            {/* Label, Title, Client Name, Company (left side) */}
             <div className="flex items-center space-x-2 mb-1">
+              <span className={labelClasses}>{typeLabel}</span>
               <h3 className="text-sm font-medium line-clamp-1">{title}</h3>
-              {documentNumber && (
-                <span className="text-xs text-muted-foreground border border-muted-foreground rounded px-1.5 py-0.5">
-                  #{documentNumber}
-                </span>
-              )}
             </div>
-            {/* Label for Quotation or Invoice */}
-            <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded ${
-              type === 'quotation' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
-            }`}>
-              {typeLabel}
-            </span>
-            <div className="flex flex-col mt-1">
-              <p className="text-xs text-muted-foreground line-clamp-1">
-                {clientName}
-              </p>
-              {clientCompany && (
-                <div className="flex items-center text-xs text-muted-foreground mt-1">
-                  <Building className="h-2.5 w-2.5 mr-1" />
-                  <span className="line-clamp-1">{clientCompany}</span>
-                </div>
-              )}
-            </div>
+            <p className="text-xs text-muted-foreground line-clamp-1">{clientName}</p>
+            {clientCompany && (
+              <div className="flex items-center text-xs text-muted-foreground mt-1">
+                <Building className="h-2.5 w-2.5 mr-1" />
+                <span className="line-clamp-1">{clientCompany}</span>
+              </div>
+            )}
           </div>
           <div className="text-right">
             <p className="font-medium text-sm">
@@ -108,6 +98,11 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
               <Calendar className="h-2.5 w-2.5 mr-1" />
               <span>{date}</span>
             </div>
+            {documentNumber && (
+              <p className="text-xs text-muted-foreground mt-1">
+                #{documentNumber}
+              </p>
+            )}
             {onDelete && (
               <Button 
                 variant="ghost" 
