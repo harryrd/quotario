@@ -77,12 +77,10 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       >
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            {/* Label, Title, Client Name, Company (left side) */}
-            <div className="flex items-center space-x-2 mb-1">
-              <span className={labelClasses}>{typeLabel}</span>
-              <h3 className="text-sm font-medium line-clamp-1">{title}</h3>
-            </div>
-            <p className="text-xs text-muted-foreground line-clamp-1">{clientName}</p>
+            {/* Label, Title, Client Name, Company (left side) vertically arranged */}
+            <span className={labelClasses}>{typeLabel}</span>
+            <h3 className="text-sm font-medium line-clamp-1 mt-1">{title}</h3>
+            <p className="text-xs text-muted-foreground line-clamp-1 mt-1">{clientName}</p>
             {clientCompany && (
               <div className="flex items-center text-xs text-muted-foreground mt-1">
                 <Building className="h-2.5 w-2.5 mr-1" />
