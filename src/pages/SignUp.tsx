@@ -19,6 +19,8 @@ type FormData = {
   confirmPassword: string;
 };
 
+const version = "v1.0.0";
+
 const SignUp: React.FC = () => {
   const { signup, loginWithGoogle, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -55,6 +57,12 @@ const SignUp: React.FC = () => {
       <AnimatedTransition>
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
+            {/* Logo image */}
+            <img
+              src="/placeholder.svg"
+              alt="App Logo"
+              className="mx-auto mb-2 h-12 w-auto"
+            />
             <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
             <CardDescription>
               Enter your details to create your account
@@ -223,13 +231,14 @@ const SignUp: React.FC = () => {
               Sign up with Google
             </Button>
           </CardContent>
-          <CardFooter className="text-center">
-            <p className="text-sm text-muted-foreground w-full">
+          <CardFooter className="text-center flex flex-col items-center gap-1">
+            <p className="text-sm text-muted-foreground w-full mb-1">
               Already have an account?{" "}
               <Link to="/sign-in" className="text-primary font-medium hover:underline">
                 Sign in
               </Link>
             </p>
+            <span className="text-xs text-muted-foreground">Version {version}</span>
           </CardFooter>
         </Card>
       </AnimatedTransition>
@@ -238,3 +247,4 @@ const SignUp: React.FC = () => {
 };
 
 export default SignUp;
+

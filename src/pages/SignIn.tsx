@@ -18,6 +18,8 @@ type FormData = {
   password: string;
 };
 
+const version = "v1.0.0";
+
 const SignIn: React.FC = () => {
   const { login, loginWithGoogle, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -47,6 +49,12 @@ const SignIn: React.FC = () => {
       <AnimatedTransition>
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
+            {/* Logo image */}
+            <img
+              src="/placeholder.svg"
+              alt="App Logo"
+              className="mx-auto mb-2 h-12 w-auto"
+            />
             <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
             <CardDescription>
               Enter your credentials to sign in to your account
@@ -165,13 +173,14 @@ const SignIn: React.FC = () => {
               Sign in with Google
             </Button>
           </CardContent>
-          <CardFooter className="text-center">
-            <p className="text-sm text-muted-foreground w-full">
+          <CardFooter className="text-center flex flex-col items-center gap-1">
+            <p className="text-sm text-muted-foreground w-full mb-1">
               Don't have an account?{" "}
               <Link to="/sign-up" className="text-primary font-medium hover:underline">
                 Sign up
               </Link>
             </p>
+            <span className="text-xs text-muted-foreground">Version {version}</span>
           </CardFooter>
         </Card>
       </AnimatedTransition>
@@ -180,3 +189,4 @@ const SignIn: React.FC = () => {
 };
 
 export default SignIn;
+
