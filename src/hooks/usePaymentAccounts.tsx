@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/AuthContext';
 import { PaymentAccount, PaymentAccountFormData } from '@/types/payment';
 
-// Define the database row type to match the actual table structure
 type PaymentAccountRow = {
   id: string;
   user_id: string;
@@ -22,7 +20,6 @@ export const usePaymentAccounts = () => {
   const [accounts, setAccounts] = useState<PaymentAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch payment accounts from Supabase
   useEffect(() => {
     const fetchPaymentAccounts = async () => {
       if (!user) return;
@@ -41,7 +38,6 @@ export const usePaymentAccounts = () => {
         }
         
         if (data && data.length > 0) {
-          // Transform data to match our interface
           const transformedAccounts = (data as PaymentAccountRow[]).map(account => ({
             id: account.id,
             accountName: account.account_name,
@@ -52,7 +48,6 @@ export const usePaymentAccounts = () => {
           
           setAccounts(transformedAccounts);
         } else {
-          // If no accounts found, set an empty array
           setAccounts([]);
         }
       } catch (error) {
@@ -78,7 +73,6 @@ export const usePaymentAccounts = () => {
     }
     
     try {
-      // Save to Supabase
       const { data, error } = await supabase
         .from('payment_accounts')
         .insert({
@@ -86,7 +80,8 @@ export const usePaymentAccounts = () => {
           account_name: newAccount.accountName,
           account_number: newAccount.accountNumber,
           bank_name: newAccount.bankName,
-          swift_code: newAccount.swiftCode
+          swift_code: newAccount.swiftCode,
+          type: newAccount.type || 'bank'
         })
         .select()
         .single();
@@ -97,13 +92,13 @@ export const usePaymentAccounts = () => {
         return;
       }
       
-      // Add to local state
       const newPaymentAccount: PaymentAccount = {
-        id: (data as PaymentAccountRow).id,
-        accountName: (data as PaymentAccountRow).account_name,
-        accountNumber: (data as PaymentAccountRow).account_number,
-        bankName: (data as PaymentAccountRow).bank_name,
-        swiftCode: (data as PaymentAccountRow).swift_code || ''
+        id: (data as any).id,
+        accountName: (data as any).account_name,
+        accountNumber: (data as any).account_number,
+        bankName: (data as any).bank_name,
+        swiftCode: (data as any).swift_code || '',
+        type: (data as any).type || 'bank'
       };
       
       setAccounts([...accounts, newPaymentAccount]);
@@ -128,14 +123,14 @@ export const usePaymentAccounts = () => {
     }
     
     try {
-      // Update in Supabase
       const { error } = await supabase
         .from('payment_accounts')
         .update({
           account_name: updatedAccount.accountName,
           account_number: updatedAccount.accountNumber,
           bank_name: updatedAccount.bankName,
-          swift_code: updatedAccount.swiftCode
+          swift_code: updatedAccount.swiftCode,
+          type: updatedAccount.type || 'bank'
         })
         .eq('id', id)
         .eq('user_id', user.id);
@@ -146,7 +141,6 @@ export const usePaymentAccounts = () => {
         return;
       }
       
-      // Update local state
       setAccounts(accounts.map(account => 
         account.id === id 
           ? { ...account, ...updatedAccount }

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Wallet, Edit, Trash2 } from 'lucide-react';
+import { Wallet, Edit, Trash2, CreditCard } from 'lucide-react';
 import { PaymentAccount } from '@/types/payment';
 
 interface PaymentAccountItemProps {
@@ -16,7 +16,12 @@ const PaymentAccountItem: React.FC<PaymentAccountItemProps> = ({ account, onDele
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <Wallet className="h-4 w-4 text-primary" />
+            {/* Using different icon for PayPal */}
+            {account.type === 'paypal' ? (
+              <CreditCard className="h-4 w-4 text-primary" />
+            ) : (
+              <Wallet className="h-4 w-4 text-primary" />
+            )}
           </div>
           <h3 className="font-medium">{account.accountName}</h3>
         </div>
@@ -41,18 +46,28 @@ const PaymentAccountItem: React.FC<PaymentAccountItemProps> = ({ account, onDele
       </div>
       
       <div className="grid gap-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Bank:</span>
-          <span>{account.bankName}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Account Number:</span>
-          <span>{account.accountNumber}</span>
-        </div>
-        {account.swiftCode && (
+        {account.type === 'bank' && (
+          <>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Bank:</span>
+              <span>{account.bankName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Account Number:</span>
+              <span>{account.accountNumber}</span>
+            </div>
+            {account.swiftCode && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">SWIFT Code:</span>
+                <span>{account.swiftCode}</span>
+              </div>
+            )}
+          </>
+        )}
+        {account.type === 'paypal' && (
           <div className="flex justify-between">
-            <span className="text-muted-foreground">SWIFT Code:</span>
-            <span>{account.swiftCode}</span>
+            <span className="text-muted-foreground">PayPal Email/ID:</span>
+            <span>{account.accountNumber}</span>
           </div>
         )}
       </div>
@@ -61,3 +76,4 @@ const PaymentAccountItem: React.FC<PaymentAccountItemProps> = ({ account, onDele
 };
 
 export default PaymentAccountItem;
+
