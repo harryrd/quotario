@@ -30,7 +30,8 @@ export const usePaymentAccounts = () => {
         setIsLoading(true);
         const { data, error } = await supabase
           .from('payment_accounts')
-          .select('*')
+          // Explicitly select all columns including the new 'type' column
+          .select('id, user_id, account_name, account_number, bank_name, swift_code, type, created_at, updated_at')
           .eq('user_id', user.id);
           
         if (error) {
@@ -91,7 +92,7 @@ export const usePaymentAccounts = () => {
           swift_code: swiftCodeToSend,
           type: newAccount.type
         })
-        .select()
+        .select('id, account_name, account_number, bank_name, swift_code, type')
         .single();
 
       if (error) {
@@ -101,12 +102,12 @@ export const usePaymentAccounts = () => {
       }
 
       const newPaymentAccount: PaymentAccount = {
-        id: (data as any).id,
-        accountName: (data as any).account_name,
-        accountNumber: (data as any).account_number,
-        bankName: (data as any).bank_name || '',
-        swiftCode: (data as any).swift_code || '',
-        type: (data as any).type || 'bank'
+        id: data.id,
+        accountName: data.account_name,
+        accountNumber: data.account_number,
+        bankName: data.bank_name || '',
+        swiftCode: data.swift_code || '',
+        type: data.type || 'bank'
       };
 
       setAccounts(prevAccounts => [...prevAccounts, newPaymentAccount]);
@@ -200,3 +201,4 @@ export const usePaymentAccounts = () => {
     deleteAccount
   };
 };
+

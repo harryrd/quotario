@@ -205,6 +205,7 @@ export type Database = {
           created_at: string | null
           id: string
           swift_code: string | null
+          type: string
           updated_at: string | null
           user_id: string
         }
@@ -215,6 +216,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           swift_code?: string | null
+          type?: string
           updated_at?: string | null
           user_id: string
         }
@@ -225,6 +227,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           swift_code?: string | null
+          type?: string
           updated_at?: string | null
           user_id?: string
         }
