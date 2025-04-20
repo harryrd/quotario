@@ -34,6 +34,7 @@ export const useDocuments = (userId: string | undefined) => {
             client_name,
             date,
             status,
+            document_number,
             document_items(unit_price, quantity)
           `)
           .eq('user_id', userId)
@@ -72,7 +73,8 @@ export const useDocuments = (userId: string | undefined) => {
               date: doc.date,
               amount: totalAmount,
               status: doc.status as 'draft' | 'sent' | 'accepted' | 'declined' | 'paid',
-              currency: currency
+              currency: currency,
+              documentNumber: doc.document_number || ''
             };
           });
           
