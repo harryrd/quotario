@@ -44,9 +44,9 @@ export const FormatSettings: React.FC<FormatSettingsProps> = ({
           <SelectContent>
             <SelectItem value="English">English</SelectItem>
             <SelectItem value="Spanish">Spanish</SelectItem>
-            <SelectItem value="French">French</SelectItem>
-            <SelectItem value="German">German</SelectItem>
-            <SelectItem value="Indonesian">Bahasa Indonesia</SelectItem>
+            <SelectItem value="Portuguese">Portuguese</SelectItem>
+            <SelectItem value="Deutsch">Deutsch</SelectItem>
+            <SelectItem value="Indonesian">Indonesian</SelectItem>
           </SelectContent>
         </Select>
       </div>
