@@ -5,7 +5,7 @@ export interface FieldTemplate {
   required: boolean;
   position: number;
   enabled: boolean;
-  type: 'text' | 'number' | 'date' | 'select';
+  type: 'text' | 'number' | 'date' | 'select' | 'image'; // Added 'image' type to support custom field type
   options?: string[]; // For select fields
 }
 
