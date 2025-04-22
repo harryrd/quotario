@@ -50,7 +50,7 @@ export const useGeneralSettings = (userId: string | undefined) => {
             dateFormat: data.date_format,
             language: data.language,
             fontSize: data.font_size,
-            themeMode: data.theme_mode
+            themeMode: data.theme // Use 'theme' from database instead of 'theme_mode'
           };
           
           setSettings(userSettings);
@@ -97,7 +97,7 @@ export const useGeneralSettings = (userId: string | undefined) => {
         date_format: settings.dateFormat,
         language: settings.language,
         font_size: settings.fontSize,
-        theme_mode: settings.themeMode
+        theme: settings.themeMode // Use 'theme' as the column name in database
       };
 
       const { error } = await supabase
