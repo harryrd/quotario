@@ -24,6 +24,7 @@ export type UserSettings = {
   dateFormat: string;
   language: string;
   fontSize: string;
+  themeMode?: string;
 }
 
 const defaultSettings: UserSettings = {
