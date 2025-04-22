@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { FieldTemplate } from './types';
 import TemplateManager from './TemplateManager';
 import AddCustomFieldDialog from './AddCustomFieldDialog';
-import PdfTemplateSelector from './PdfTemplateSelector';
 
 const TemplateSettings: React.FC = () => {
   const { user } = useAuth();
@@ -16,8 +14,6 @@ const TemplateSettings: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [quotationFields, setQuotationFields] = useState<FieldTemplate[]>([]);
   const [invoiceFields, setInvoiceFields] = useState<FieldTemplate[]>([]);
-  const [quotationTemplate, setQuotationTemplate] = useState('classic');
-  const [invoiceTemplate, setInvoiceTemplate] = useState('classic');
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -26,10 +22,9 @@ const TemplateSettings: React.FC = () => {
       try {
         setLoading(true);
 
-        // Update the query to include pdf_template field explicitly
         const { data, error } = await supabase
           .from('document_templates')
-          .select('id, user_id, type, fields, pdf_template, created_at, updated_at')
+          .select('*')
           .eq('user_id', user.id);
 
         if (error) {
@@ -39,20 +34,17 @@ const TemplateSettings: React.FC = () => {
         }
 
         if (data && data.length > 0) {
-          // Process the data as before
-          const quotationTemplateData = data.find(t => t.type === 'quotation');
-          const invoiceTemplateData = data.find(t => t.type === 'invoice');
+          const quotationTemplate = data.find(t => t.type === 'quotation');
+          const invoiceTemplate = data.find(t => t.type === 'invoice');
 
-          if (quotationTemplateData) {
-            setQuotationFields(quotationTemplateData.fields as unknown as FieldTemplate[]);
-            setQuotationTemplate(quotationTemplateData.pdf_template || 'classic');
+          if (quotationTemplate) {
+            setQuotationFields(quotationTemplate.fields as unknown as FieldTemplate[]);
           } else {
             setQuotationFields(getDefaultQuotationFields());
           }
 
-          if (invoiceTemplateData) {
-            setInvoiceFields(invoiceTemplateData.fields as unknown as FieldTemplate[]);
-            setInvoiceTemplate(invoiceTemplateData.pdf_template || 'classic');
+          if (invoiceTemplate) {
+            setInvoiceFields(invoiceTemplate.fields as unknown as FieldTemplate[]);
           } else {
             setInvoiceFields(getDefaultInvoiceFields());
           }
@@ -149,14 +141,12 @@ const TemplateSettings: React.FC = () => {
     try {
       setSaving(true);
 
-      // Add pdf_template to the upsert operations
       const { error: quotationError } = await supabase
         .from('document_templates')
         .upsert({
           user_id: user.id,
           type: 'quotation',
-          fields: quotationFields as unknown as any,
-          pdf_template: quotationTemplate
+          fields: quotationFields as unknown as any
         }, { onConflict: 'user_id,type' });
 
       if (quotationError) {
@@ -168,8 +158,7 @@ const TemplateSettings: React.FC = () => {
         .upsert({
           user_id: user.id,
           type: 'invoice',
-          fields: invoiceFields as unknown as any,
-          pdf_template: invoiceTemplate
+          fields: invoiceFields as unknown as any
         }, { onConflict: 'user_id,type' });
 
       if (invoiceError) {
@@ -213,12 +202,6 @@ const TemplateSettings: React.FC = () => {
         </TabsList>
 
         <TabsContent value="quotation" className="space-y-5">
-          <PdfTemplateSelector 
-            templateType="quotation"
-            selectedTemplate={quotationTemplate}
-            onSelectTemplate={(templateId) => setQuotationTemplate(templateId)}
-          />
-          
           <TemplateManager
             fields={quotationFields}
             setFields={setQuotationFields}
@@ -228,12 +211,6 @@ const TemplateSettings: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="invoice" className="space-y-5">
-          <PdfTemplateSelector 
-            templateType="invoice"
-            selectedTemplate={invoiceTemplate}
-            onSelectTemplate={(templateId) => setInvoiceTemplate(templateId)}
-          />
-          
           <TemplateManager
             fields={invoiceFields}
             setFields={setInvoiceFields}
