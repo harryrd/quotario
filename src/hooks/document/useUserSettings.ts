@@ -11,9 +11,11 @@ export interface UserSettings {
   documentTemplates?: {
     quotation?: {
       fields: any[];
+      pdfTemplate?: string;
     };
     invoice?: {
       fields: any[];
+      pdfTemplate?: string;
     };
   };
 }
@@ -84,8 +86,14 @@ export const useUserSettings = (userId: string | undefined) => {
           invoicePrefix: settingsData?.invoice_prefix || 'INV-',
           invoiceStartNumber: settingsData?.invoice_start_number || '1001',
           documentTemplates: {
-            quotation: templates.quotation,
-            invoice: templates.invoice
+            quotation: templates.quotation ? {
+              fields: templates.quotation.fields,
+              pdfTemplate: templates.quotation.pdf_template
+            } : undefined,
+            invoice: templates.invoice ? {
+              fields: templates.invoice.fields,
+              pdfTemplate: templates.invoice.pdf_template
+            } : undefined
           }
         });
       } catch (error) {

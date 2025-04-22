@@ -14,6 +14,7 @@ export interface DocumentTemplate {
   user_id: string;
   type: 'quotation' | 'invoice';
   fields: FieldTemplate[];
+  pdf_template?: string; // Added to support PDF template selection
   created_at?: string;
   updated_at?: string;
 }
