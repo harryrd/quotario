@@ -11,9 +11,11 @@ export interface UserSettings {
   documentTemplates?: {
     quotation?: {
       fields: any[];
+      pdf_template?: string; // Added pdf_template property
     };
     invoice?: {
       fields: any[];
+      pdf_template?: string; // Added pdf_template property
     };
   };
 }

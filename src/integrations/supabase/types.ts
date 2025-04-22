@@ -130,6 +130,7 @@ export type Database = {
           created_at: string | null
           fields: Json
           id: string
+          pdf_template: string | null
           type: string
           updated_at: string | null
           user_id: string
@@ -138,6 +139,7 @@ export type Database = {
           created_at?: string | null
           fields: Json
           id?: string
+          pdf_template?: string | null
           type: string
           updated_at?: string | null
           user_id: string
@@ -146,6 +148,7 @@ export type Database = {
           created_at?: string | null
           fields?: Json
           id?: string
+          pdf_template?: string | null
           type?: string
           updated_at?: string | null
           user_id?: string

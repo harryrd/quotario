@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { FieldTemplate } from './types';
 import TemplateManager from './TemplateManager';
 import AddCustomFieldDialog from './AddCustomFieldDialog';
+import PdfTemplateSelector from './PdfTemplateSelector';
 
 const TemplateSettings: React.FC = () => {
   const { user } = useAuth();
@@ -14,6 +16,8 @@ const TemplateSettings: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [quotationFields, setQuotationFields] = useState<FieldTemplate[]>([]);
   const [invoiceFields, setInvoiceFields] = useState<FieldTemplate[]>([]);
+  const [quotationPdfTemplate, setQuotationPdfTemplate] = useState<string>('template1');
+  const [invoicePdfTemplate, setInvoicePdfTemplate] = useState<string>('template1');
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -39,12 +43,14 @@ const TemplateSettings: React.FC = () => {
 
           if (quotationTemplate) {
             setQuotationFields(quotationTemplate.fields as unknown as FieldTemplate[]);
+            setQuotationPdfTemplate(quotationTemplate.pdf_template || 'template1');
           } else {
             setQuotationFields(getDefaultQuotationFields());
           }
 
           if (invoiceTemplate) {
             setInvoiceFields(invoiceTemplate.fields as unknown as FieldTemplate[]);
+            setInvoicePdfTemplate(invoiceTemplate.pdf_template || 'template1');
           } else {
             setInvoiceFields(getDefaultInvoiceFields());
           }
@@ -132,6 +138,14 @@ const TemplateSettings: React.FC = () => {
     }
   };
 
+  const handlePdfTemplateChange = (templateId: string) => {
+    if (activeTab === 'quotation') {
+      setQuotationPdfTemplate(templateId);
+    } else {
+      setInvoicePdfTemplate(templateId);
+    }
+  };
+
   const handleSave = async () => {
     if (!user) {
       toast.error('You must be logged in to save settings');
@@ -146,7 +160,8 @@ const TemplateSettings: React.FC = () => {
         .upsert({
           user_id: user.id,
           type: 'quotation',
-          fields: quotationFields as unknown as any
+          fields: quotationFields as unknown as any,
+          pdf_template: quotationPdfTemplate
         }, { onConflict: 'user_id,type' });
 
       if (quotationError) {
@@ -158,7 +173,8 @@ const TemplateSettings: React.FC = () => {
         .upsert({
           user_id: user.id,
           type: 'invoice',
-          fields: invoiceFields as unknown as any
+          fields: invoiceFields as unknown as any,
+          pdf_template: invoicePdfTemplate
         }, { onConflict: 'user_id,type' });
 
       if (invoiceError) {
@@ -181,6 +197,7 @@ const TemplateSettings: React.FC = () => {
   const currentFields = activeTab === 'quotation' ? quotationFields : invoiceFields;
   const customFieldsCount = countCustomFields(currentFields);
   const canAddCustomField = customFieldsCount < 3;
+  const currentPdfTemplate = activeTab === 'quotation' ? quotationPdfTemplate : invoicePdfTemplate;
 
   return (
     <div className="space-y-6">
@@ -228,6 +245,14 @@ const TemplateSettings: React.FC = () => {
           </p>
         )}
         <AddCustomFieldDialog onAddField={addCustomField} disabled={!canAddCustomField} />
+      </div>
+
+      <div className="border rounded-md p-4 bg-muted/30">
+        <PdfTemplateSelector 
+          selectedTemplate={currentPdfTemplate}
+          onChange={handlePdfTemplateChange}
+          templateType={activeTab}
+        />
       </div>
 
       <Button 
