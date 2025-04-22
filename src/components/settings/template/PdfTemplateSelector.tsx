@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { FilePdf } from 'lucide-react';
+import { File } from 'lucide-react';
 
 export type TemplateOption = {
   id: string;
@@ -65,7 +65,7 @@ const PdfTemplateSelector: React.FC<PdfTemplateSelectorProps> = ({
           onClick={() => setOpen(true)}
           className="flex items-center gap-2"
         >
-          <FilePdf className="h-4 w-4" />
+          <File className="h-4 w-4" />
           Select Template
         </Button>
       </div>

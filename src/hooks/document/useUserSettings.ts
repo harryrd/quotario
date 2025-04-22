@@ -53,7 +53,7 @@ export const useUserSettings = (userId: string | undefined) => {
           return;
         }
         
-        // Fetch document templates
+        // Fetch document templates with pdf_template field
         const { data: templatesData, error: templatesError } = await supabase
           .from('document_templates')
           .select('*')

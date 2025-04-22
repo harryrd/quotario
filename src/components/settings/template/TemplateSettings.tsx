@@ -26,9 +26,10 @@ const TemplateSettings: React.FC = () => {
       try {
         setLoading(true);
 
+        // Update the query to include pdf_template field explicitly
         const { data, error } = await supabase
           .from('document_templates')
-          .select('*')
+          .select('id, user_id, type, fields, pdf_template, created_at, updated_at')
           .eq('user_id', user.id);
 
         if (error) {
@@ -38,6 +39,7 @@ const TemplateSettings: React.FC = () => {
         }
 
         if (data && data.length > 0) {
+          // Process the data as before
           const quotationTemplateData = data.find(t => t.type === 'quotation');
           const invoiceTemplateData = data.find(t => t.type === 'invoice');
 
@@ -147,6 +149,7 @@ const TemplateSettings: React.FC = () => {
     try {
       setSaving(true);
 
+      // Add pdf_template to the upsert operations
       const { error: quotationError } = await supabase
         .from('document_templates')
         .upsert({
