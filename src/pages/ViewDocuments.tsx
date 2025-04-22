@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import AnimatedTransition from '@/components/AnimatedTransition';
@@ -126,14 +126,6 @@ const ViewDocuments: React.FC = () => {
               onCancelEditing={handleCancelEditing}
               onSaveChanges={handleSaveChanges}
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full h-8 w-8 text-destructive hover:bg-destructive/10"
-              onClick={handleDeleteClick}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
           </>
         }
       />
@@ -157,6 +149,7 @@ const ViewDocuments: React.FC = () => {
         documentType={document.type}
         onPreviewPDF={handlePreviewPDF}
         onConvertToInvoice={handleConvertToInvoice}
+        onDeleteDocument={handleDeleteClick}
       />
       
       <DeleteDocumentDialog

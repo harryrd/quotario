@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Download, Share, Printer, FilePlus, Menu, Send, Check } from 'lucide-react';
+import { Download, Share, Printer, FilePlus, Menu, Send, Check, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
@@ -12,6 +12,7 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 
 interface DocumentActionsProps {
@@ -19,13 +20,15 @@ interface DocumentActionsProps {
   documentType: 'quotation' | 'invoice';
   onPreviewPDF: () => void;
   onConvertToInvoice: () => Promise<void>;
+  onDeleteDocument: () => void;
 }
 
 const DocumentActions: React.FC<DocumentActionsProps> = ({
   documentId,
   documentType,
   onPreviewPDF,
-  onConvertToInvoice
+  onConvertToInvoice,
+  onDeleteDocument
 }) => {
   // Handlers for new submenu items
   const markAsSent = () => {
@@ -120,6 +123,17 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
                   Convert to Invoice
                 </DropdownMenuItem>
               )}
+              
+              <DropdownMenuSeparator />
+              
+              {/* Delete option with red styling */}
+              <DropdownMenuItem 
+                onClick={onDeleteDocument}
+                className="text-red-500 hover:text-red-600 focus:text-red-600 hover:bg-red-50 focus:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -129,4 +143,3 @@ const DocumentActions: React.FC<DocumentActionsProps> = ({
 };
 
 export default DocumentActions;
-
