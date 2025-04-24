@@ -12,6 +12,7 @@ import QuotationNotes from '@/components/quotation/QuotationNotes';
 import QuotationLoadingState from '@/components/quotation/QuotationLoadingState';
 import { useQuotationDetails } from '@/hooks/quotation/useQuotationDetails';
 
+// Fix the TypeScript error by ensuring items are properly mapped with all required fields
 const QuotationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -52,7 +53,6 @@ const QuotationDetails: React.FC = () => {
       />
       
       <div className="flex-1 container max-w-4xl py-6 space-y-8">
-        {/* Quotation header with title, number, and date */}
         <QuotationHeader 
           title={quotation.title}
           documentNumber={quotation.document_number}
@@ -62,20 +62,24 @@ const QuotationDetails: React.FC = () => {
         
         <Separator />
         
-        {/* Business and client information */}
         <BusinessClientInfo 
           businessDetails={businessDetails}
           clientDetails={clientInfo}
         />
         
-        {/* Quotation items table */}
+        {/* Ensure items are properly mapped with required fields */}
         <QuotationItemsTable 
-          items={quotation.items}
+          items={quotation.items.map(item => ({
+            id: item.id || `temp-${Date.now()}-${Math.random()}`,
+            description: item.description || '',
+            quantity: Number(item.quantity) || 0,
+            unit_price: Number(item.unit_price) || 0,
+            tax: item.tax
+          }))}
           formatCurrency={formatCurrency}
           total={total}
         />
         
-        {/* Notes section */}
         <QuotationNotes notes={quotation.notes} />
       </div>
     </div>

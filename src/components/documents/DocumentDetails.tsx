@@ -1,8 +1,7 @@
-
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { BusinessDetails, Document } from '@/schemas/document-details';
+import { formatCurrency } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
+import { Document, BusinessDetails } from '@/schemas/document-details';
 import DocumentItemsTable from '@/components/documents/DocumentItemsTable';
 
 interface DocumentDetailsProps {

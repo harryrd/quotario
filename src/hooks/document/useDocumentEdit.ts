@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { Document } from '@/schemas/document-details';
 
 export const useDocumentEdit = (document: Document | null, userId: string | undefined) => {

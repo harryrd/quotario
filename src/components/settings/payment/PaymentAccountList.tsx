@@ -1,79 +1,51 @@
-
 import React from 'react';
-import { motion } from 'framer-motion';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CreditCard } from 'lucide-react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { PaymentAccount } from '@/schemas/payment';
 import PaymentAccountItem from './PaymentAccountItem';
 
 interface PaymentAccountListProps {
   accounts: PaymentAccount[];
-  onDelete: (id: string) => Promise<void>;
-  onAddClick: () => void;
-  onEditClick: (account: PaymentAccount) => void;
-  isLoading: boolean;
-  showAddButton: boolean;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
-const PaymentAccountList: React.FC<PaymentAccountListProps> = ({ 
-  accounts, 
-  onDelete, 
-  onAddClick, 
-  onEditClick,
-  isLoading,
-  showAddButton
-}) => {
-  if (isLoading) {
+const PaymentAccountList: React.FC<PaymentAccountListProps> = ({ accounts, onEdit, onDelete }) => {
+  if (!accounts || accounts.length === 0) {
     return (
-      <div className="flex justify-center items-center py-8">
-        <p className="text-muted-foreground">Loading payment accounts...</p>
-      </div>
-    );
-  }
-
-  if (accounts.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground mb-4">No payment accounts added yet</p>
-        <Button 
-          variant="outline" 
-          onClick={onAddClick}
-        >
-          <CreditCard className="h-4 w-4 mr-2" />
-          Add Your First Payment Account
-        </Button>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>No Payment Accounts</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+            <p className="text-sm text-muted-foreground">
+              You have not added any payment accounts yet.
+            </p>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button variant="link" disabled>
+            Add Payment Account
+          </Button>
+        </CardFooter>
+      </Card>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
-    >
-      <div className="space-y-4">
-        {accounts.map((account) => (
-          <PaymentAccountItem 
-            key={account.id} 
-            account={account} 
-            onDelete={onDelete}
-            onEdit={onEditClick}
-          />
-        ))}
-      </div>
-      
-      {showAddButton && (
-        <Button 
-          variant="outline" 
-          className="w-full"
-          onClick={onAddClick}
-        >
-          <CreditCard className="h-4 w-4 mr-2" />
-          Add Payment Account
-        </Button>
-      )}
-    </motion.div>
+    <div>
+      {accounts.map((account) => (
+        <PaymentAccountItem
+          key={account.id}
+          account={account}
+          onEdit={() => onEdit(account.id)}
+          onDelete={() => onDelete(account.id)}
+        />
+      ))}
+    </div>
   );
 };
 

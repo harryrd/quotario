@@ -1,140 +1,186 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React, { useEffect, useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { CreditCard } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PaymentAccount, PaymentAccountFormData } from '@/schemas/payment';
 
 interface PaymentAccountFormProps {
-  onSubmit: (account: PaymentAccountFormData) => Promise<void>;
-  onCancel: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (account: PaymentAccountFormData, id?: string) => void;
   account?: PaymentAccount;
-  isEditing?: boolean;
 }
 
-const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ 
-  onSubmit, 
-  onCancel, 
-  account,
-  isEditing = false
-}) => {
+const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ isOpen, onClose, onSave, account }) => {
   const [formData, setFormData] = useState<PaymentAccountFormData>({
     type: 'bank',
     accountName: '',
     accountNumber: '',
     bankName: '',
-    swiftCode: ''
+    swiftCode: '',
   });
 
   useEffect(() => {
-    if (account && isEditing) {
+    if (account) {
       setFormData({
-        type: account.type || 'bank',
+        type: account.type,
         accountName: account.accountName,
         accountNumber: account.accountNumber,
         bankName: account.bankName,
-        swiftCode: account.swiftCode
+        swiftCode: account.swiftCode,
+      });
+    } else {
+      // Reset form when creating a new account
+      setFormData({
+        type: 'bank',
+        accountName: '',
+        accountNumber: '',
+        bankName: '',
+        swiftCode: '',
       });
     }
-  }, [account, isEditing]);
+  }, [account]);
 
-  const handleSubmit = async () => {
-    if (!formData.accountName.trim() || !formData.accountNumber.trim()) {
-      return;
-    }
-    await onSubmit(formData);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSave = () => {
+    onSave(formData, account?.id);
+    onClose();
+  };
+
+  const handleTabChange = (value: string) => {
+    setFormData({
+      ...formData,
+      type: value as 'bank' | 'paypal',
+      bankName: '',
+      swiftCode: '',
+    });
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
-      className="p-4 border rounded-md space-y-4"
-    >
-      <h3 className="font-medium flex items-center gap-2">
-        <CreditCard className="h-4 w-4" />
-        {isEditing ? 'Edit Payment Account' : 'Add New Payment Account'}
-      </h3>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{account ? 'Edit Payment Account' : 'Add Payment Account'}</DialogTitle>
+        </DialogHeader>
 
-      <div className="space-y-3">
-        <div className="space-y-2">
-          <Label htmlFor="payment-type">Payment Method Type</Label>
-          <select
-            id="payment-type"
-            value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value as 'bank' | 'paypal' })}
-            className="rounded border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary w-full"
-          >
-            <option value="bank">Bank Transfer</option>
-            <option value="paypal">PayPal</option>
-          </select>
-        </div>
+        <Tabs defaultValue={formData.type} className="space-y-4" onValueChange={handleTabChange}>
+          <TabsList>
+            <TabsTrigger value="bank">Bank Transfer</TabsTrigger>
+            <TabsTrigger value="paypal">PayPal</TabsTrigger>
+          </TabsList>
 
-        <div className="space-y-2">
-          <Label htmlFor="account-name">
-            {formData.type === 'paypal' ? 'PayPal Account Name/Description' : 'Account Name'}
-          </Label>
-          <Input
-            id="account-name"
-            value={formData.accountName}
-            onChange={(e) => setFormData({...formData, accountName: e.target.value})}
-          />
-        </div>
-        
-        {formData.type === 'bank' && (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="bank-name">Bank Name</Label>
-              <Input
-                id="bank-name"
-                value={formData.bankName}
-                onChange={(e) => setFormData({...formData, bankName: e.target.value})}
-              />
+          <TabsContent value="bank" className="space-y-2">
+            <div className="grid gap-4 py-4">
+              <div className="space-y-1">
+                <Label htmlFor="accountName" className="text-xs">
+                  Account Name
+                </Label>
+                <Input
+                  id="accountName"
+                  name="accountName"
+                  value={formData.accountName}
+                  onChange={handleInputChange}
+                  placeholder="John Doe"
+                  className="h-9"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="accountNumber" className="text-xs">
+                  Account Number
+                </Label>
+                <Input
+                  id="accountNumber"
+                  name="accountNumber"
+                  value={formData.accountNumber}
+                  onChange={handleInputChange}
+                  placeholder="1234567890"
+                  className="h-9"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="bankName" className="text-xs">
+                  Bank Name
+                </Label>
+                <Input
+                  id="bankName"
+                  name="bankName"
+                  value={formData.bankName}
+                  onChange={handleInputChange}
+                  placeholder="Bank of America"
+                  className="h-9"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="swiftCode" className="text-xs">
+                  SWIFT Code
+                </Label>
+                <Input
+                  id="swiftCode"
+                  name="swiftCode"
+                  value={formData.swiftCode}
+                  onChange={handleInputChange}
+                  placeholder="BOFAUS6S"
+                  className="h-9"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="account-number">Account Number</Label>
-              <Input
-                id="account-number"
-                value={formData.accountNumber}
-                onChange={(e) => setFormData({...formData, accountNumber: e.target.value})}
-              />
+          </TabsContent>
+
+          <TabsContent value="paypal" className="space-y-2">
+            <div className="grid gap-4 py-4">
+              <div className="space-y-1">
+                <Label htmlFor="accountName" className="text-xs">
+                  Account Name
+                </Label>
+                <Input
+                  id="accountName"
+                  name="accountName"
+                  value={formData.accountName}
+                  onChange={handleInputChange}
+                  placeholder="John Doe"
+                  className="h-9"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="accountNumber" className="text-xs">
+                  PayPal Email
+                </Label>
+                <Input
+                  id="accountNumber"
+                  name="accountNumber"
+                  value={formData.accountNumber}
+                  onChange={handleInputChange}
+                  placeholder="john.doe@example.com"
+                  className="h-9"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="swift-code">SWIFT Code (optional)</Label>
-              <Input
-                id="swift-code"
-                value={formData.swiftCode}
-                onChange={(e) => setFormData({...formData, swiftCode: e.target.value})}
-              />
-            </div>
-          </>
-        )}
-        {formData.type === 'paypal' && (
-          <div className="space-y-2">
-            <Label htmlFor="paypal-email">PayPal Email or ID</Label>
-            <Input
-              id="paypal-email"
-              value={formData.accountNumber}
-              onChange={(e) => setFormData({...formData, accountNumber: e.target.value})}
-              placeholder="paypal@example.com"
-            />
-          </div>
-        )}
-        
-        <div className="flex gap-2">
-          <Button onClick={handleSubmit}>
-            {isEditing ? 'Save Changes' : 'Save Account'}
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={onCancel}
-          >
+          </TabsContent>
+        </Tabs>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={onClose}>
             Cancel
           </Button>
+          <Button size="sm" onClick={handleSave}>
+            Save
+          </Button>
         </div>
-      </div>
-    </motion.div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

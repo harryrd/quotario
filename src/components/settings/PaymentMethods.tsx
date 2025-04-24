@@ -1,90 +1,67 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { usePaymentAccounts } from '@/hooks/usePaymentAccounts';
-import PaymentAccountList from './payment/PaymentAccountList';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PaymentAccountForm from './payment/PaymentAccountForm';
+import { usePaymentAccounts } from '@/hooks/usePaymentAccounts';
 import { PaymentAccount, PaymentAccountFormData } from '@/schemas/payment';
+import PaymentAccountList from './payment/PaymentAccountList';
 
-const PaymentMethods: React.FC = () => {
+const PaymentMethods = () => {
+  const [open, setOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<PaymentAccount | null>(null);
   const { accounts, isLoading, addAccount, editAccount, deleteAccount } = usePaymentAccounts();
-  const [isAdding, setIsAdding] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentAccount, setCurrentAccount] = useState<PaymentAccount | undefined>(undefined);
 
-  const handleAddAccount = async (newAccount: PaymentAccountFormData) => {
-    try {
-      await addAccount(newAccount);
-      setIsAdding(false);
-    } catch (error) {
-      // Error is already handled in the hook
-      console.error('Failed to add account:', error);
+  const handleAddAccount = () => {
+    setSelectedAccount(null);
+    setOpen(true);
+  };
+
+  const handleEditAccount = (account: PaymentAccount) => {
+    setSelectedAccount(account);
+    setOpen(true);
+  };
+
+  const handleSaveAccount = async (accountData: PaymentAccountFormData) => {
+    if (selectedAccount) {
+      // Edit existing account
+      await editAccount(selectedAccount.id, accountData);
+    } else {
+      // Add new account
+      await addAccount(accountData);
     }
+    setOpen(false);
+    setSelectedAccount(null);
   };
 
-  const handleEditAccount = async (updatedAccount: PaymentAccountFormData) => {
-    if (!currentAccount) return;
-    
-    try {
-      await editAccount(currentAccount.id, updatedAccount);
-      setIsEditing(false);
-      setCurrentAccount(undefined);
-    } catch (error) {
-      // Error is already handled in the hook
-      console.error('Failed to update account:', error);
-    }
+  const handleDeleteAccount = async (id: string) => {
+    await deleteAccount(id);
   };
-
-  const handleCancelAdd = () => {
-    setIsAdding(false);
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setCurrentAccount(undefined);
-  };
-
-  const handleAddClick = () => {
-    setIsAdding(true);
-  };
-
-  const handleEditClick = (account: PaymentAccount) => {
-    setCurrentAccount(account);
-    setIsEditing(true);
-  };
-
-  // Show form if in adding or editing mode
-  const showForm = isAdding || isEditing;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
-    >
-      {!showForm ? (
-        <PaymentAccountList 
-          accounts={accounts}
-          onDelete={deleteAccount}
-          onAddClick={handleAddClick}
-          onEditClick={handleEditClick}
-          isLoading={isLoading}
-          showAddButton={accounts.length > 0}
-        />
-      ) : isAdding ? (
-        <PaymentAccountForm 
-          onSubmit={handleAddAccount}
-          onCancel={handleCancelAdd}
-          isEditing={false}
-        />
-      ) : (
-        <PaymentAccountForm 
-          onSubmit={handleEditAccount}
-          onCancel={handleCancelEdit}
-          account={currentAccount}
-          isEditing={true}
-        />
-      )}
-    </motion.div>
+    <div>
+      <div className="md:flex justify-between items-center mb-4">
+        <h2 className="text-lg font-medium">Payment Methods</h2>
+        <Button size="sm" onClick={handleAddAccount}>
+          <Plus className="h-3.5 w-3.5 mr-1" />
+          Add Account
+        </Button>
+      </div>
+
+      <PaymentAccountList
+        accounts={accounts}
+        isLoading={isLoading}
+        onEdit={handleEditAccount}
+        onDelete={handleDeleteAccount}
+      />
+
+      <PaymentAccountForm
+        open={open}
+        setOpen={setOpen}
+        onSave={handleSaveAccount}
+        account={selectedAccount}
+      />
+    </div>
   );
 };
 
