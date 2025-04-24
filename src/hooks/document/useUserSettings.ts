@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { type FieldTemplate } from '@/schemas/template';
 
 export interface UserSettings {
   currency: string;
@@ -10,11 +10,11 @@ export interface UserSettings {
   invoiceStartNumber: string;
   documentTemplates?: {
     quotation?: {
-      fields: any[];
+      fields: FieldTemplate[];
       pdf_template?: string; // Added pdf_template property
     };
     invoice?: {
-      fields: any[];
+      fields: FieldTemplate[];
       pdf_template?: string; // Added pdf_template property
     };
   };

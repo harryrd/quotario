@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { DocumentType, DocumentDetails } from '@/types/document';
-import { TableRow } from '@/components/table/types';
+import { type DocumentType, type DocumentDetails } from '@/schemas/document';
+import { type TableRow } from '@/schemas/table';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 

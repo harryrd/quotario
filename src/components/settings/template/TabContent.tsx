@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FieldTemplate } from './types';
+import { type FieldTemplate } from '@/schemas/template';
 import TemplateManager from './TemplateManager';
 
 interface TabContentProps {
