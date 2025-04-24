@@ -55,3 +55,6 @@ export const quotationSchema = z.object({
 });
 
 export type QuotationData = z.infer<typeof quotationSchema>;
+
+// Add QuotationItem type as an alias to DocumentItem for backward compatibility
+export type QuotationItem = DocumentItem;

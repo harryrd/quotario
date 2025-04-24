@@ -24,3 +24,18 @@ export const documentTemplateSchema = z.object({
 });
 
 export type DocumentTemplate = z.infer<typeof documentTemplateSchema>;
+
+// Add missing TemplateTab type
+export type TemplateTab = 'quotation' | 'invoice';
+
+// Add Field type (simpler version of FieldTemplate for use in custom fields)
+export type Field = {
+  id: string;
+  name: string;
+  type: 'text' | 'number' | 'date' | 'select' | 'image';
+  enabled: boolean;
+  position: number;
+  required?: boolean;
+  custom?: boolean;
+  options?: string[];
+};

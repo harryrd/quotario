@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { QuotationData, QuotationItem } from '@/schemas/document-details';
+import { QuotationData, DocumentItem } from '@/schemas/document-details';
 
 export const useFetchQuotation = (quotationId: string | undefined, user: User | null) => {
   const navigate = useNavigate();
@@ -63,6 +64,15 @@ export const useFetchQuotation = (quotationId: string | undefined, user: User | 
         
         setTotal(calculatedTotal);
         
+        // Ensure all required fields are present in the items
+        const validItems = itemsData.map(item => ({
+          id: item.id || `temp-${Date.now()}-${Math.random()}`,
+          description: item.description || '',
+          quantity: Number(item.quantity) || 0,
+          unit_price: Number(item.unit_price) || 0,
+          tax: item.tax !== undefined ? Number(item.tax) : undefined
+        }));
+        
         // Combine all data
         setQuotation({
           id: quotationData.id,
@@ -76,7 +86,7 @@ export const useFetchQuotation = (quotationId: string | undefined, user: User | 
           client_address: clientData?.address || '',
           client_company: clientData?.company || '',
           notes: quotationData.notes,
-          items: itemsData
+          items: validItems
         });
       } catch (error) {
         console.error('Error fetching quotation details:', error);

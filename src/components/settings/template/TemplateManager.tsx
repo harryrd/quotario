@@ -1,15 +1,29 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { TemplateTab } from '@/schemas/template';
+import { TemplateTab, type FieldTemplate } from '@/schemas/template';
 
 interface TemplateManagerProps {
   activeTab: TemplateTab;
   setActiveTab: (tab: TemplateTab) => void;
+  // Add missing props to match usage in TabContent
+  fields?: FieldTemplate[];
+  setFields?: React.Dispatch<React.SetStateAction<FieldTemplate[]>>;
+  templateType?: 'quotation' | 'invoice';
+  onRemoveField?: (fieldId: string) => void;
 }
 
-const TemplateManager: React.FC<TemplateManagerProps> = ({ activeTab, setActiveTab }) => {
+const TemplateManager: React.FC<TemplateManagerProps> = ({ 
+  activeTab, 
+  setActiveTab,
+  // We don't need to use these props in this component, but they are passed from TabContent
+  fields, 
+  setFields, 
+  templateType, 
+  onRemoveField 
+}) => {
   const navigate = useNavigate();
 
   const handleTabChange = (tab: TemplateTab) => {
@@ -49,4 +63,3 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({ activeTab, setActiveT
 };
 
 export default TemplateManager;
-
