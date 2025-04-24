@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { BusinessDetails, Document, DocumentItem as QuotationItem } from '@/schemas/document-details';
+import { BusinessDetails, Document, DocumentItem } from '@/schemas/document-details';
 
 interface UseQuotationDetailsResult {
   quotation: Document | null;
@@ -72,7 +73,7 @@ export const useQuotationDetails = (quotationId: string | undefined, user: any):
         }));
 
         // Calculate total
-        const calculatedTotal = items.reduce((sum: number, item: QuotationItem) => {
+        const calculatedTotal = items.reduce((sum: number, item: DocumentItem) => {
           const itemTotal = item.quantity * item.unit_price;
           return sum + itemTotal;
         }, 0);

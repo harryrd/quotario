@@ -66,7 +66,13 @@ const ViewDocuments: React.FC = () => {
                 <DocumentList
                   documents={filteredDocuments}
                   loading={loading}
-                  onDelete={handleDelete}
+                  handleDeleteClick={(id, e) => {
+                    e.stopPropagation();
+                    const doc = documents.find(doc => doc.id === id);
+                    if (doc) {
+                      handleDelete(doc as unknown as Document);
+                    }
+                  }}
                 />
               </div>
             </AnimatedTransition>
@@ -78,7 +84,13 @@ const ViewDocuments: React.FC = () => {
                 <DocumentList
                   documents={filteredDocuments}
                   loading={loading}
-                  onDelete={handleDelete}
+                  handleDeleteClick={(id, e) => {
+                    e.stopPropagation();
+                    const doc = documents.find(doc => doc.id === id);
+                    if (doc) {
+                      handleDelete(doc as unknown as Document);
+                    }
+                  }}
                 />
               </div>
             </AnimatedTransition>
