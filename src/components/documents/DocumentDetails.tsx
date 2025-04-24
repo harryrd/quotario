@@ -1,6 +1,9 @@
+
 import React from 'react';
 import { formatCurrency } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Document, BusinessDetails } from '@/schemas/document-details';
 import DocumentItemsTable from '@/components/documents/DocumentItemsTable';
 
@@ -137,8 +140,7 @@ const DocumentDetails: React.FC<DocumentDetailsProps> = ({
       
       <DocumentItemsTable 
         items={isEditing ? editableDocument.items : document.items}
-        documentType={document.type}
-        isEditing={isEditing}
+        currency={document.currency || 'USD'}
         onItemsChange={(items) => setEditableDocument({...editableDocument, items})}
       />
       
@@ -146,19 +148,19 @@ const DocumentDetails: React.FC<DocumentDetailsProps> = ({
         <div className="w-full md:w-1/3">
           <div className="flex justify-between py-2">
             <span>Subtotal:</span>
-            <span>${isEditing ? editableSubtotal.toFixed(2) : subtotal.toFixed(2)}</span>
+            <span>{formatCurrency(isEditing ? editableSubtotal : subtotal, document.currency || 'USD')}</span>
           </div>
           
           {(tax > 0 || (isEditing && editableTax > 0)) && (
             <div className="flex justify-between py-2">
               <span>Tax:</span>
-              <span>${isEditing ? editableTax.toFixed(2) : tax.toFixed(2)}</span>
+              <span>{formatCurrency(isEditing ? editableTax : tax, document.currency || 'USD')}</span>
             </div>
           )}
           
           <div className="flex justify-between py-2 border-t border-t-gray-200">
             <span className="font-bold">Total:</span>
-            <span className="font-bold">${isEditing ? editableTotal.toFixed(2) : total.toFixed(2)}</span>
+            <span className="font-bold">{formatCurrency(isEditing ? editableTotal : total, document.currency || 'USD')}</span>
           </div>
         </div>
       </div>

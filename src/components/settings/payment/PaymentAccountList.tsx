@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,11 +8,24 @@ import PaymentAccountItem from './PaymentAccountItem';
 
 interface PaymentAccountListProps {
   accounts: PaymentAccount[];
+  isLoading?: boolean;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
-const PaymentAccountList: React.FC<PaymentAccountListProps> = ({ accounts, onEdit, onDelete }) => {
+const PaymentAccountList: React.FC<PaymentAccountListProps> = ({ accounts, isLoading = false, onEdit, onDelete }) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="py-6">
+          <div className="flex justify-center">
+            <p className="text-sm text-muted-foreground">Loading payment accounts...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (!accounts || accounts.length === 0) {
     return (
       <Card>
@@ -36,13 +50,13 @@ const PaymentAccountList: React.FC<PaymentAccountListProps> = ({ accounts, onEdi
   }
 
   return (
-    <div>
+    <div className="space-y-4">
       {accounts.map((account) => (
         <PaymentAccountItem
           key={account.id}
           account={account}
-          onEdit={() => onEdit(account.id)}
-          onDelete={() => onDelete(account.id)}
+          onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </div>

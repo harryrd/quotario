@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,11 +18,11 @@ const ViewDocuments: React.FC = () => {
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { user } = useAuth();
-  const { documents, loading, fetchDocuments, deleteDocument } = useDocuments(user?.id, activeTab);
+  const { documents, loading, deleteDocument } = useDocuments(user?.id);
 
   const filteredDocuments = documents.filter(document =>
     document.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    document.client_name.toLowerCase().includes(searchQuery.toLowerCase())
+    document.clientName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleTabChange = (tab: DocumentType) => {
@@ -36,10 +37,9 @@ const ViewDocuments: React.FC = () => {
 
   const confirmDelete = async () => {
     if (documentToDelete) {
-      await deleteDocument(documentToDelete.id);
+      await deleteDocument();
       setIsDeleteModalOpen(false);
       setDocumentToDelete(null);
-      fetchDocuments(user?.id, activeTab); // Refresh documents after deletion
     }
   };
 
@@ -66,7 +66,6 @@ const ViewDocuments: React.FC = () => {
                 <DocumentList
                   documents={filteredDocuments}
                   loading={loading}
-                  type="quotation"
                   onDelete={handleDelete}
                 />
               </div>
@@ -79,7 +78,6 @@ const ViewDocuments: React.FC = () => {
                 <DocumentList
                   documents={filteredDocuments}
                   loading={loading}
-                  type="invoice"
                   onDelete={handleDelete}
                 />
               </div>
@@ -89,10 +87,10 @@ const ViewDocuments: React.FC = () => {
       </div>
 
       <DeleteDocumentDialog
-        isOpen={isDeleteModalOpen}
-        onClose={cancelDelete}
-        onConfirm={confirmDelete}
-        documentTitle={documentToDelete?.title || ''}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onDelete={confirmDelete}
+        isDeleting={false}
       />
     </div>
   );

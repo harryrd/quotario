@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,18 +9,21 @@ import { PaymentAccount, PaymentAccountFormData } from '@/schemas/payment';
 import PaymentAccountList from './payment/PaymentAccountList';
 
 const PaymentMethods = () => {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<PaymentAccount | null>(null);
   const { accounts, isLoading, addAccount, editAccount, deleteAccount } = usePaymentAccounts();
 
   const handleAddAccount = () => {
     setSelectedAccount(null);
-    setOpen(true);
+    setIsOpen(true);
   };
 
-  const handleEditAccount = (account: PaymentAccount) => {
-    setSelectedAccount(account);
-    setOpen(true);
+  const handleEditAccount = (id: string) => {
+    const account = accounts.find(acc => acc.id === id);
+    if (account) {
+      setSelectedAccount(account);
+      setIsOpen(true);
+    }
   };
 
   const handleSaveAccount = async (accountData: PaymentAccountFormData) => {
@@ -30,7 +34,7 @@ const PaymentMethods = () => {
       // Add new account
       await addAccount(accountData);
     }
-    setOpen(false);
+    setIsOpen(false);
     setSelectedAccount(null);
   };
 
@@ -56,8 +60,8 @@ const PaymentMethods = () => {
       />
 
       <PaymentAccountForm
-        open={open}
-        setOpen={setOpen}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
         onSave={handleSaveAccount}
         account={selectedAccount}
       />

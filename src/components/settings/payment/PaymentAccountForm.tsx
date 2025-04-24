@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -10,7 +11,7 @@ interface PaymentAccountFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (account: PaymentAccountFormData, id?: string) => void;
-  account?: PaymentAccount;
+  account?: PaymentAccount | null;
 }
 
 const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ isOpen, onClose, onSave, account }) => {
@@ -28,8 +29,8 @@ const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({ isOpen, onClose
         type: account.type,
         accountName: account.accountName,
         accountNumber: account.accountNumber,
-        bankName: account.bankName,
-        swiftCode: account.swiftCode,
+        bankName: account.bankName || '',
+        swiftCode: account.swiftCode || '',
       });
     } else {
       // Reset form when creating a new account

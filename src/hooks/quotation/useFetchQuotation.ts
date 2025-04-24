@@ -1,106 +1,122 @@
-
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
-import { QuotationData, DocumentItem } from '@/schemas/document-details';
+import { toast } from 'sonner';
+import { BusinessDetails, Document, DocumentItem as QuotationItem } from '@/schemas/document-details';
 
-export const useFetchQuotation = (quotationId: string | undefined, user: User | null) => {
-  const navigate = useNavigate();
-  const [quotation, setQuotation] = useState<QuotationData | null>(null);
+interface UseQuotationDetailsResult {
+  quotation: Document | null;
+  loading: boolean;
+  total: number;
+  formatCurrency: (amount: number) => string;
+}
+
+export const useQuotationDetails = (quotationId: string | undefined, user: any): UseQuotationDetailsResult => {
+  const [quotation, setQuotation] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
     const fetchQuotationDetails = async () => {
-      if (!quotationId || !user) return;
-      
+      if (!quotationId || !user) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        
-        // Fetch the quotation data
         const { data: quotationData, error: quotationError } = await supabase
           .from('documents')
-          .select('*')
+          .select(`
+            id,
+            document_number,
+            title,
+            date,
+            status,
+            client_name,
+            client_email,
+            client_phone,
+            client_address,
+            client_company,
+            notes,
+            type,
+            document_items (
+              id,
+              description,
+              quantity,
+              unit_price,
+              tax
+            )
+          `)
           .eq('id', quotationId)
           .eq('user_id', user.id)
-          .eq('type', 'quotation')
           .single();
-        
+
         if (quotationError) {
-          console.error('Error fetching quotation:', quotationError);
+          console.error('Error fetching quotation details:', quotationError);
+          toast.error('Failed to load quotation details.');
           return;
         }
-        
-        // Fetch the client details - look for exact match by client name
-        const { data: clientData, error: clientError } = await supabase
-          .from('clients')
-          .select('*')
-          .eq('name', quotationData.client_name)
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        if (clientError && clientError.code !== 'PGRST116') {
-          console.error('Error fetching client:', clientError);
-        }
-        
-        // Fetch the quotation items
-        const { data: itemsData, error: itemsError } = await supabase
-          .from('document_items')
-          .select('*')
-          .eq('document_id', quotationId);
-        
-        if (itemsError) {
-          console.error('Error fetching quotation items:', itemsError);
+
+        if (!quotationData) {
+          toast.error('Quotation not found.');
           return;
         }
-        
-        // Calculate total
-        let calculatedTotal = 0;
-        itemsData.forEach((item) => {
-          const itemTotal = Number(item.quantity) * Number(item.unit_price);
-          calculatedTotal += itemTotal;
-        });
-        
-        setTotal(calculatedTotal);
-        
-        // Ensure all required fields are present in the items
-        const validItems = itemsData.map(item => ({
-          id: item.id || `temp-${Date.now()}-${Math.random()}`,
-          description: item.description || '',
-          quantity: Number(item.quantity) || 0,
-          unit_price: Number(item.unit_price) || 0,
-          tax: item.tax !== undefined ? Number(item.tax) : undefined
+
+        // Transform document_items to items array
+        const items = quotationData.document_items.map((item: any) => ({
+          id: item.id,
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          tax: item.tax || 0,
         }));
-        
-        // Combine all data
+
+        // Calculate total
+        const calculatedTotal = items.reduce((sum: number, item: QuotationItem) => {
+          const itemTotal = item.quantity * item.unit_price;
+          return sum + itemTotal;
+        }, 0);
+
+        setTotal(calculatedTotal);
+
+        // Set quotation details
         setQuotation({
           id: quotationData.id,
-          document_number: quotationData.document_number || 'N/A',
+          document_number: quotationData.document_number || '',
           title: quotationData.title,
           date: quotationData.date,
           status: quotationData.status,
           client_name: quotationData.client_name,
-          client_email: clientData?.email || '',
-          client_phone: clientData?.phone || '',
-          client_address: clientData?.address || '',
-          client_company: clientData?.company || '',
+          client_email: quotationData.client_email,
+          client_phone: quotationData.client_phone,
+          client_address: quotationData.client_address,
+          client_company: quotationData.client_company,
           notes: quotationData.notes,
-          items: validItems
-        });
+          type: quotationData.type,
+          items: items,
+        } as Document);
       } catch (error) {
-        console.error('Error fetching quotation details:', error);
+        console.error('Unexpected error fetching quotation details:', error);
+        toast.error('Failed to load quotation details.');
       } finally {
         setLoading(false);
       }
     };
-    
-    fetchQuotationDetails();
-  }, [quotationId, user, navigate]);
 
-  return {
-    quotation,
-    loading,
-    total
+    fetchQuotationDetails();
+  }, [quotationId, user]);
+
+  const formatCurrency = (amount: number) => {
+    switch(user?.user_metadata?.currency) {
+      case 'USD': return '$' + amount.toFixed(2);
+      case 'EUR': return '€' + amount.toFixed(2);
+      case 'GBP': return '£' + amount.toFixed(2);
+      case 'JPY': return '¥' + amount.toFixed(2);
+      case 'CAD': return 'C$' + amount.toFixed(2);
+      case 'IDR': return 'Rp' + amount.toFixed(2);
+      default: return amount.toFixed(2) + ' ' + user?.user_metadata?.currency;
+    }
   };
+
+  return { quotation, loading, total, formatCurrency };
 };

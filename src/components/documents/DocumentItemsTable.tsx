@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { formatCurrency } from '@/lib/utils';
 import { DocumentItem } from '@/schemas/document-details';
@@ -5,9 +6,10 @@ import { DocumentItem } from '@/schemas/document-details';
 interface DocumentItemsTableProps {
   items: DocumentItem[];
   currency: string;
+  onItemsChange?: (items: DocumentItem[]) => void;
 }
 
-const DocumentItemsTable: React.FC<DocumentItemsTableProps> = ({ items, currency }) => {
+const DocumentItemsTable: React.FC<DocumentItemsTableProps> = ({ items, currency, onItemsChange }) => {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -37,7 +38,7 @@ const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
 }) => {
   const [date, setDate] = React.useState<Date | undefined>(details.date ? new Date(details.date) : undefined);
   const [dueDate, setDueDate] = React.useState<Date | undefined>(details.dueDate ? new Date(details.dueDate) : undefined);
-  const { settings, isLoading } = useGeneralSettings();
+  const { settings, loading } = useGeneralSettings();
 
   React.useEffect(() => {
     if (details.date) {

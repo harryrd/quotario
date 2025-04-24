@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -33,7 +34,7 @@ const QuotationDetailsForm: React.FC<QuotationDetailsFormProps> = ({
   onNotesChange,
   onDocumentNumberChange,
 }) => {
-  const { settings, isLoading } = useGeneralSettings();
+  const { settings, loading } = useGeneralSettings();
   const [date, setDate] = React.useState<Date | undefined>(details.date ? new Date(details.date) : undefined);
 
   React.useEffect(() => {

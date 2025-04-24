@@ -26,6 +26,7 @@ export const documentSchema = z.object({
   client_email: z.string().optional(),
   client_phone: z.string().optional(),
   client_company: z.string().optional(),
+  currency: z.string().optional(),
 });
 
 export type Document = z.infer<typeof documentSchema>;
