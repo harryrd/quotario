@@ -16,7 +16,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { Client } from '@/types/client';
+import { Client } from '@/schemas/client';
 import { useClients } from '@/hooks/useClients';
 import { useAuth } from '@/components/AuthContext';
 

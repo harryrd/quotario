@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreditCard } from 'lucide-react';
-import { PaymentAccount, PaymentAccountFormData } from '@/types/payment';
+import { PaymentAccount, PaymentAccountFormData } from '@/schemas/payment';
 
 interface PaymentAccountFormProps {
   onSubmit: (account: PaymentAccountFormData) => Promise<void>;
@@ -27,7 +27,6 @@ const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({
     swiftCode: ''
   });
 
-  // Load existing account data if editing
   useEffect(() => {
     if (account && isEditing) {
       setFormData({
@@ -41,10 +40,7 @@ const PaymentAccountForm: React.FC<PaymentAccountFormProps> = ({
   }, [account, isEditing]);
 
   const handleSubmit = async () => {
-    // Basic validation: For bank, accountName and accountNumber required
-    // For PayPal, accountNumber (email or id) and accountName required
     if (!formData.accountName.trim() || !formData.accountNumber.trim()) {
-      // Could add toast but per instructions keep minimal
       return;
     }
     await onSubmit(formData);

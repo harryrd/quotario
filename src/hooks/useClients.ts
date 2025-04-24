@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Client, emptyClient } from '@/types/client';
+import { Client, emptyClient } from '@/schemas/client';
 
 export const useClients = (userId?: string) => {
   // Initialize with empty array explicitly to prevent undefined issues

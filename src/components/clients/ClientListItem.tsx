@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Edit, Trash, Mail, Phone, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Client } from '@/types/client';
+import { Client } from '@/schemas/client';
 
 interface ClientListItemProps {
   client: Client;

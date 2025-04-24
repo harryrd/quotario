@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { usePaymentAccounts } from '@/hooks/usePaymentAccounts';
 import PaymentAccountList from './payment/PaymentAccountList';
 import PaymentAccountForm from './payment/PaymentAccountForm';
-import { PaymentAccount, PaymentAccountFormData } from '@/types/payment';
+import { PaymentAccount, PaymentAccountFormData } from '@/schemas/payment';
 
 const PaymentMethods: React.FC = () => {
   const { accounts, isLoading, addAccount, editAccount, deleteAccount } = usePaymentAccounts();

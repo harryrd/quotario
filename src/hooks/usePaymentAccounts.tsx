@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/AuthContext';
-import { PaymentAccount, PaymentAccountFormData } from '@/types/payment';
+import { PaymentAccount, PaymentAccountFormData } from '@/schemas/payment';
 
 type PaymentAccountRow = {
   id: string;
@@ -228,4 +227,3 @@ export const usePaymentAccounts = () => {
     deleteAccount
   };
 };
-

@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { DocumentItem } from '@/types/document-details';
+import { DocumentItem } from '@/schemas/document-details';
 
 interface DocumentItemsTableProps {
   items: DocumentItem[];
@@ -18,7 +17,6 @@ const DocumentItemsTable: React.FC<DocumentItemsTableProps> = ({
 }) => {
   const [totals, setTotals] = useState<{[key: string]: number}>({});
   
-  // Recalculate totals whenever items change
   useEffect(() => {
     const newTotals: {[key: string]: number} = {};
     items.forEach((item, index) => {
@@ -37,7 +35,6 @@ const DocumentItemsTable: React.FC<DocumentItemsTableProps> = ({
       [field]: field === 'description' ? value : parseFloat(value) || 0
     };
     
-    // Recalculate the total for this item immediately
     const itemId = updatedItems[index].id;
     const itemTotal = Number(updatedItems[index].quantity) * Number(updatedItems[index].unit_price);
     setTotals(prev => ({...prev, [itemId]: itemTotal}));

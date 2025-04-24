@@ -1,7 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Document } from '@/types/document-details';
+import { Document } from '@/schemas/document-details';
 
 export const useDocumentActions = (document: Document | null, userId: string | undefined) => {
   const handleConvertToInvoice = async () => {

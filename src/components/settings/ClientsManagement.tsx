@@ -11,7 +11,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { useAuth } from '@/components/AuthContext';
-import { Client } from '@/types/client';
+import { Client } from '@/schemas/client';
 import { useClients } from '@/hooks/useClients';
 import ClientsList from '@/components/clients/ClientsList';
 import ClientForm from '@/components/clients/ClientForm';

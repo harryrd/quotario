@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { BusinessDetails, Document } from '@/types/document-details';
+import { BusinessDetails, Document } from '@/schemas/document-details';
 import DocumentItemsTable from '@/components/documents/DocumentItemsTable';
 
 interface DocumentDetailsProps {

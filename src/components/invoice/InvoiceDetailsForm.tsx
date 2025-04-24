@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
@@ -13,8 +12,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import ClientSelector from '@/components/clients/ClientSelector';
-import { Client } from '@/types/client';
-import { DocumentDetails } from '@/types/document';
+import { Client } from '@/schemas/client';
+import { DocumentDetails } from '@/schemas/document';
 
 interface InvoiceDetailsFormProps {
   details: DocumentDetails;
@@ -40,7 +39,6 @@ const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
   onNotesChange,
   onDocumentNumberChange
 }) => {
-  // Auto-fill document number if empty and settings are available
   useEffect(() => {
     if (
       onDocumentNumberChange && 

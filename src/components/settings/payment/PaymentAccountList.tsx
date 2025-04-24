@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { CreditCard } from 'lucide-react';
-import { PaymentAccount } from '@/types/payment';
+import { PaymentAccount } from '@/schemas/payment';
 import PaymentAccountItem from './PaymentAccountItem';
 
 interface PaymentAccountListProps {

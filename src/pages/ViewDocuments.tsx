@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
@@ -10,7 +9,7 @@ import DocumentDetails from '@/components/documents/DocumentDetails';
 import DocumentActions from '@/components/documents/DocumentActions';
 import DocumentEditActions from '@/components/documents/DocumentEditActions';
 import { useDocumentDetails } from '@/hooks/document/useDocumentDetails';
-import { Document, BusinessDetails, DocumentItem } from '@/types/document-details';
+import { Document, BusinessDetails, DocumentItem } from '@/schemas/document-details';
 import DeleteDocumentDialog from '@/components/documents/DeleteDocumentDialog';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';

@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Document, BusinessDetails } from '@/types/document-details';
+import { Document, BusinessDetails } from '@/schemas/document-details';
 
 export const useFetchDocument = (documentId: string | undefined, userId: string | undefined) => {
   const navigate = useNavigate();

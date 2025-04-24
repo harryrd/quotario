@@ -1,7 +1,7 @@
 
 import React from 'react';
 import ClientListItem from './ClientListItem';
-import { Client } from '@/types/client';
+import { Client } from '@/schemas/client';
 import { Loader2 } from 'lucide-react';
 
 interface ClientsListProps {

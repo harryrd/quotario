@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Client, emptyClient } from '@/types/client';
+import { Client, emptyClient } from '@/schemas/client';
 import { toast } from 'sonner';
 
 interface ClientFormProps {
