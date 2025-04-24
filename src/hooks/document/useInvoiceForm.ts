@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { TableField, TableRow } from '@/components/table/types';
-import { Client } from '@/types/client';
-import { DocumentDetails } from '@/types/document';
+import { Client } from '@/schemas/client';
+import { DocumentDetails } from '@/schemas/document';
 import { useUserSettings } from '@/hooks/document/useUserSettings';
 import { useDocumentSave } from '@/hooks/document/useDocumentSave';
-import { FieldTemplate } from '@/components/settings/template/types';
+import { FieldTemplate } from '@/schemas/template';
 
 export const useInvoiceForm = (userId: string | undefined) => {
   const navigate = useNavigate();
